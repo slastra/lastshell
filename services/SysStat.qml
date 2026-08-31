@@ -12,6 +12,12 @@ Singleton {
     property real memPct: 0
     property real tempC: 0
     property real diskPct: 0
+    // tooltip detail
+    property string loadAvg: ""
+    property real memUsedGiB: 0
+    property real memTotalGiB: 0
+    property string diskUsed: ""
+    property string diskTotal: ""
 
     property var _prev: null
 
@@ -20,12 +26,13 @@ Singleton {
     // is how the first cut showed NaN% memory and a frozen 0% cpu.
     FileView { id: stat;    path: "/proc/stat";    blockLoading: true }
     FileView { id: meminfo; path: "/proc/meminfo"; blockLoading: true }
+    FileView { id: loadavg; path: "/proc/loadavg"; blockLoading: true }
 
     Timer {
         interval: 5000; running: true; repeat: true
         triggeredOnStart: true
         onTriggered: {
-            stat.reload(); meminfo.reload()
+            stat.reload(); meminfo.reload(); loadavg.reload()
             root._tick()
             temp.running = true
         }
@@ -54,6 +61,9 @@ Singleton {
             }
             // waybar's memory {}%: used = total - available
             memPct = Math.round(100 * (m["MemTotal:"] - m["MemAvailable:"]) / m["MemTotal:"])
+            memUsedGiB = (m["MemTotal:"] - m["MemAvailable:"]) / 1048576
+            memTotalGiB = m["MemTotal:"] / 1048576
+            loadAvg = loadavg.text().split(" ").slice(0, 3).join("  ")
         } catch (e) { /* mid-read; next tick corrects */ }
     }
 
@@ -72,11 +82,16 @@ Singleton {
 
     Process {
         id: df
-        command: ["sh", "-c", "df --output=pcent / | tail -1"]
+        command: ["sh", "-c", "df -h --output=pcent,used,size / | tail -1"]
         stdout: StdioCollector {
             onStreamFinished: {
-                const v = Number(text.trim().replace("%", ""))
-                if (v > 0) root.diskPct = v
+                const p = text.trim().split(/\s+/)
+                const v = Number((p[0] ?? "").replace("%", ""))
+                if (v > 0) {
+                    root.diskPct = v
+                    root.diskUsed = p[1] ?? ""
+                    root.diskTotal = p[2] ?? ""
+                }
             }
         }
     }

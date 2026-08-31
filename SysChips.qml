@@ -49,6 +49,10 @@ Row {
             color: Theme.level(SysStat.cpuPct, 25, 50)
             text: `${SysStat.cpuPct}% 󰘚`  // plain chip glyph — the cpu-64-bit one reads as a mystery '64' at bar scale
         }
+        ChipTip {
+            owner: cpu; edge: "top"; ownerHovered: cpu.hovered
+            text: `CPU ${SysStat.cpuPct}%\nload ${SysStat.loadAvg}`
+        }
     }
 
     Chip {
@@ -69,7 +73,7 @@ Row {
                 text: `${SysStat.tempC}°C`
             }
 
-            Canvas { // thermometer: mercury tracks the reading
+            Canvas { // thermometer: mercury tracks the reading (tip on chip below)
                 id: thermo
                 anchors.verticalCenter: parent.verticalCenter
                 width: 10; height: 18
@@ -107,6 +111,11 @@ Row {
                 }
             }
         }
+
+        ChipTip {
+            owner: temp; edge: "top"; ownerHovered: temp.hovered
+            text: `package temperature ${SysStat.tempC}°C\nwarning 70°C · critical 80°C`
+        }
     }
 
     Chip {
@@ -118,6 +127,10 @@ Row {
             color: Theme.level(SysStat.diskPct, 70, 90)
             text: `${SysStat.diskPct}% 󰋊`
         }
+        ChipTip {
+            owner: disk; edge: "top"; ownerHovered: disk.hovered
+            text: `/ — ${SysStat.diskUsed} of ${SysStat.diskTotal} used`
+        }
     }
 
     Chip {
@@ -128,6 +141,10 @@ Row {
             padRight: 17
             color: Theme.level(SysStat.memPct, 50, 75)
             text: `${SysStat.memPct}% 󰍛`  // nf-md memory; same story as cpu
+        }
+        ChipTip {
+            owner: mem; edge: "top"; ownerHovered: mem.hovered
+            text: `${SysStat.memUsedGiB.toFixed(1)} / ${SysStat.memTotalGiB.toFixed(1)} GiB`
         }
     }
 
