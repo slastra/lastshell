@@ -16,4 +16,5 @@ Scope {
     }
 
     TabSwitcher { id: switcher }
+    VolumeOsd {}
 }
