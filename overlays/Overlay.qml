@@ -30,27 +30,55 @@ PanelWindow {
                     Behavior on opacity { NumberAnimation { duration: Theme.animDuration } } }
     }
 
+    // Soft depth without shader effects: two translucent halos behind the card.
+    Repeater {
+        model: [ { pad: 14, a: 0.18 }, { pad: 6, a: 0.30 } ]
+        Rectangle {
+            required property var modelData
+            anchors.centerIn: parent
+            anchors.verticalCenterOffset: card.anchors.verticalCenterOffset + 5
+            width: card.width + modelData.pad
+            height: card.height + modelData.pad
+            radius: Theme.overlayRadius + modelData.pad / 2
+            color: Qt.alpha("#000000", modelData.a)
+            opacity: card.opacity
+            scale: card.scale
+        }
+    }
+
     Rectangle {
         id: card
         anchors.centerIn: parent
-        implicitHeight: inner.childrenRect.height + 32
+        anchors.verticalCenterOffset: root.open ? 0 : 10
+        implicitHeight: inner.childrenRect.height + 36
         radius: Theme.overlayRadius
         color: Theme.surface
         border.color: Theme.overlay
         border.width: 2
 
         opacity: root.open ? 1 : 0
-        scale: root.open ? 1 : 0.96
+        scale: root.open ? 1 : 0.97
         Behavior on opacity { NumberAnimation { duration: Theme.animDuration; easing.type: Easing.OutCubic } }
         Behavior on scale { NumberAnimation { duration: Theme.animDuration; easing.type: Easing.OutCubic } }
+        Behavior on anchors.verticalCenterOffset { NumberAnimation { duration: Theme.animDuration; easing.type: Easing.OutCubic } }
+
+        // hairline top highlight: catches "light" the way the OLED never will
+        Rectangle {
+            anchors.top: parent.top
+            anchors.topMargin: 2
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: parent.width - Theme.overlayRadius * 2
+            height: 1
+            color: Qt.alpha(Theme.text, 0.07)
+        }
 
         MouseArea { anchors.fill: parent } // swallow clicks inside the card
 
         Item {
             id: inner
-            x: 16; y: 16
-            width: parent.width - 32
-            height: parent.height - 32
+            x: 18; y: 18
+            width: parent.width - 36
+            height: parent.height - 36
         }
     }
 }
