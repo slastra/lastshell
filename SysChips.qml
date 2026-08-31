@@ -47,18 +47,65 @@ Row {
             height: cpu.height
             padRight: 17
             color: Theme.level(SysStat.cpuPct, 25, 50)
-            text: `${SysStat.cpuPct}% 󰻠`  // nf-md cpu; waybar's U+F4BC glyph doesn't resolve in Qt
+            text: `${SysStat.cpuPct}% 󰘚`  // plain chip glyph — the cpu-64-bit one reads as a mystery '64' at bar scale
         }
     }
 
     Chip {
         id: temp
         edge: "top"
-        ChipText {
-            height: temp.height
-            padRight: 17
-            color: Theme.level(SysStat.tempC, 70, 80)
-            text: `${SysStat.tempC}°C 󰟈`
+
+        Row {
+            height: temp.height - 2
+            spacing: 8
+            leftPadding: 12
+            rightPadding: 12
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                font.family: Theme.fontFamily
+                font.pixelSize: 16
+                color: Theme.level(SysStat.tempC, 70, 80)
+                text: `${SysStat.tempC}°C`
+            }
+
+            Canvas { // thermometer: mercury tracks the reading
+                id: thermo
+                anchors.verticalCenter: parent.verticalCenter
+                width: 10; height: 18
+                Connections {
+                    target: SysStat
+                    function onTempCChanged() { thermo.requestPaint() }
+                }
+                onPaint: {
+                    const ctx = getContext("2d")
+                    ctx.reset()
+                    const cx = width / 2
+                    const bulbR = 3.4, bulbY = height - bulbR - 1
+                    const tubeW = 3.4, tubeTop = 2
+                    const tone = Theme.level(SysStat.tempC, 70, 80)
+                    // glass
+                    ctx.lineWidth = 1.3
+                    ctx.strokeStyle = Qt.alpha(Theme.text, 0.4)
+                    ctx.beginPath()
+                    ctx.arc(cx, bulbY, bulbR, 0, 2 * Math.PI)
+                    ctx.moveTo(cx - tubeW / 2, bulbY - bulbR + 0.8)
+                    ctx.lineTo(cx - tubeW / 2, tubeTop + tubeW / 2)
+                    ctx.arc(cx, tubeTop + tubeW / 2, tubeW / 2, Math.PI, 0)
+                    ctx.lineTo(cx + tubeW / 2, bulbY - bulbR + 0.8)
+                    ctx.stroke()
+                    // mercury: 30..90°C maps to the tube; bulb always filled
+                    ctx.fillStyle = tone
+                    ctx.beginPath(); ctx.arc(cx, bulbY, bulbR - 1.2, 0, 2 * Math.PI); ctx.fill()
+                    const frac = Math.max(0, Math.min(1, (SysStat.tempC - 30) / 60))
+                    const tubeLen = (bulbY - bulbR) - tubeTop
+                    const h = frac * tubeLen
+                    if (h > 0) {
+                        ctx.fillRect(cx - (tubeW - 2.2) / 2, bulbY - bulbR - h + 1,
+                                     tubeW - 2.2, h)
+                    }
+                }
+            }
         }
     }
 
