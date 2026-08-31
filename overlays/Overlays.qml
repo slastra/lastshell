@@ -13,8 +13,10 @@ Scope {
     IpcHandler {
         target: "overlays"
         function toggleSwitcher(): void { switcher.toggle() }
+        function toggleLauncher(): void { launcher.toggle() }
     }
 
     TabSwitcher { id: switcher }
+    Launcher { id: launcher }
     VolumeOsd {}
 }

@@ -3,3 +3,5 @@ SearchOverlay 1.0 SearchOverlay.qml
 TabSwitcher 1.0 TabSwitcher.qml
 Overlays 1.0 Overlays.qml
 VolumeOsd 1.0 VolumeOsd.qml
+Launcher 1.0 Launcher.qml
+singleton Frecency 1.0 Frecency.qml
