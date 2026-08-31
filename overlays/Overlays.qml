@@ -19,4 +19,5 @@ Scope {
     TabSwitcher { id: switcher }
     Launcher { id: launcher }
     VolumeOsd {}
+    NotificationPopups {}
 }
