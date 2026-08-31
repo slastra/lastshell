@@ -24,9 +24,30 @@ SearchOverlay {
         }
     }
 
-    items: raw.map((t, i) => ({ key: t.id, label: t.label, iconSource: "file://" + t.icon }))
+    // Action rows: open a fresh window per known browser. Always offered
+    // (a browser needn't have tabs connected to be worth launching); tiny
+    // negative weight sorts them under real tabs on an empty query, while
+    // typing "new" or the browser name fuzzy-finds them instantly.
+    readonly property var browsers: [
+        { name: "Firefox", cmd: ["firefox", "--new-window"] },
+        { name: "Chrome",  cmd: ["google-chrome-stable", "--new-window"] },
+    ]
+
+    items: raw.map(t => ({ key: t.id, label: t.label, iconSource: "file://" + t.icon }))
+        .concat(browsers.map(b => ({
+            key: "new:" + b.name,
+            label: `󰐕 New ${b.name} window`,
+            iconSource: "file://" + Quickshell.env("HOME")
+                + `/.cache/tabctl/favicons/_fallback-${b.name.toLowerCase()}.png`,
+            weight: -1,
+            cmd: b.cmd,
+        })))
 
     onActivated: item => {
+        if (item.cmd) {
+            Quickshell.execDetached(item.cmd)
+            return
+        }
         const idx = root.raw.findIndex(t => t.id === item.key)
         if (idx >= 0)
             Quickshell.execDetached(

@@ -11,7 +11,7 @@ Overlay {
     property var items: []
     property string query: ""
     property string placeholder: ""
-    property int maxRows: 12
+    property int maxRows: 14
     signal activated(var item)
 
     cardWidth: 560

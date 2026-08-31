@@ -45,8 +45,11 @@ Item {
                     text: wsChip.modelData
                     height: wsChip.height
                     rightPadding: 12
+                    // empty workspaces read dim but legible — overlay-on-surface
+                    // was too faint to count at a glance
                     color: wsChip.active ? Theme.rose
-                         : root.occupied[wsChip.modelData] ? Theme.text : Theme.overlay
+                         : root.occupied[wsChip.modelData] ? Theme.text
+                         : Qt.alpha(Theme.text, 0.45)
                 }
             }
         }
