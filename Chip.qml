@@ -22,7 +22,9 @@ Rectangle {
     signal wheelDown()
 
     implicitWidth: inner.implicitWidth + 4
-    implicitHeight: Theme.barHeight - 2
+    // Uniform by construction: every chip is exactly this tall, so no
+    // instance can drift a pixel from its neighbours.
+    height: Theme.barHeight - 2
 
     color: active ? accent : Theme.overlay
     topLeftRadius: edge === "bottom" ? 8 : 0

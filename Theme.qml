@@ -15,7 +15,7 @@ QtObject {
     readonly property color foam:    "#9CCFD8"
     readonly property color iris:    "#C4A7E7"
 
-    readonly property int barHeight: 30
+    readonly property int barHeight: 34
     readonly property string fontFamily: "ShureTechMono Nerd Font"
     readonly property int animDuration: 140
     readonly property int overlayRadius: 8
