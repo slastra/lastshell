@@ -48,6 +48,12 @@ Scope {
             width: parent.width
             spacing: 8
 
+            // any card changing slot glides there — covers reflows the
+            // per-card collapse animation doesn't own
+            move: Transition {
+                NumberAnimation { properties: "y"; duration: 180; easing.type: Easing.OutCubic }
+            }
+
             Repeater {
                 model: root.toasts.slice(-5)
                 NotificationToast {
