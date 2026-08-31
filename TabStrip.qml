@@ -35,40 +35,54 @@ PanelWindow {
         color: Theme.base
 
         Row {
-            anchors.verticalCenter: parent.verticalCenter
+            anchors.bottom: parent.bottom
             anchors.left: parent.left
-            anchors.leftMargin: 6
-            spacing: 4
+            anchors.leftMargin: 8
+            spacing: 8
 
             Repeater {
                 model: root.tabs
 
+                // A literal browser-tab chip, matching the waybar CSS: surface
+                // fill, 2px overlay border on top/left/right, rounded top
+                // corners, open bottom edge; rose border when active. The
+                // outer rect is the border, the inner rect the fill, inset on
+                // three sides only so the chip stays attached to the bar edge.
                 Rectangle {
+                    id: chip
                     required property var modelData
                     required property int index
 
-                    width: 22; height: 22; radius: 5
-                    color: modelData.active ? Theme.overlay : "transparent"
+                    width: icon.width + 20
+                    height: Theme.barHeight - 2
+                    anchors.bottom: parent.bottom
+                    topLeftRadius: 8
+                    topRightRadius: 8
+                    color: modelData.active ? Theme.rose : Theme.overlay
 
-                    Image {
-                        anchors.centerIn: parent
-                        width: 18; height: 18
-                        source: "file://" + modelData.icon
-                        sourceSize: Qt.size(36, 36) // decode above device pixels
-                        smooth: true
-                        // brightness is baked into the chip the daemon picked
-                        // (bright vs -dim.png, by window focus) — don't re-dim
-                    }
+                    Rectangle {
+                        anchors.fill: parent
+                        anchors.topMargin: 2
+                        anchors.leftMargin: 2
+                        anchors.rightMargin: 2
+                        topLeftRadius: 6
+                        topRightRadius: 6
+                        color: mouse.containsMouse ? Theme.overlay : Theme.surface
 
-                    Rectangle { // active underline, reads at a glance like waybar's marker
-                        visible: modelData.active
-                        anchors.bottom: parent.bottom
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        width: 14; height: 2; radius: 1
-                        color: Theme.iris
+                        Image {
+                            id: icon
+                            anchors.centerIn: parent
+                            width: 18; height: 18
+                            source: "file://" + chip.modelData.icon
+                            sourceSize: Qt.size(36, 36) // decode above device pixels
+                            smooth: true
+                            // brightness is baked into the chip the daemon picked
+                            // (bright vs -dim.png, by window focus) — don't re-dim
+                        }
                     }
 
                     MouseArea {
+                        id: mouse
                         anchors.fill: parent
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
                         hoverEnabled: true
@@ -76,7 +90,7 @@ PanelWindow {
                             if (mouse.button === Qt.RightButton)
                                 Quickshell.execDetached(["bash", Quickshell.env("HOME") + "/.config/rofi/scripts/tabs.sh"])
                             else
-                                Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/tabstrip", "goto", String(index + 1)])
+                                Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/tabstrip", "goto", String(chip.index + 1)])
                         }
                         onWheel: wheel => {
                             const dir = wheel.angleDelta.y > 0 ? "next" : "prev"
@@ -84,7 +98,7 @@ PanelWindow {
                         }
                         ToolTip.visible: containsMouse
                         ToolTip.delay: 400
-                        ToolTip.text: modelData.label ?? ""
+                        ToolTip.text: chip.modelData.label ?? ""
                     }
                 }
             }
