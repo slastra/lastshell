@@ -12,3 +12,8 @@ VolumeChip 1.0 VolumeChip.qml
 BatteryChip 1.0 BatteryChip.qml
 Tray 1.0 Tray.qml
 ClockChip 1.0 ClockChip.qml
+SysChips 1.0 SysChips.qml
+singleton SysStat 1.0 services/SysStat.qml
+singleton Net 1.0 services/Net.qml
+singleton Weather 1.0 services/Weather.qml
+singleton Recorder 1.0 services/Recorder.qml

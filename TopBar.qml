@@ -25,6 +25,7 @@ BarWindow {
         anchors.rightMargin: 8
         spacing: 8
         Tray {}
+        SysChips {}
         VolumeChip {}
         BatteryChip {}
         ClockChip {}
