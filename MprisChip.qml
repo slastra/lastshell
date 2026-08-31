@@ -21,19 +21,37 @@ Chip {
     onWheelUp: if (player?.canGoNext) player.next()
     onWheelDown: if (player?.canGoPrevious) player.previous()
 
-    ChipText {
-        height: root.height
+    Row {
+        height: root.height - 2
+        spacing: 8
+        leftPadding: 12
         rightPadding: 12
-        font.italic: root.paused
-        text: {
-            if (!root.player) return ""
-            // nf-md plane; the classic PUA player glyphs render blank in Qt
-            const icon = (root.player.identity ?? "").toLowerCase().includes("firefox") ? "󰈹" : "󰝚"
-            const state = root.paused ? "󰏤" : "󰐊"
-            let dyn = [root.player.trackTitle, root.player.trackArtist]
-                .filter(x => x).join(" - ")
-            if (dyn.length > 40) dyn = dyn.slice(0, 39) + "…"
-            return `${state} ${icon} ${dyn}`
+
+        LucideIcon {
+            anchors.verticalCenter: parent.verticalCenter
+            name: root.paused ? "pause" : "play"
+            font.pixelSize: 13
+            color: Qt.alpha(Theme.text, 0.7)
+        }
+        LucideIcon {
+            anchors.verticalCenter: parent.verticalCenter
+            name: (root.player?.identity ?? "").toLowerCase().includes("firefox") ? "globe" : "music"
+            font.pixelSize: 13
+            color: Qt.alpha(Theme.text, 0.7)
+        }
+        Text {
+            anchors.verticalCenter: parent.verticalCenter
+            font.family: Theme.fontFamily
+            font.pixelSize: 16
+            font.italic: root.paused
+            color: Theme.text
+            text: {
+                if (!root.player) return ""
+                let dyn = [root.player.trackTitle, root.player.trackArtist]
+                    .filter(x => x).join(" - ")
+                if (dyn.length > 40) dyn = dyn.slice(0, 39) + "…"
+                return dyn
+            }
         }
     }
 }

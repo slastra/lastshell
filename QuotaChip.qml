@@ -64,15 +64,11 @@ Chip {
             Behavior on color { ColorAnimation { duration: Theme.animDuration } }
         }
 
-        Text { // frame marker: hourglass for the 5h window, calendar for weeklies
+        LucideIcon { // frame marker: hourglass for the 5h window, calendar for weeklies
             anchors.verticalCenter: parent.verticalCenter
-            // nf-md glyphs sit low on their line; nudge up to optically center
-            anchors.verticalCenterOffset: -1
-            font.family: Theme.fontFamily
             font.pixelSize: 14
             color: root.accent
-            text: root.shown.id === "5h" ? "󰔟" : "󰨴"
-            Behavior on color { ColorAnimation { duration: Theme.animDuration } }
+            name: root.shown.id === "5h" ? "hourglass" : "calendar-days"
         }
 
         Text { // model name, only where the calendar alone is ambiguous
@@ -95,11 +91,11 @@ Chip {
 
             Row { // header
                 spacing: 8
-                Text {
+                LucideIcon {
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "✳"
+                    name: "sparkles"
                     color: Theme.rose
-                    font.family: Theme.fontFamily; font.pixelSize: 14
+                    font.pixelSize: 14
                 }
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
@@ -142,10 +138,10 @@ Chip {
                             Row {
                                 anchors.left: parent.left
                                 spacing: 6
-                                Text {
-                                    text: frameRow.modelData.id === "5h" ? "󰔟" : "󰨴"
+                                LucideIcon {
+                                    name: frameRow.modelData.id === "5h" ? "hourglass" : "calendar-days"
                                     color: Qt.alpha(Theme.text, 0.55)
-                                    font.family: Theme.fontFamily; font.pixelSize: 13
+                                    font.pixelSize: 13
                                 }
                                 Text {
                                     text: frameRow.names[frameRow.modelData.id] ?? frameRow.modelData.id

@@ -32,22 +32,44 @@ Row {
             }
         }
 
-        ChipText {
-            height: net.height
-            padRight: 17
-            color: Net.connected ? Theme.foam : Theme.love
-            text: Net.connected ? `${Net.ip} 󰈀` : "Disconnected 󰈂"
+        Row {
+            height: net.height - 2
+            spacing: 8
+            leftPadding: 12
+            rightPadding: 12
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                font.family: Theme.fontFamily; font.pixelSize: 16
+                color: Net.connected ? Theme.foam : Theme.love
+                text: Net.connected ? Net.ip : "Disconnected"
+            }
+            LucideIcon {
+                anchors.verticalCenter: parent.verticalCenter
+                name: Net.connected ? "ethernet-port" : "unplug"
+                color: Net.connected ? Theme.foam : Theme.love
+            }
         }
     }
 
     Chip {
         id: cpu
         edge: "top"
-        ChipText {
-            height: cpu.height
-            padRight: 17
-            color: Theme.level(SysStat.cpuPct, 25, 50)
-            text: `${SysStat.cpuPct}% 󰘚`  // plain chip glyph — the cpu-64-bit one reads as a mystery '64' at bar scale
+        Row {
+            height: cpu.height - 2
+            spacing: 8
+            leftPadding: 12
+            rightPadding: 12
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                font.family: Theme.fontFamily; font.pixelSize: 16
+                color: Theme.level(SysStat.cpuPct, 25, 50)
+                text: `${SysStat.cpuPct}%`
+            }
+            LucideIcon {
+                anchors.verticalCenter: parent.verticalCenter
+                name: "cpu"
+                color: Theme.level(SysStat.cpuPct, 25, 50)
+            }
         }
         ChipTip {
             owner: cpu; edge: "top"; ownerHovered: cpu.hovered
@@ -121,11 +143,22 @@ Row {
     Chip {
         id: disk
         edge: "top"
-        ChipText {
-            height: disk.height
-            padRight: 17
-            color: Theme.level(SysStat.diskPct, 70, 90)
-            text: `${SysStat.diskPct}% 󰋊`
+        Row {
+            height: disk.height - 2
+            spacing: 8
+            leftPadding: 12
+            rightPadding: 12
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                font.family: Theme.fontFamily; font.pixelSize: 16
+                color: Theme.level(SysStat.diskPct, 70, 90)
+                text: `${SysStat.diskPct}%`
+            }
+            LucideIcon {
+                anchors.verticalCenter: parent.verticalCenter
+                name: "hard-drive"
+                color: Theme.level(SysStat.diskPct, 70, 90)
+            }
         }
         ChipTip {
             owner: disk; edge: "top"; ownerHovered: disk.hovered
@@ -136,11 +169,22 @@ Row {
     Chip {
         id: mem
         edge: "top"
-        ChipText {
-            height: mem.height
-            padRight: 17
-            color: Theme.level(SysStat.memPct, 50, 75)
-            text: `${SysStat.memPct}% 󰍛`  // nf-md memory; same story as cpu
+        Row {
+            height: mem.height - 2
+            spacing: 8
+            leftPadding: 12
+            rightPadding: 12
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                font.family: Theme.fontFamily; font.pixelSize: 16
+                color: Theme.level(SysStat.memPct, 50, 75)
+                text: `${SysStat.memPct}%`
+            }
+            LucideIcon {
+                anchors.verticalCenter: parent.verticalCenter
+                name: "memory-stick"
+                color: Theme.level(SysStat.memPct, 50, 75)
+            }
         }
         ChipTip {
             owner: mem; edge: "top"; ownerHovered: mem.hovered
@@ -153,12 +197,23 @@ Row {
         edge: "top"
         visible: Recorder.recording
         onClicked: Recorder.stop()
-        ChipText {
-            id: recText
-            height: rec.height
-            padRight: 17
-            color: Theme.love
-            text: "󰑊 REC"
+        Row {
+            id: recRow
+            height: rec.height - 2
+            spacing: 8
+            leftPadding: 12
+            rightPadding: 12
+            LucideIcon {
+                anchors.verticalCenter: parent.verticalCenter
+                name: "circle-dot"
+                color: Theme.love
+            }
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                font.family: Theme.fontFamily; font.pixelSize: 16
+                color: Theme.love
+                text: "REC"
+            }
             SequentialAnimation on opacity {
                 running: Recorder.recording
                 loops: Animation.Infinite

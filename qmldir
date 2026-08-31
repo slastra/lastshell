@@ -27,3 +27,5 @@ singleton Claude 1.0 services/Claude.qml
 MprisChip 1.0 MprisChip.qml
 ChipTip 1.0 ChipTip.qml
 StateDot 1.0 StateDot.qml
+singleton Lucide 1.0 Lucide.qml
+LucideIcon 1.0 LucideIcon.qml
