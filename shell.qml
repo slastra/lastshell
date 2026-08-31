@@ -1,5 +1,6 @@
 import Quickshell
 
 ShellRoot {
-    TabStrip {}
+    TopBar {}
+    BottomBar {}
 }

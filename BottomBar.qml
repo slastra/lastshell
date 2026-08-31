@@ -1,0 +1,13 @@
+import QtQuick
+
+// The bottom bar: browser tabs left, (mpris + claude strip to come) right.
+// One window, one exclusive zone — content items only below here.
+BarWindow {
+    anchors.bottom: true
+
+    TabStrip {
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.leftMargin: 8
+    }
+}

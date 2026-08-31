@@ -1,2 +1,7 @@
 singleton Theme 1.0 Theme.qml
+Chip 1.0 Chip.qml
+ChipText 1.0 ChipText.qml
+BarWindow 1.0 BarWindow.qml
 TabStrip 1.0 TabStrip.qml
+TopBar 1.0 TopBar.qml
+BottomBar 1.0 BottomBar.qml

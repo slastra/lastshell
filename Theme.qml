@@ -17,4 +17,11 @@ QtObject {
 
     readonly property int barHeight: 26
     readonly property string fontFamily: "ShureTechMono Nerd Font"
+    readonly property int animDuration: 140
+    readonly property int overlayRadius: 8
+
+    // Threshold color: value against warn/crit cutoffs, foam family base.
+    function level(v, warn, crit, base) {
+        return v >= crit ? love : v >= warn ? gold : (base ?? foam)
+    }
 }
