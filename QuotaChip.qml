@@ -66,10 +66,13 @@ Chip {
 
         Text { // frame marker: hourglass for the 5h window, calendar for weeklies
             anchors.verticalCenter: parent.verticalCenter
+            // nf-md glyphs sit low on their line; nudge up to optically center
+            anchors.verticalCenterOffset: -1
             font.family: Theme.fontFamily
             font.pixelSize: 14
-            color: Qt.alpha(Theme.text, 0.55)
+            color: root.accent
             text: root.shown.id === "5h" ? "󰔟" : "󰨴"
+            Behavior on color { ColorAnimation { duration: Theme.animDuration } }
         }
 
         Text { // model name, only where the calendar alone is ambiguous
