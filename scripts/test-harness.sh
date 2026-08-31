@@ -85,7 +85,11 @@ hyp dismissnotify >/dev/null 2>&1
 
 shot()  { WAYLAND_DISPLAY=$NWL grim "$OUT/$1.png" && echo "shot: $OUT/$1.png"; }
 key()   { WAYLAND_DISPLAY=$NWL wtype "$@"; }
-click() { WAYLAND_DISPLAY=$NWL wlrctl pointer move "$1" "$2" 2>/dev/null; WAYLAND_DISPLAY=$NWL wlrctl pointer click left; }
+# wlrctl pointer move is RELATIVE. Absolute positioning = slam into the 0,0
+# corner (motion clamps at edges), then move by the target offset.
+hover() { WAYLAND_DISPLAY=$NWL wlrctl pointer move -20000 -20000 2>/dev/null
+          WAYLAND_DISPLAY=$NWL wlrctl pointer move "$1" "$2" 2>/dev/null; }
+click() { hover "$1" "$2"; WAYLAND_DISPLAY=$NWL wlrctl pointer click left; }
 
 if [ -n "$BODY" ]; then
     # shellcheck disable=SC1090

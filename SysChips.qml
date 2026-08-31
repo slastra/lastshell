@@ -9,6 +9,29 @@ Row {
         id: net
         edge: "top"
         visible: true
+
+        Popout {
+            owner: net
+            edge: "top"
+            ownerHovered: net.hovered
+            Column {
+                spacing: 6
+                Text {
+                    text: `${Net.iface}: ${Net.ip}`
+                    color: Theme.text; font.family: Theme.fontFamily; font.pixelSize: 14
+                }
+                Text {
+                    function fmt(b) {
+                        return b > 1e6 ? `${(b / 1e6).toFixed(1)} MB/s`
+                             : b > 1e3 ? `${(b / 1e3).toFixed(0)} kB/s` : `${b.toFixed(0)} B/s`
+                    }
+                    text: `↓ ${fmt(Net.rxBps)}   ↑ ${fmt(Net.txBps)}`
+                    color: Theme.foam; font.family: Theme.fontFamily; font.pixelSize: 14
+                }
+                NetGraph { width: 240; height: 60 }
+            }
+        }
+
         ChipText {
             height: net.height
             padRight: 17
@@ -85,6 +108,18 @@ Row {
         id: weather
         edge: "top"
         visible: Weather.text !== ""
+
+        Popout {
+            owner: weather
+            edge: "top"
+            ownerHovered: weather.hovered
+            Text {
+                text: Weather.tooltip
+                textFormat: Text.RichText // wttrbar emits pango-ish markup; RichText renders the common subset
+                color: Theme.text; font.family: Theme.fontFamily; font.pixelSize: 13
+            }
+        }
+
         ChipText {
             height: weather.height
             padRight: 17

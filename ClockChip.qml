@@ -18,4 +18,11 @@ Chip {
             ? Qt.formatDateTime(clock.date, "ddd, dd MMM yyyy") + " 󰃭"
             : Qt.formatDateTime(clock.date, "hh:mm AP") + " "
     }
+
+    Popout {
+        owner: root
+        edge: "top"
+        ownerHovered: root.hovered
+        Calendar {}
+    }
 }

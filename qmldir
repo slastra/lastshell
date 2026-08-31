@@ -17,3 +17,6 @@ singleton SysStat 1.0 services/SysStat.qml
 singleton Net 1.0 services/Net.qml
 singleton Weather 1.0 services/Weather.qml
 singleton Recorder 1.0 services/Recorder.qml
+Popout 1.0 Popout.qml
+Calendar 1.0 Calendar.qml
+NetGraph 1.0 NetGraph.qml
