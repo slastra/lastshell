@@ -19,15 +19,13 @@ Row {
 
             edge: "top"
 
-            onClicked: modelData.onlyMenu ? menu.open() : modelData.activate()
-            onRightClicked: if (modelData.hasMenu) menu.open()
+            onClicked: modelData.onlyMenu ? menu.show() : modelData.activate()
+            onRightClicked: if (modelData.hasMenu) menu.show()
 
-            QsMenuAnchor {
+            TrayMenu {
                 id: menu
-                menu: slot.modelData.menu
-                anchor.item: slot
-                anchor.edges: Edges.Bottom
-                anchor.gravity: Edges.Bottom
+                owner: slot
+                handle: slot.modelData.menu
             }
 
             Item {
