@@ -155,6 +155,13 @@ Overlay {
                                     sourceSize: Qt.size(40, 40)
                                     visible: source != ""
                                 }
+                                LucideIcon {
+                                    visible: (row.modelData.lucideIcon ?? "") !== ""
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    name: row.modelData.lucideIcon ?? ""
+                                    font.pixelSize: 15
+                                    color: Qt.alpha(Theme.iris, 0.8)
+                                }
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     font.family: Theme.fontFamily

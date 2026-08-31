@@ -45,6 +45,8 @@ QtObject {
         "wand-sparkles": "\ue357",
         "check": "\ue06c",
         "volume-2": "\ue1ab",
+        "clipboard-list": "\ue086",
+        "image": "\ue0f6",
     })
 
     function icon(name) { return glyphs[name] ?? "?" }

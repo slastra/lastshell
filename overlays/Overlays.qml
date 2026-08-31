@@ -16,12 +16,14 @@ Scope {
         function toggleLauncher(): void { launcher.toggle() }
         function toggleAudio(): void { audio.toggle() }
         function toggleEffects(): void { effects.toggle() }
+        function toggleClipboard(): void { clipboard.toggle() }
     }
 
     TabSwitcher { id: switcher }
     Launcher { id: launcher }
     AudioPicker { id: audio }
     EffectPicker { id: effects }
+    ClipboardPicker { id: clipboard }
     VolumeOsd {}
     NotificationPopups {}
 }
