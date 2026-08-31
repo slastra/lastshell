@@ -35,6 +35,7 @@ Chip {
         }
         Item { // the player's real app icon, lucide music as the fallback
             anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: -1  // same optical line as everything else
             width: 16; height: 16
             Image {
                 id: appIcon
