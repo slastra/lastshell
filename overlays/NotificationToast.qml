@@ -34,6 +34,17 @@ Rectangle {
         }
     }
 
+    Text { // close — anchored to the card corner, not flowed in the row
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.topMargin: 10
+        anchors.rightMargin: 12
+        z: 1
+        text: "✕"; color: Qt.alpha(Theme.text, 0.5)
+        font.pixelSize: 14
+        TapHandler { onTapped: root.notif.dismiss() }
+    }
+
     Column {
         id: layout
         x: 12; y: 12
@@ -41,16 +52,19 @@ Rectangle {
         spacing: 6
 
         Row {
+            id: headRow
             spacing: 10
             width: parent.width
             Image {
+                id: appImage
                 width: 32; height: 32
                 visible: source != ""
                 source: root.notif.image || root.notif.appIcon || ""
                 sourceSize: Qt.size(64, 64)
             }
             Column {
-                width: parent.width - 80
+                // full row minus the icon (when shown) and the corner ✕
+                width: headRow.width - (appImage.visible ? appImage.width + headRow.spacing : 0) - 28
                 spacing: 2
                 Text {
                     text: root.notif.appName ?? ""
@@ -70,11 +84,6 @@ Rectangle {
                     elide: Text.ElideRight; visible: text !== ""
                     textFormat: Text.StyledText
                 }
-            }
-            Text { // close
-                text: "✕"; color: Qt.alpha(Theme.text, 0.5)
-                font.pixelSize: 14
-                TapHandler { onTapped: root.notif.dismiss() }
             }
         }
 
