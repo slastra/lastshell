@@ -29,28 +29,34 @@ PanelWindow {
         anchors.fill: parent
         onClicked: root.dismiss()
 
-        // Vignette mask: darkest at the edges, lighter where the card sits,
-        // so opening reads as the desktop receding and attention pooling in
-        // the middle. Painted once; the transition is transform + opacity —
-        // it breathes in with a slight contraction, fully animatable (the
-        // reason this replaced compositor blur).
+        // Vignette mask, animated as an iris: the darkness closes in from
+        // the edges toward the card as `progress` runs 0->1, and opens back
+        // out on dismiss. Repainted per frame — a radial gradient whose
+        // bright center shrinks while the edge weight lands.
         Canvas {
             id: maskCanvas
             anchors.fill: parent
-            opacity: root.open ? 1 : 0
-            scale: root.open ? 1 : 1.12
-            transformOrigin: Item.Center
-            Behavior on opacity { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
-            Behavior on scale { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
+
+            property real progress: root.open ? 1 : 0
+            Behavior on progress { NumberAnimation { duration: 320; easing.type: Easing.OutCubic } }
+            onProgressChanged: requestPaint()
+            visible: progress > 0
 
             onPaint: {
                 const ctx = getContext("2d")
                 ctx.reset()
-                const g = ctx.createRadialGradient(
-                    width / 2, height / 2, Math.min(width, height) * 0.18,
-                    width / 2, height / 2, Math.max(width, height) * 0.75)
-                g.addColorStop(0, Qt.alpha(Theme.base, 0.80))
-                g.addColorStop(1, Qt.alpha(Theme.base, 0.97))
+                if (progress === 0) return
+                const p = progress
+                const cx = width / 2, cy = height / 2
+                // outer = exact corner distance, so the corners actually land
+                // on the final stop — spanning past them flattened the whole
+                // gradient into an even dim and the vignette vanished
+                const outer = Math.hypot(cx, cy)
+                // clear pool contracts from everything -> a halo round the card
+                const inner = outer * (0.95 - 0.83 * p)
+                const g = ctx.createRadialGradient(cx, cy, inner, cx, cy, outer)
+                g.addColorStop(0, Qt.alpha(Theme.base, 0.45 * p))
+                g.addColorStop(1, Qt.alpha(Theme.base, 1.0 * p))
                 ctx.fillStyle = g
                 ctx.fillRect(0, 0, width, height)
             }
