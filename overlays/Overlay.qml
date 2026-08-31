@@ -62,16 +62,6 @@ PanelWindow {
         Behavior on scale { NumberAnimation { duration: Theme.animDuration; easing.type: Easing.OutCubic } }
         Behavior on anchors.verticalCenterOffset { NumberAnimation { duration: Theme.animDuration; easing.type: Easing.OutCubic } }
 
-        // hairline top highlight: catches "light" the way the OLED never will
-        Rectangle {
-            anchors.top: parent.top
-            anchors.topMargin: 2
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: parent.width - Theme.overlayRadius * 2
-            height: 1
-            color: Qt.alpha(Theme.text, 0.07)
-        }
-
         MouseArea { anchors.fill: parent } // swallow clicks inside the card
 
         Item {

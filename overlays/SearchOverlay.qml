@@ -106,21 +106,17 @@ Overlay {
                 ? root.filtered.length * root.rowH + (root.filtered.length - 1) * 2
                 : 34
 
-            Rectangle { // cursor plate + blade, one element gliding between rows
+            Rectangle { // cursor plate: rose outline, gliding between rows —
+                        // the same active language the bar chips speak
                 visible: root.filtered.length > 0
                 y: root.cursor * (root.rowH + 2)
                 width: parent.width
                 height: root.rowH
                 radius: 6
                 color: Theme.overlay
+                border.width: 2
+                border.color: Qt.alpha(Theme.rose, 0.8)
                 Behavior on y { NumberAnimation { duration: 110; easing.type: Easing.OutCubic } }
-
-                Rectangle {
-                    anchors.left: parent.left
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: 3; height: 24; radius: 1.5
-                    color: Theme.rose
-                }
             }
 
             Column {
