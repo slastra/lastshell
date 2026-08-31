@@ -64,7 +64,16 @@ Chip {
             Behavior on color { ColorAnimation { duration: Theme.animDuration } }
         }
 
-        Text { // frame label, quiet
+        Text { // frame marker: hourglass for the 5h window, calendar for weeklies
+            anchors.verticalCenter: parent.verticalCenter
+            font.family: Theme.fontFamily
+            font.pixelSize: 14
+            color: Qt.alpha(Theme.text, 0.55)
+            text: root.shown.id === "5h" ? "󰔟" : "󰨴"
+        }
+
+        Text { // model name, only where the calendar alone is ambiguous
+            visible: root.shown.id !== "5h" && root.shown.id !== "wk"
             anchors.verticalCenter: parent.verticalCenter
             font.family: Theme.fontFamily
             font.pixelSize: 12
@@ -106,7 +115,9 @@ Chip {
                         x: 62
                         anchors.verticalCenter: parent.verticalCenter
                         width: 120; height: 6; radius: 3
-                        color: Theme.overlay
+                        // empty space in a faint wash of the frame's own color,
+                        // matching the ring-track treatment
+                        color: Qt.alpha(parent.tone, 0.22)
                         Rectangle {
                             width: parent.width * Math.min(1, parent.parent.modelData.pct / 100)
                             height: parent.height; radius: 3
