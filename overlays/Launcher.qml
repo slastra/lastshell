@@ -10,7 +10,7 @@ import ".."  // root module: Theme and friends
 SearchOverlay {
     id: root
 
-    placeholder: "windows & apps…"
+    typeIcon: "rocket"
 
     property var windows: []
 

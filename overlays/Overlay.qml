@@ -12,6 +12,7 @@ PanelWindow {
     property bool open: false
     default property alias content: inner.data
     property alias cardWidth: card.implicitWidth
+    property int contentPadding: 18
 
     function toggle() { open = !open }
     function dismiss() { open = false }
@@ -50,7 +51,7 @@ PanelWindow {
         id: card
         anchors.centerIn: parent
         anchors.verticalCenterOffset: root.open ? 0 : 10
-        implicitHeight: inner.childrenRect.height + 36
+        implicitHeight: inner.childrenRect.height + root.contentPadding * 2
         radius: Theme.overlayRadius
         color: Theme.surface
         border.color: Theme.overlay
@@ -66,9 +67,9 @@ PanelWindow {
 
         Item {
             id: inner
-            x: 18; y: 18
-            width: parent.width - 36
-            height: parent.height - 36
+            x: root.contentPadding; y: root.contentPadding
+            width: parent.width - root.contentPadding * 2
+            height: parent.height - root.contentPadding * 2
         }
     }
 }

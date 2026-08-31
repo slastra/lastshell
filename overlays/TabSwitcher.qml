@@ -10,7 +10,7 @@ import ".."  // root module: Theme and friends
 SearchOverlay {
     id: root
 
-    placeholder: "switch tab…"
+    typeIcon: "app-window"
     property var raw: []
 
     FileView {

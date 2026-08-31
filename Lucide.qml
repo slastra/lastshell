@@ -37,6 +37,9 @@ QtObject {
         "cloud-sun-rain": "\ue2fb",
         "cloud-moon-rain": "\ue2fa",
         "tornado": "\ue218",
+        "search": "\ue151",
+        "rocket": "\ue286",
+        "app-window": "\ue426",
     })
 
     function icon(name) { return glyphs[name] ?? "?" }

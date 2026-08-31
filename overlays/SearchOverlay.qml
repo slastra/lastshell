@@ -2,20 +2,21 @@ import QtQuick
 import ".."  // root module: Theme and friends
 import "Fuzzy.js" as Fuzzy
 
-// Shared switcher/launcher chrome: type-to-filter list, keyboard driven.
-// Feed `items` ([{key,label,sublabel,iconSource,weight,...}]). Matched
-// characters light up gold; a rose blade slides between rows instead of
-// each row painting its own cursor.
+// Shared switcher/launcher chrome, cut into three sections:
+//   header  identity icon + the query (fixed caret, no placeholder ghost)
+//   body    the filtered list with its gliding rose-outline cursor
+//   footer  key hints and the live result count
 Overlay {
     id: root
 
     property var items: []
     property string query: ""
-    property string placeholder: ""
+    property string typeIcon: "search"   // lucide name marking what this modal is
     property int maxRows: 14
     signal activated(var item)
 
     cardWidth: 560
+    contentPadding: 2  // sections run full-bleed inside the card border
     readonly property int rowH: 40
 
     readonly property var filtered: {
@@ -38,7 +39,6 @@ Overlay {
 
     Column {
         width: parent.width
-        spacing: 10
         focus: true
 
         Keys.onPressed: event => {
@@ -59,38 +59,42 @@ Overlay {
             event.accepted = true
         }
 
-        Rectangle { // query field: the modal's focal point
+        Rectangle { // ── header: identity + input
             width: parent.width
-            height: 42
-            radius: 7
+            height: 54
+            topLeftRadius: 6
+            topRightRadius: 6
             color: Theme.overlay
-            // hairline that warms up while a query is live
-            border.width: 1
-            border.color: root.query !== "" ? Qt.alpha(Theme.rose, 0.5) : Qt.alpha(Theme.iris, 0.25)
-            Behavior on border.color { ColorAnimation { duration: Theme.animDuration } }
 
             Row {
                 anchors.verticalCenter: parent.verticalCenter
-                x: 14
-                spacing: 10
-                Text { // prompt glyph
+                x: 18
+                spacing: 12
+
+                LucideIcon {
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "❯"
-                    color: root.query !== "" ? Theme.rose : Qt.alpha(Theme.iris, 0.7)
-                    font.family: Theme.fontFamily; font.pixelSize: 16
-                    Behavior on color { ColorAnimation { duration: Theme.animDuration } }
+                    name: root.typeIcon
+                    font.pixelSize: 18
+                    color: Theme.rose
                 }
+
+                Rectangle { // hairline separates identity from input
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: 1; height: 22
+                    color: Qt.alpha(Theme.text, 0.15)
+                }
+
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     font.family: Theme.fontFamily
-                    font.pixelSize: 16
-                    color: root.query === "" ? Qt.alpha(Theme.text, 0.35) : Theme.text
-                    text: root.query === "" ? root.placeholder : root.query
+                    font.pixelSize: 17
+                    color: Theme.text
+                    text: root.query
                 }
-                Rectangle { // caret
-                    visible: root.open
+
+                Rectangle { // caret: fixed home position, rides the query
                     anchors.verticalCenter: parent.verticalCenter
-                    width: 2; height: 20; color: Theme.rose
+                    width: 2; height: 22; color: Theme.rose
                     SequentialAnimation on opacity {
                         running: root.open; loops: Animation.Infinite
                         NumberAnimation { to: 0; duration: 500 }
@@ -100,91 +104,108 @@ Overlay {
             }
         }
 
-        Item { // result list with a sliding cursor blade
+        Rectangle { width: parent.width; height: 1; color: Qt.alpha("#000000", 0.35) }
+
+        Item { // ── body: results
             width: parent.width
-            height: root.filtered.length > 0
+            height: (root.filtered.length > 0
                 ? root.filtered.length * root.rowH + (root.filtered.length - 1) * 2
-                : 34
+                : 40) + 20
 
-            Rectangle { // cursor plate: rose outline, gliding between rows —
-                        // the same active language the bar chips speak
-                visible: root.filtered.length > 0
-                y: root.cursor * (root.rowH + 2)
-                width: parent.width
-                height: root.rowH
-                radius: 6
-                color: Theme.overlay
-                border.width: 2
-                border.color: Qt.alpha(Theme.rose, 0.8)
-                Behavior on y { NumberAnimation { duration: 110; easing.type: Easing.OutCubic } }
-            }
+            Item {
+                x: 10; y: 10
+                width: parent.width - 20
+                height: parent.height - 20
 
-            Column {
-                width: parent.width
-                spacing: 2
+                Rectangle { // gliding rose-outline cursor plate
+                    visible: root.filtered.length > 0
+                    y: root.cursor * (root.rowH + 2)
+                    width: parent.width
+                    height: root.rowH
+                    radius: 6
+                    color: Theme.overlay
+                    border.width: 2
+                    border.color: Qt.alpha(Theme.rose, 0.8)
+                    Behavior on y { NumberAnimation { duration: 110; easing.type: Easing.OutCubic } }
+                }
 
-                Repeater {
-                    model: root.filtered
+                Column {
+                    width: parent.width
+                    spacing: 2
 
-                    Item {
-                        id: row
-                        required property var modelData
-                        required property int index
-                        width: parent.width
-                        height: root.rowH
+                    Repeater {
+                        model: root.filtered
 
-                        Row {
-                            anchors.verticalCenter: parent.verticalCenter
-                            x: 14
-                            spacing: 10
-                            Image {
+                        Item {
+                            id: row
+                            required property var modelData
+                            required property int index
+                            width: parent.width
+                            height: root.rowH
+
+                            Row {
                                 anchors.verticalCenter: parent.verticalCenter
-                                width: 20; height: 20
-                                source: row.modelData.iconSource ?? ""
-                                sourceSize: Qt.size(40, 40)
-                                visible: source != ""
+                                x: 14
+                                spacing: 10
+                                Image {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: 20; height: 20
+                                    source: row.modelData.iconSource ?? ""
+                                    sourceSize: Qt.size(40, 40)
+                                    visible: source != ""
+                                }
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    font.family: Theme.fontFamily
+                                    font.pixelSize: 15
+                                    color: row.index === root.cursor ? Theme.text : Qt.alpha(Theme.text, 0.75)
+                                    textFormat: Text.StyledText
+                                    text: Fuzzy.highlight(row.modelData.label, row.modelData._idx, Theme.gold.toString())
+                                    width: 450
+                                    elide: Text.ElideRight
+                                }
                             }
-                            Text {
-                                anchors.verticalCenter: parent.verticalCenter
-                                font.family: Theme.fontFamily
-                                font.pixelSize: 15
-                                color: row.index === root.cursor ? Theme.text : Qt.alpha(Theme.text, 0.75)
-                                textFormat: Text.StyledText
-                                text: Fuzzy.highlight(row.modelData.label, row.modelData._idx, Theme.gold.toString())
-                                width: 460
-                                elide: Text.ElideRight
-                            }
-                        }
 
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: { root.cursor = row.index; root.activate() }
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: { root.cursor = row.index; root.activate() }
+                            }
                         }
                     }
                 }
-            }
 
-            Text { // empty state
-                visible: root.filtered.length === 0
-                anchors.centerIn: parent
-                text: "no matches"
-                color: Qt.alpha(Theme.love, 0.7)
-                font.family: Theme.fontFamily; font.pixelSize: 14
-                font.italic: true
+                Text { // empty state
+                    visible: root.filtered.length === 0
+                    anchors.centerIn: parent
+                    text: "no matches"
+                    color: Qt.alpha(Theme.love, 0.7)
+                    font.family: Theme.fontFamily; font.pixelSize: 14
+                    font.italic: true
+                }
             }
         }
 
-        Item { // footer: hints left, count right
+        Rectangle { width: parent.width; height: 1; color: Qt.alpha("#000000", 0.35) }
+
+        Rectangle { // ── footer: hints + count
             width: parent.width
-            height: 18
+            height: 32
+            bottomLeftRadius: 6
+            bottomRightRadius: 6
+            color: Qt.alpha(Theme.overlay, 0.55)
+
             Text {
                 anchors.left: parent.left
+                anchors.leftMargin: 18
+                anchors.verticalCenter: parent.verticalCenter
                 text: "↑↓ navigate   ↵ open   esc close"
                 color: Qt.alpha(Theme.iris, 0.55)
                 font.family: Theme.fontFamily; font.pixelSize: 12
             }
             Text {
                 anchors.right: parent.right
+                anchors.rightMargin: 18
+                anchors.verticalCenter: parent.verticalCenter
                 text: root.query === "" ? `${root.items.length}` : `${root.filtered.length}/${root.items.length}`
                 color: Qt.alpha(Theme.text, 0.4)
                 font.family: Theme.fontFamily; font.pixelSize: 12
