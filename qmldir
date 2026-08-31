@@ -8,3 +8,7 @@ BottomBar 1.0 BottomBar.qml
 Workspaces 1.0 Workspaces.qml
 WindowTitle 1.0 WindowTitle.qml
 Taskbar 1.0 Taskbar.qml
+VolumeChip 1.0 VolumeChip.qml
+BatteryChip 1.0 BatteryChip.qml
+Tray 1.0 Tray.qml
+ClockChip 1.0 ClockChip.qml

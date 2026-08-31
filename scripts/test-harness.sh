@@ -79,6 +79,9 @@ cleanup() { kill $QS_PID $HYPR_PID 2>/dev/null; }
 trap cleanup EXIT INT TERM
 
 sleep 3
+# Hyprland paints a "started without start-hyprland" error banner over the top
+# edge in debug environments — exactly where the top bar lives. Dismiss it.
+hyp dismissnotify >/dev/null 2>&1
 
 shot()  { WAYLAND_DISPLAY=$NWL grim "$OUT/$1.png" && echo "shot: $OUT/$1.png"; }
 key()   { WAYLAND_DISPLAY=$NWL wtype "$@"; }

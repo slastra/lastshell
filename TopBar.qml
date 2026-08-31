@@ -18,4 +18,15 @@ BarWindow {
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
     }
+
+    Row {
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.rightMargin: 8
+        spacing: 8
+        Tray {}
+        VolumeChip {}
+        BatteryChip {}
+        ClockChip {}
+    }
 }
