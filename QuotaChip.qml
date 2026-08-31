@@ -152,6 +152,15 @@ Chip {
                                     color: Qt.alpha(Theme.text, 0.85)
                                     font.family: Theme.fontFamily; font.pixelSize: 13
                                 }
+                                Text {
+                                    visible: text !== ""
+                                    text: {
+                                        const r = frameRow.resetsIn(frameRow.modelData.resets)
+                                        return r ? `(${r})` : ""
+                                    }
+                                    color: Qt.alpha(Theme.text, 0.4)
+                                    font.family: Theme.fontFamily; font.pixelSize: 12
+                                }
                             }
                             Text {
                                 anchors.right: parent.right
@@ -161,26 +170,15 @@ Chip {
                             }
                         }
 
-                        Item {
-                            width: 264; height: 12
+                        Rectangle {
+                            width: 264; height: 6; radius: 3
+                            // same neutral track as the ring on the chip
+                            color: Qt.alpha(Theme.text, 0.22)
                             Rectangle {
-                                anchors.verticalCenter: parent.verticalCenter
-                                width: 190; height: 6; radius: 3
-                                // same neutral track as the ring on the chip
-                                color: Qt.alpha(Theme.text, 0.22)
-                                Rectangle {
-                                    width: parent.width * Math.min(1, frameRow.modelData.pct / 100)
-                                    height: parent.height; radius: 3
-                                    color: frameRow.tone
-                                    Behavior on width { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
-                                }
-                            }
-                            Text {
-                                anchors.right: parent.right
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: frameRow.resetsIn(frameRow.modelData.resets)
-                                color: Qt.alpha(Theme.text, 0.45)
-                                font.family: Theme.fontFamily; font.pixelSize: 11
+                                width: parent.width * Math.min(1, frameRow.modelData.pct / 100)
+                                height: parent.height; radius: 3
+                                color: frameRow.tone
+                                Behavior on width { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
                             }
                         }
                     }
