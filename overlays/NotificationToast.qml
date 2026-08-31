@@ -127,8 +127,8 @@ Rectangle {
             Column {
                 width: headRow.width - (appImage.visible ? appImage.width + headRow.spacing : 0) - 28
                 spacing: 2
-                Item {
-                    width: parent.width; height: appName.implicitHeight
+                Row {
+                    spacing: 8
                     Text {
                         id: appName
                         text: root.notif.appName ?? ""
@@ -137,7 +137,7 @@ Rectangle {
                         visible: text !== ""
                     }
                     Text {
-                        anchors.right: parent.right
+                        anchors.baseline: appName.baseline
                         text: Qt.formatTime(new Date(), "hh:mm AP")
                         color: Qt.alpha(Theme.text, 0.35)
                         font.family: Theme.fontFamily; font.pixelSize: 11
