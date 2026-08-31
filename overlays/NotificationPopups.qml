@@ -11,7 +11,8 @@ Scope {
     id: root
 
     property bool enabled: Quickshell.env("LASTSHELL_NOTIFS") === "1"
-    property var toasts: []
+
+    ListModel { id: toasts }
 
     NotificationServer {
         id: server
@@ -23,50 +24,64 @@ Scope {
         onNotification: n => {
             if (!root.enabled) return
             n.tracked = true
-            root.toasts = root.toasts.concat([n])
-            // mirror mako's lamp hook so cutover is behavior-neutral
+            toasts.append({ notif: n })
+            if (toasts.count > 5) toasts.remove(0)
             const lamp = Quickshell.env("HOME") + "/.config/mako/scripts/lamp.sh"
             Quickshell.execDetached(["bash", lamp, n.urgency === 2 ? "alert" : "info"])
         }
     }
 
-    function drop(n) { root.toasts = root.toasts.filter(t => t !== n) }
+    function drop(n, dismissToo) {
+        for (let i = 0; i < toasts.count; i++)
+            if (toasts.get(i).notif === n) { toasts.remove(i); break }
+        if (dismissToo) n.dismiss()
+    }
+
+    Timer { // prune notifications dismissed server-side
+        interval: 2000; running: toasts.count > 0; repeat: true
+        onTriggered: {
+            for (let i = toasts.count - 1; i >= 0; i--)
+                if (!toasts.get(i).notif.tracked) toasts.remove(i)
+        }
+    }
 
     PanelWindow {
-        visible: root.enabled && root.toasts.length > 0
+        visible: root.enabled && toasts.count > 0
         color: "transparent"
         anchors { top: true; right: true }
         margins { top: Theme.barHeight + 10; right: 10 }
         implicitWidth: 380
-        implicitHeight: stack.implicitHeight
+        implicitHeight: stack.contentHeight
         exclusionMode: ExclusionMode.Ignore
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
-        Column {
+        ListView {
             id: stack
-            width: parent.width
+            anchors.fill: parent
+            interactive: false
             spacing: 8
+            // NOT `model: model` — that self-references the ListView's own
+            // model property and silently renders nothing
+            model: toasts
 
-            // any card changing slot glides there — covers reflows the
-            // per-card collapse animation doesn't own
-            move: Transition {
-                NumberAnimation { properties: "y"; duration: 180; easing.type: Easing.OutCubic }
+            delegate: NotificationToast {
+                // `notif` is the component's own required property; the model
+                // role fills it — redeclaring here shadows and breaks it
+                onWantsOut: dismissToo => root.drop(notif, dismissToo)
             }
 
-            Repeater {
-                model: root.toasts.slice(-5)
-                NotificationToast {
-                    required property var modelData
-                    notif: modelData
-                    onExpired: root.drop(modelData)
-                }
+            add: Transition {
+                NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 180; easing.type: Easing.OutCubic }
+                NumberAnimation { property: "x"; from: 40; to: 0; duration: 180; easing.type: Easing.OutCubic }
+            }
+            remove: Transition {
+                NumberAnimation { property: "opacity"; to: 0; duration: 170; easing.type: Easing.InCubic }
+                NumberAnimation { property: "x"; to: 40; duration: 170; easing.type: Easing.InCubic }
+            }
+            displaced: Transition {
+                NumberAnimation { property: "y"; duration: 200; easing.type: Easing.OutCubic }
             }
         }
-    }
-
-    Timer { // prune notifications dismissed server-side (sender close, dismiss())
-        interval: 2000; running: root.toasts.length > 0; repeat: true
-        onTriggered: root.toasts = root.toasts.filter(t => t.tracked)
     }
 }
