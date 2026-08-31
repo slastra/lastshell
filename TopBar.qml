@@ -4,4 +4,18 @@ import QtQuick
 // chips right. Modules land here phase by phase.
 BarWindow {
     anchors.top: true
+
+    Row {
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.leftMargin: 8
+        spacing: 8
+        Workspaces {}
+        WindowTitle { anchors.top: parent.top }
+    }
+
+    Taskbar {
+        anchors.top: parent.top
+        anchors.horizontalCenter: parent.horizontalCenter
+    }
 }

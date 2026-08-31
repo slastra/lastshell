@@ -5,3 +5,6 @@ BarWindow 1.0 BarWindow.qml
 TabStrip 1.0 TabStrip.qml
 TopBar 1.0 TopBar.qml
 BottomBar 1.0 BottomBar.qml
+Workspaces 1.0 Workspaces.qml
+WindowTitle 1.0 WindowTitle.qml
+Taskbar 1.0 Taskbar.qml
