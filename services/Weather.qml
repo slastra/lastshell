@@ -9,11 +9,45 @@ Singleton {
 
     property string text: ""
     property string tooltip: ""
+    // parsed from the tooltip: current conditions + per-day hi/lo
+    property var now: ({})
+    property var days: []
 
     Timer {
         interval: 1800000; running: true; repeat: true
         triggeredOnStart: true
         onTriggered: proc.running = true
+    }
+
+    // wttrbar's tooltip is a fixed shape: a current-conditions block, then
+    // one <b>DayName, date</b> header per day followed by a hi/lo line.
+    // Distil it: the hourly rows are noise at popout scale.
+    function parse(tip) {
+        const lines = tip.split("\n")
+        const n = {}
+        const cond = lines[0]?.match(/<b>(.+)<\/b>\s*(-?\d+)°/)
+        if (cond) { n.condition = cond[1]; n.temp = cond[2] }
+        for (const l of lines.slice(1, 6)) {
+            let m
+            if ((m = l.match(/Feels Like:\s*(-?\d+)°/))) n.feels = m[1]
+            else if ((m = l.match(/Wind:\s*(.+)/))) n.wind = m[1]
+            else if ((m = l.match(/Humidity:\s*(.+)/))) n.humidity = m[1]
+        }
+        const d = []
+        for (let i = 0; i < lines.length - 1; i++) {
+            const h = lines[i].match(/^<b>([^,<]+)(?:, [\d-]+)?<\/b>$/)
+            if (!h) continue
+            const hl = lines[i + 1].match(/(-?\d+)°.*?(-?\d+)°/)
+            if (!hl) continue
+            // beyond Today/Tomorrow the header is a bare date — show the
+            // weekday name instead ("Wednesday" beats "2026-09-02")
+            let name = h[1]
+            if (/^\d{4}-\d{2}-\d{2}$/.test(name))
+                name = Qt.formatDate(new Date(name + "T12:00:00"), "dddd")
+            d.push({ name: name, hi: hl[1], lo: hl[2] })
+        }
+        root.now = n
+        root.days = d
     }
 
     Process {
@@ -26,6 +60,7 @@ Singleton {
                     const j = JSON.parse(text)
                     root.text = j.text ?? ""
                     root.tooltip = j.tooltip ?? ""
+                    root.parse(j.tooltip ?? "")
                 } catch (e) { /* network hiccup; old value stands */ }
             }
         }

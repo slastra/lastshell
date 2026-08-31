@@ -113,10 +113,48 @@ Row {
             owner: weather
             edge: "top"
             ownerHovered: weather.hovered
-            Text {
-                text: Weather.tooltip
-                textFormat: Text.RichText // wttrbar emits pango-ish markup; RichText renders the common subset
-                color: Theme.text; font.family: Theme.fontFamily; font.pixelSize: 13
+
+            Column {
+                spacing: 8
+
+                Row {
+                    spacing: 8
+                    Text {
+                        text: `${Weather.now.condition ?? "—"}`
+                        color: Theme.text; font.family: Theme.fontFamily
+                        font.pixelSize: 15; font.bold: true
+                    }
+                    Text {
+                        text: `${Weather.now.temp ?? "?"}°`
+                        color: Theme.foam; font.family: Theme.fontFamily
+                        font.pixelSize: 15
+                    }
+                }
+                Text {
+                    text: `feels ${Weather.now.feels ?? "?"}°  ·  ${Weather.now.wind ?? ""}  ·  ${Weather.now.humidity ?? ""}`
+                    color: Qt.alpha(Theme.text, 0.6)
+                    font.family: Theme.fontFamily; font.pixelSize: 12
+                }
+                Rectangle { width: 200; height: 1; color: Theme.overlay }
+                Repeater {
+                    model: Weather.days
+                    Item {
+                        required property var modelData
+                        width: 200; height: 20
+                        Text {
+                            anchors.left: parent.left
+                            text: modelData.name
+                            color: Qt.alpha(Theme.text, 0.8)
+                            font.family: Theme.fontFamily; font.pixelSize: 13
+                        }
+                        Text {
+                            anchors.right: parent.right
+                            text: `${modelData.hi}° / ${modelData.lo}°`
+                            color: Theme.foam
+                            font.family: Theme.fontFamily; font.pixelSize: 13
+                        }
+                    }
+                }
             }
         }
 
