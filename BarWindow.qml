@@ -1,11 +1,10 @@
 import Quickshell
 import QtQuick
 
-// A bar shell: full-width transparent panel. During the parallel run with
-// waybar it reserves NO exclusive zone (waybar keeps the layout); flip
-// `reserve: true` at cutover.
+// A bar shell: full-width transparent panel reserving its strip of the
+// screen. (`reserve: false` existed for the parallel run with waybar.)
 PanelWindow {
-    property bool reserve: false
+    property bool reserve: true
     implicitHeight: Theme.barHeight
     color: "transparent"
     exclusiveZone: reserve ? Theme.barHeight : 0
