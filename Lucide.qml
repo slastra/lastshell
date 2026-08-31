@@ -40,6 +40,7 @@ QtObject {
         "search": "\ue151",
         "rocket": "\ue286",
         "app-window": "\ue426",
+        "chevron-right": "\ue06f",
     })
 
     function icon(name) { return glyphs[name] ?? "?" }

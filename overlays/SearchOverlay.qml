@@ -78,10 +78,11 @@ Overlay {
                     color: Theme.rose
                 }
 
-                Rectangle { // hairline separates identity from input
+                LucideIcon { // chevron leads from identity into the input
                     anchors.verticalCenter: parent.verticalCenter
-                    width: 1; height: 22
-                    color: Qt.alpha(Theme.text, 0.15)
+                    name: "chevron-right"
+                    font.pixelSize: 14
+                    color: Qt.alpha(Theme.text, 0.35)
                 }
 
                 Text {
