@@ -32,6 +32,7 @@ Chip {
         Canvas { // the face
             id: face
             anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: -1
             width: 18; height: 18
 
             // fractional hour drives the hand; minutes advance it smoothly

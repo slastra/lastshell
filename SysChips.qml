@@ -98,6 +98,7 @@ Row {
             Canvas { // thermometer: mercury tracks the reading (tip on chip below)
                 id: thermo
                 anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: -1
                 width: 10; height: 18
                 Connections {
                     target: SysStat

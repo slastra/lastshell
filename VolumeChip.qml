@@ -66,6 +66,7 @@ Chip {
         Canvas { // drawn speaker: wave arcs grow with volume, slash when muted
             id: spk
             anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: -1
             width: 18; height: 18
 
             Connections {
