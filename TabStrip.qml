@@ -30,9 +30,11 @@ PanelWindow {
         }
     }
 
-    Rectangle {
+    // No panel background — matches waybar's `window#waybar.fftabs
+    // { background-color: transparent }`: the chips float on whatever is
+    // behind the bar, carrying their own fills.
+    Item {
         anchors.fill: parent
-        color: Theme.base
 
         Row {
             anchors.bottom: parent.bottom
