@@ -10,3 +10,4 @@ NotificationPopups 1.0 NotificationPopups.qml
 AudioPicker 1.0 AudioPicker.qml
 EffectPicker 1.0 EffectPicker.qml
 ClipboardPicker 1.0 ClipboardPicker.qml
+NotificationCenter 1.0 NotificationCenter.qml

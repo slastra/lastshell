@@ -13,6 +13,8 @@ Scope {
     property bool enabled: Quickshell.env("LASTSHELL_NOTIFS") === "1"
 
     ListModel { id: toasts }
+    ListModel { id: history }
+    property ListModel historyModel: history
 
     NotificationServer {
         id: server
@@ -26,6 +28,8 @@ Scope {
             n.tracked = true
             toasts.append({ notif: n })
             if (toasts.count > 5) toasts.remove(0)
+            history.insert(0, { notif: n, time: Qt.formatTime(new Date(), "hh:mm AP") })
+            if (history.count > 50) history.remove(50)
             const lamp = Quickshell.env("HOME") + "/.config/mako/scripts/lamp.sh"
             Quickshell.execDetached(["bash", lamp, n.urgency === 2 ? "alert" : "info"])
         }
@@ -37,11 +41,13 @@ Scope {
         if (dismissToo) n.dismiss()
     }
 
-    Timer { // prune notifications dismissed server-side
-        interval: 2000; running: toasts.count > 0; repeat: true
+    Timer { // prune dismissed notifications from both models
+        interval: 2000; running: toasts.count > 0 || history.count > 0; repeat: true
         onTriggered: {
             for (let i = toasts.count - 1; i >= 0; i--)
                 if (!toasts.get(i).notif.tracked) toasts.remove(i)
+            for (let i = history.count - 1; i >= 0; i--)
+                if (!history.get(i).notif.tracked) history.remove(i)
         }
     }
 

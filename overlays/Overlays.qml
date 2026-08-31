@@ -17,6 +17,7 @@ Scope {
         function toggleAudio(): void { audio.toggle() }
         function toggleEffects(): void { effects.toggle() }
         function toggleClipboard(): void { clipboard.toggle() }
+        function toggleNotifications(): void { center.toggle() }
     }
 
     TabSwitcher { id: switcher }
@@ -25,5 +26,6 @@ Scope {
     EffectPicker { id: effects }
     ClipboardPicker { id: clipboard }
     VolumeOsd {}
-    NotificationPopups {}
+    NotificationPopups { id: popups }
+    NotificationCenter { id: center; history: popups.historyModel }
 }

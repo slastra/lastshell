@@ -47,6 +47,9 @@ QtObject {
         "volume-2": "\ue1ab",
         "clipboard-list": "\ue086",
         "image": "\ue0f6",
+        "bell": "\ue059",
+        "trash-2": "\ue18e",
+        "inbox": "\ue0f7",
     })
 
     function icon(name) { return glyphs[name] ?? "?" }
