@@ -17,8 +17,9 @@ Rectangle {
     readonly property int timeout: 6000
     readonly property bool sticky: urgency === 2
 
+    property real slotFactor: 1  // collapses the stack gap on leave
     width: 380
-    implicitHeight: layout.implicitHeight + 24
+    implicitHeight: (layout.implicitHeight + 24) * slotFactor
     radius: Theme.overlayRadius
     color: Theme.surface
     border.color: Theme.overlay
@@ -30,31 +31,49 @@ Rectangle {
     transform: Translate { id: slide; x: 40 }
     Component.onCompleted: { opacity = 1; slide.x = 0 }
     Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+    Behavior on slotFactor { NumberAnimation { duration: 160; easing.type: Easing.InCubic } }
+
+    // leave: reverse the entrance, then give the slot back, then report done.
+    // Every removal path routes through here so nothing pops out abruptly.
+    property bool leaving: false
+    property bool alsoDismiss: false
+    function leave(dismissToo) {
+        if (leaving) return
+        leaving = true
+        alsoDismiss = dismissToo === true
+        opacity = 0
+        slide.x = 40
+        slotTimer.start()
+    }
+    Timer {
+        id: slotTimer
+        interval: 190
+        onTriggered: { root.slotFactor = 0; doneTimer.start() }
+    }
+    Timer {
+        id: doneTimer
+        interval: 170
+        onTriggered: {
+            if (root.alsoDismiss) root.notif.dismiss()
+            root.expired()
+        }
+    }
 
     Timer {
         id: expiry
         interval: root.timeout
-        running: !root.sticky && !hover.hovered
-        onTriggered: root.expired()
+        running: !root.sticky && !hover.hovered && !root.leaving
+        onTriggered: root.leave(false)
     }
     HoverHandler { id: hover }
 
     TapHandler {
         onTapped: {
+            if (root.leaving) return
             const def = root.notif.actions?.find(a => a.identifier === "default") ?? root.notif.actions?.[0]
             if (def) def.invoke()
-            root.notif.dismiss()
+            root.leave(true)
         }
-    }
-
-    Rectangle { // urgency accent
-        anchors.left: parent.left
-        anchors.leftMargin: 2
-        anchors.verticalCenter: parent.verticalCenter
-        width: 4
-        height: parent.height - 14
-        radius: 2
-        color: root.urgencyColor
     }
 
     Text { // close — anchored to the card corner
@@ -65,7 +84,7 @@ Rectangle {
         z: 1
         text: "✕"; color: Qt.alpha(Theme.text, 0.5)
         font.pixelSize: 14
-        TapHandler { onTapped: root.notif.dismiss() }
+        TapHandler { onTapped: root.leave(true) }
     }
 
     Column {
@@ -146,7 +165,7 @@ Rectangle {
                         text: parent.modelData.text
                         color: Theme.iris; font.family: Theme.fontFamily; font.pixelSize: 12
                     }
-                    TapHandler { onTapped: { parent.modelData.invoke(); root.notif.dismiss() } }
+                    TapHandler { onTapped: { parent.modelData.invoke(); root.leave(true) } }
                 }
             }
         }
