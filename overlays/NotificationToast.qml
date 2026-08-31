@@ -161,9 +161,15 @@ Rectangle {
 
         Row {
             spacing: 6
-            visible: (root.notif.actions?.length ?? 0) > 0
+            // Only actions with a visible label become buttons. Senders often
+            // attach a "default" action with empty text — that one is meant
+            // for the body click (which invokes it above), not a chip; it was
+            // rendering as an empty button.
+            readonly property var shownActions:
+                (root.notif.actions ?? []).filter(a => (a.text ?? "") !== "")
+            visible: shownActions.length > 0
             Repeater {
-                model: root.notif.actions ?? []
+                model: parent.shownActions
                 Rectangle {
                     required property var modelData
                     width: actionText.implicitWidth + 22; height: 26; radius: 6
