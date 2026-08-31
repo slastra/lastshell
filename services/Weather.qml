@@ -13,6 +13,27 @@ Singleton {
     property var now: ({})
     property var days: []
 
+    // Lucide icon for the current condition — a live binding, so the chip
+    // follows every 30-min refresh, and Clear flips sun/moon by hour.
+    readonly property string icon: {
+        const c = (now.condition ?? "").toLowerCase()
+        const night = new Date().getHours() < 6 || new Date().getHours() >= 20
+        if (c.includes("thunder") || c.includes("lightning")) return "cloud-lightning"
+        if (c.includes("snow") || c.includes("sleet") || c.includes("blizzard")) return "cloud-snow"
+        if (c.includes("drizzle")) return "cloud-drizzle"
+        if ((c.includes("rain") || c.includes("shower")) && c.includes("partly"))
+            return (new Date().getHours() < 6 || new Date().getHours() >= 20) ? "cloud-moon-rain" : "cloud-sun-rain"
+        if (c.includes("rain") || c.includes("shower")) return "cloud-rain"
+        if (c.includes("haze")) return "haze"
+        if (c.includes("fog") || c.includes("mist")) return "cloud-fog"
+        if (c.includes("tornado")) return "tornado"
+        if (c.includes("overcast") || c.includes("cloudy") && !c.includes("partly")) return "cloud"
+        if (c.includes("partly")) return night ? "cloud-moon" : "cloud-sun"
+        if (c.includes("sunny")) return "sun"
+        if (c.includes("clear")) return night ? "moon" : "sun"
+        return "cloud-sun"
+    }
+
     Timer {
         interval: 1800000; running: true; repeat: true
         triggeredOnStart: true

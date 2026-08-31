@@ -277,11 +277,22 @@ Row {
             }
         }
 
-        ChipText {
-            height: weather.height
-            padRight: 17
-            color: Theme.foam
-            text: Weather.text
+        Row {
+            height: weather.height - 2
+            spacing: 8
+            leftPadding: 12
+            rightPadding: 12
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                font.family: Theme.fontFamily; font.pixelSize: 16
+                color: Theme.foam
+                text: `${Weather.now.temp ?? "?"}°F`
+            }
+            LucideIcon {
+                anchors.verticalCenter: parent.verticalCenter
+                name: Weather.icon
+                color: Theme.foam
+            }
         }
     }
 }

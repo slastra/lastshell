@@ -21,6 +21,22 @@ QtObject {
         "music":         "",
         "globe":         "",
         "sparkles":      "",
+        "sun": "\ue178",
+        "moon": "\ue11e",
+        "cloud": "\ue088",
+        "cloud-sun": "\ue216",
+        "cloud-moon": "\ue215",
+        "cloud-rain": "\ue08e",
+        "cloud-drizzle": "\ue08a",
+        "cloud-snow": "\ue090",
+        "cloud-lightning": "\ue08c",
+        "cloud-fog": "\ue214",
+        "snowflake": "\ue165",
+        "wind": "\ue1b0",
+        "haze": "\ue0f0",
+        "cloud-sun-rain": "\ue2fb",
+        "cloud-moon-rain": "\ue2fa",
+        "tornado": "\ue218",
     })
 
     function icon(name) { return glyphs[name] ?? "?" }
