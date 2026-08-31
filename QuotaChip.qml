@@ -91,56 +91,119 @@ Chip {
         ownerHovered: root.hovered
 
         Column {
-            spacing: 8
+            spacing: 10
 
-            Text {
-                text: "Usage"
-                color: Theme.text; font.family: Theme.fontFamily
-                font.pixelSize: 14; font.bold: true
+            Row { // header
+                spacing: 8
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "✳"
+                    color: Theme.rose
+                    font.family: Theme.fontFamily; font.pixelSize: 14
+                }
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "Claude Code Usage"
+                    color: Theme.text; font.family: Theme.fontFamily
+                    font.pixelSize: 14; font.bold: true
+                    font.letterSpacing: 0.5
+                }
             }
+
+            Rectangle { width: 264; height: 1; color: Theme.overlay }
 
             Repeater {
                 model: Claude.quota.frames
                 Item {
+                    id: frameRow
                     required property var modelData
-                    width: 240
-                    height: 26
+                    width: 264
+                    height: 34
                     readonly property color tone: Theme.level(modelData.pct, 70, 90, Theme.foam)
+                    readonly property var names: ({ "5h": "5-hour window", "wk": "weekly",
+                                                    "opus": "weekly · opus", "sonnet": "weekly · sonnet" })
 
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 58
-                        text: modelData.id
-                        color: Qt.alpha(Theme.text, 0.7)
-                        font.family: Theme.fontFamily; font.pixelSize: 13
+                    function resetsIn(v) {
+                        if (!v) return ""
+                        const t = typeof v === "number" ? v * 1000 : Date.parse(v)
+                        const s = (t - Date.now()) / 1000
+                        if (!(s > 0)) return ""
+                        if (s < 5400) return `resets in ${Math.round(s / 60)}m`
+                        if (s < 129600) return `resets in ${Math.round(s / 3600)}h`
+                        return `resets in ${Math.round(s / 86400)}d`
                     }
-                    Rectangle {
-                        x: 62
+
+                    Column {
                         anchors.verticalCenter: parent.verticalCenter
-                        width: 120; height: 6; radius: 3
-                        // same neutral track as the ring on the chip
-                        color: Qt.alpha(Theme.text, 0.22)
-                        Rectangle {
-                            width: parent.width * Math.min(1, parent.parent.modelData.pct / 100)
-                            height: parent.height; radius: 3
-                            color: parent.parent.tone
+                        spacing: 4
+
+                        Item {
+                            width: 264; height: 16
+                            Row {
+                                anchors.left: parent.left
+                                spacing: 6
+                                Text {
+                                    text: frameRow.modelData.id === "5h" ? "󰔟" : "󰨴"
+                                    color: Qt.alpha(Theme.text, 0.55)
+                                    font.family: Theme.fontFamily; font.pixelSize: 13
+                                }
+                                Text {
+                                    text: frameRow.names[frameRow.modelData.id] ?? frameRow.modelData.id
+                                    color: Qt.alpha(Theme.text, 0.85)
+                                    font.family: Theme.fontFamily; font.pixelSize: 13
+                                }
+                            }
+                            Text {
+                                anchors.right: parent.right
+                                text: `${frameRow.modelData.pct.toFixed(0)}%`
+                                color: frameRow.tone
+                                font.family: Theme.fontFamily; font.pixelSize: 13; font.bold: true
+                            }
                         }
-                    }
-                    Text {
-                        anchors.right: parent.right
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: `${modelData.pct.toFixed(0)}%`
-                        color: parent.tone
-                        font.family: Theme.fontFamily; font.pixelSize: 13
+
+                        Item {
+                            width: 264; height: 12
+                            Rectangle {
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: 190; height: 6; radius: 3
+                                // same neutral track as the ring on the chip
+                                color: Qt.alpha(Theme.text, 0.22)
+                                Rectangle {
+                                    width: parent.width * Math.min(1, frameRow.modelData.pct / 100)
+                                    height: parent.height; radius: 3
+                                    color: frameRow.tone
+                                    Behavior on width { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+                                }
+                            }
+                            Text {
+                                anchors.right: parent.right
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: frameRow.resetsIn(frameRow.modelData.resets)
+                                color: Qt.alpha(Theme.text, 0.45)
+                                font.family: Theme.fontFamily; font.pixelSize: 11
+                            }
+                        }
                     }
                 }
             }
 
-            Text {
-                visible: Claude.quota.stale
-                text: "data is stale"
-                color: Qt.alpha(Theme.gold, 0.8)
-                font.family: Theme.fontFamily; font.pixelSize: 12; font.italic: true
+            Rectangle { width: 264; height: 1; color: Theme.overlay }
+
+            Item { // freshness footer
+                width: 264; height: 14
+                Text {
+                    anchors.left: parent.left
+                    text: `${Claude.sessions.length} session${Claude.sessions.length === 1 ? "" : "s"}`
+                    color: Qt.alpha(Theme.text, 0.45)
+                    font.family: Theme.fontFamily; font.pixelSize: 11
+                }
+                Text {
+                    anchors.right: parent.right
+                    text: Claude.quota.stale ? "stale data" : "live"
+                    color: Claude.quota.stale ? Qt.alpha(Theme.gold, 0.8) : Qt.alpha(Theme.foam, 0.6)
+                    font.family: Theme.fontFamily; font.pixelSize: 11
+                    font.italic: Claude.quota.stale
+                }
             }
         }
     }
