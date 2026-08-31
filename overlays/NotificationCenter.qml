@@ -110,8 +110,11 @@ Overlay {
 
                 Rectangle {
                     anchors.fill: parent
-                    color: rowHover.hovered ? Qt.alpha(Theme.overlay, 0.6) : "transparent"
-                    Behavior on color { ColorAnimation { duration: Theme.animDuration } }
+                    color: Qt.alpha(Theme.overlay, 0.6)
+                    opacity: rowHover.hovered ? 1 : 0
+                    // opacity, not color: fading a fixed fill moves smoothly
+                    // between rows where restarting color animations stuttered
+                    Behavior on opacity { NumberAnimation { duration: 100 } }
                 }
                 HoverHandler { id: rowHover }
 
@@ -152,14 +155,15 @@ Overlay {
                     }
                 }
 
-                Text { // per-row dismiss
-                    visible: rowHover.hovered
+                Text { // per-row dismiss — fades rather than popping
+                    opacity: rowHover.hovered ? 1 : 0
+                    Behavior on opacity { NumberAnimation { duration: 100 } }
                     anchors.right: parent.right
                     anchors.rightMargin: 16
                     anchors.verticalCenter: parent.verticalCenter
                     text: "✕"; color: Qt.alpha(Theme.text, 0.5)
                     font.pixelSize: 13
-                    TapHandler { onTapped: row.notif.dismiss() }
+                    TapHandler { enabled: rowHover.hovered; onTapped: row.notif.dismiss() }
                 }
 
                 Rectangle { // row divider
