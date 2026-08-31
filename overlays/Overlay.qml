@@ -49,8 +49,8 @@ PanelWindow {
                 const g = ctx.createRadialGradient(
                     width / 2, height / 2, Math.min(width, height) * 0.18,
                     width / 2, height / 2, Math.max(width, height) * 0.75)
-                g.addColorStop(0, Qt.alpha(Theme.base, 0.30))
-                g.addColorStop(1, Qt.alpha(Theme.base, 0.72))
+                g.addColorStop(0, Qt.alpha(Theme.base, 0.80))
+                g.addColorStop(1, Qt.alpha(Theme.base, 0.97))
                 ctx.fillStyle = g
                 ctx.fillRect(0, 0, width, height)
             }
