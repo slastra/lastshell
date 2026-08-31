@@ -33,11 +33,27 @@ Chip {
             font.pixelSize: 13
             color: Qt.alpha(Theme.text, 0.7)
         }
-        LucideIcon {
+        Item { // the player's real app icon, lucide music as the fallback
             anchors.verticalCenter: parent.verticalCenter
-            name: (root.player?.identity ?? "").toLowerCase().includes("firefox") ? "globe" : "music"
-            font.pixelSize: 13
-            color: Qt.alpha(Theme.text, 0.7)
+            width: 16; height: 16
+            Image {
+                id: appIcon
+                anchors.fill: parent
+                sourceSize: Qt.size(32, 32)
+                source: {
+                    const key = root.player?.desktopEntry || root.player?.identity || ""
+                    const e = DesktopEntries.heuristicLookup(key)
+                    return e?.icon ? Quickshell.iconPath(e.icon, "") : ""
+                }
+                visible: status === Image.Ready
+            }
+            LucideIcon {
+                anchors.centerIn: parent
+                visible: appIcon.status !== Image.Ready
+                name: "music"
+                font.pixelSize: 13
+                color: Qt.alpha(Theme.text, 0.7)
+            }
         }
         Text {
             anchors.verticalCenter: parent.verticalCenter
