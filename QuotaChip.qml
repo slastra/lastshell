@@ -118,9 +118,8 @@ Chip {
                         x: 62
                         anchors.verticalCenter: parent.verticalCenter
                         width: 120; height: 6; radius: 3
-                        // empty space in a faint wash of the frame's own color,
-                        // matching the ring-track treatment
-                        color: Qt.alpha(parent.tone, 0.22)
+                        // same neutral track as the ring on the chip
+                        color: Qt.alpha(Theme.text, 0.22)
                         Rectangle {
                             width: parent.width * Math.min(1, parent.parent.modelData.pct / 100)
                             height: parent.height; radius: 3
