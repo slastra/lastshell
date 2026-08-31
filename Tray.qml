@@ -2,52 +2,50 @@ import Quickshell
 import Quickshell.Services.SystemTray
 import QtQuick
 
-// System tray: one icon per StatusNotifierItem, left-click activate,
-// right-click opens the item's DBus menu anchored to the icon.
-Chip {
-    id: root
-    edge: "top"
+// System tray: one chip per StatusNotifierItem, matching the taskbar's
+// per-icon pattern. Interaction goes through Chip's own signals — content
+// MouseAreas never fire, because Chip's MouseArea sits above the content
+// (that's why the first version's clicks went nowhere).
+Row {
+    spacing: 4
     visible: SystemTray.items.values.length > 0
 
-    Row {
-        height: root.height
-        spacing: 10
-        leftPadding: 12
-        rightPadding: 12
+    Repeater {
+        model: SystemTray.items
 
-        Repeater {
-            model: SystemTray.items
+        Chip {
+            id: slot
+            required property SystemTrayItem modelData
+
+            edge: "top"
+
+            onClicked: modelData.onlyMenu ? menu.open() : modelData.activate()
+            onRightClicked: if (modelData.hasMenu) menu.open()
+
+            QsMenuAnchor {
+                id: menu
+                menu: slot.modelData.menu
+                anchor.item: slot
+                anchor.edges: Edges.Bottom
+                anchor.gravity: Edges.Bottom
+            }
 
             Item {
-                id: slot
-                required property SystemTrayItem modelData
-                width: 18
-                height: root.height
-
+                implicitWidth: 34
+                height: slot.height - 2
                 Image {
                     anchors.centerIn: parent
                     width: 18; height: 18
                     source: slot.modelData.icon
                     sourceSize: Qt.size(36, 36)
                 }
+            }
 
-                QsMenuAnchor {
-                    id: menu
-                    menu: slot.modelData.menu
-                    anchor.item: slot
-                    anchor.edges: Edges.Bottom
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    acceptedButtons: Qt.LeftButton | Qt.RightButton
-                    onClicked: mouse => {
-                        if (mouse.button === Qt.RightButton || slot.modelData.onlyMenu)
-                            menu.open()
-                        else
-                            slot.modelData.activate()
-                    }
-                }
+            ChipTip {
+                owner: slot
+                edge: "top"
+                ownerHovered: slot.hovered
+                text: slot.modelData.tooltipTitle || slot.modelData.title || ""
             }
         }
     }
