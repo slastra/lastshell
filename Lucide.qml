@@ -41,6 +41,10 @@ QtObject {
         "rocket": "\ue286",
         "app-window": "\ue426",
         "chevron-right": "\ue06f",
+        "palette": "\ue1dd",
+        "wand-sparkles": "\ue357",
+        "check": "\ue06c",
+        "volume-2": "\ue1ab",
     })
 
     function icon(name) { return glyphs[name] ?? "?" }

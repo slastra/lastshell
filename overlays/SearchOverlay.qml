@@ -159,12 +159,23 @@ Overlay {
                                     anchors.verticalCenter: parent.verticalCenter
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 15
-                                    color: row.index === root.cursor ? Theme.text : Qt.alpha(Theme.text, 0.75)
+                                    color: row.modelData.current ? Theme.iris
+                                         : row.index === root.cursor ? Theme.text : Qt.alpha(Theme.text, 0.75)
                                     textFormat: Text.StyledText
                                     text: Fuzzy.highlight(row.modelData.label, row.modelData._idx, Theme.gold.toString())
                                     width: 450
                                     elide: Text.ElideRight
                                 }
+                            }
+
+                            LucideIcon { // current-selection mark
+                                visible: row.modelData.current ?? false
+                                anchors.right: parent.right
+                                anchors.rightMargin: 14
+                                anchors.verticalCenter: parent.verticalCenter
+                                name: "check"
+                                font.pixelSize: 14
+                                color: Theme.iris
                             }
 
                             MouseArea {

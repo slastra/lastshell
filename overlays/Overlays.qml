@@ -14,10 +14,14 @@ Scope {
         target: "overlays"
         function toggleSwitcher(): void { switcher.toggle() }
         function toggleLauncher(): void { launcher.toggle() }
+        function toggleAudio(): void { audio.toggle() }
+        function toggleEffects(): void { effects.toggle() }
     }
 
     TabSwitcher { id: switcher }
     Launcher { id: launcher }
+    AudioPicker { id: audio }
+    EffectPicker { id: effects }
     VolumeOsd {}
     NotificationPopups {}
 }
