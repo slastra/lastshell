@@ -46,14 +46,57 @@ Rectangle {
         }
     }
 
-    Text { // close — anchored to the card corner
+    Item { // close, with the countdown as a ring draining around it
         anchors.top: parent.top
         anchors.right: parent.right
-        anchors.topMargin: 10
-        anchors.rightMargin: 12
+        anchors.topMargin: 8
+        anchors.rightMargin: 10
         z: 1
-        text: "✕"; color: Qt.alpha(Theme.text, 0.5)
-        font.pixelSize: 14
+        width: 24; height: 24
+
+        property real remaining: 1
+        NumberAnimation on remaining {
+            id: drain
+            running: !root.sticky
+            from: 1; to: 0
+            duration: root.timeout
+        }
+        Connections {
+            target: hover
+            function onHoveredChanged() {
+                if (root.sticky) return
+                hover.hovered ? drain.pause() : drain.resume()
+            }
+        }
+
+        Canvas {
+            id: ring
+            anchors.fill: parent
+            onPaint: {
+                const ctx = getContext("2d")
+                ctx.reset()
+                if (root.sticky) return
+                const c = width / 2, r = c - 1.5
+                ctx.lineWidth = 2
+                ctx.lineCap = "round"
+                ctx.strokeStyle = Qt.alpha(Theme.text, 0.15)
+                ctx.beginPath(); ctx.arc(c, c, r, 0, 2 * Math.PI); ctx.stroke()
+                if (parent.remaining > 0) {
+                    ctx.strokeStyle = Qt.alpha(root.urgencyColor, 0.8)
+                    ctx.beginPath()
+                    ctx.arc(c, c, r, -Math.PI / 2,
+                            -Math.PI / 2 + 2 * Math.PI * parent.remaining)
+                    ctx.stroke()
+                }
+            }
+        }
+        onRemainingChanged: ring.requestPaint()
+
+        Text {
+            anchors.centerIn: parent
+            text: "✕"; color: Qt.alpha(Theme.text, 0.55)
+            font.pixelSize: 12
+        }
         TapHandler { onTapped: root.wantsOut(true) }
     }
 
@@ -141,28 +184,4 @@ Rectangle {
         }
     }
 
-    Rectangle { // countdown: drains toward expiry, holds while hovered
-        visible: !root.sticky
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.leftMargin: 2
-        anchors.bottomMargin: 2
-        height: 2
-        color: Qt.alpha(root.urgencyColor, 0.55)
-        width: parent.width - 4
-        NumberAnimation on width {
-            id: drain
-            running: !root.sticky
-            from: root.width - 4; to: 0
-            duration: root.timeout
-        }
-        // hover pauses the timer; pause the drain with it
-        Connections {
-            target: hover
-            function onHoveredChanged() {
-                if (hover.hovered) drain.pause()
-                else drain.resume()
-            }
-        }
-    }
 }
