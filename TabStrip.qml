@@ -41,7 +41,7 @@ Row {
             onClicked: Quickshell.execDetached(
                 [Quickshell.env("HOME") + "/.local/bin/tabstrip", "goto", String(index + 1)])
             onRightClicked: Quickshell.execDetached(
-                ["bash", Quickshell.env("HOME") + "/.config/rofi/scripts/tabs.sh"])
+                ["qs", "-c", "lastshell", "ipc", "call", "overlays", "toggleSwitcher"])
             onWheelUp: Quickshell.execDetached(
                 [Quickshell.env("HOME") + "/.local/bin/tabstrip", "next"])
             onWheelDown: Quickshell.execDetached(
