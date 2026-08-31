@@ -20,3 +20,7 @@ singleton Recorder 1.0 services/Recorder.qml
 Popout 1.0 Popout.qml
 Calendar 1.0 Calendar.qml
 NetGraph 1.0 NetGraph.qml
+ClaudeStrip 1.0 ClaudeStrip.qml
+ClaudeChip 1.0 ClaudeChip.qml
+QuotaChip 1.0 QuotaChip.qml
+singleton Claude 1.0 services/Claude.qml

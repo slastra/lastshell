@@ -10,4 +10,9 @@ BarWindow {
         anchors.left: parent.left
         anchors.leftMargin: 8
     }
+
+    ClaudeStrip {
+        anchors.bottom: parent.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+    }
 }
