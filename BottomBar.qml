@@ -15,4 +15,10 @@ BarWindow {
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
     }
+
+    MprisChip {
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        anchors.rightMargin: 8
+    }
 }

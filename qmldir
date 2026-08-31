@@ -24,3 +24,4 @@ ClaudeStrip 1.0 ClaudeStrip.qml
 ClaudeChip 1.0 ClaudeChip.qml
 QuotaChip 1.0 QuotaChip.qml
 singleton Claude 1.0 services/Claude.qml
+MprisChip 1.0 MprisChip.qml
