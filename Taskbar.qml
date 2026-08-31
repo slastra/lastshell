@@ -1,7 +1,6 @@
 import Quickshell
 import Quickshell.Wayland
 import QtQuick
-import QtQuick.Controls
 
 // Icon-only taskbar (waybar wlr/taskbar): click activates, right-click
 // fullscreens, tooltip shows the title.
@@ -23,7 +22,9 @@ Row {
 
             Item {
                 implicitWidth: 40
-                height: task.height
+                // the chip's 2px border sits only on the bottom (edge "top"),
+                // so center within the borderless region or the icon reads low
+                height: task.height - 2
                 Image {
                     anchors.centerIn: parent
                     width: 18; height: 18
@@ -35,9 +36,12 @@ Row {
                 }
             }
 
-            ToolTip.visible: task.hovered
-            ToolTip.delay: 400
-            ToolTip.text: task.modelData.title === "Picture in picture" ? "MPV" : task.modelData.title
+            ChipTip {
+                owner: task
+                edge: "top"
+                ownerHovered: task.hovered
+                text: task.modelData.title === "Picture in picture" ? "MPV" : task.modelData.title
+            }
         }
     }
 }

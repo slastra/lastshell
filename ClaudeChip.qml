@@ -1,6 +1,5 @@
 import Quickshell.Hyprland
 import QtQuick
-import QtQuick.Controls
 
 // One Claude session: glyph shows Claude's state, border shows whether the
 // session's terminal is the focused window (same active language as tabs).
@@ -38,12 +37,15 @@ Chip {
         }
     }
 
-    ToolTip.visible: root.hovered
-    ToolTip.delay: 400
-    ToolTip.text: {
-        const s = root.session
-        const jobs = (s.jobs ?? []).map(j => `bg job: ${j.name} — ${j.status}`).join("\n")
-        return [s.cwd, `status: ${s.state}`, jobs, `session: ${s.session ?? "—"}`,
-                `uptime: ${s.uptime}`].filter(x => x).join("\n")
+    ChipTip {
+        owner: root
+        edge: "bottom"
+        ownerHovered: root.hovered
+        text: {
+            const s = root.session
+            const jobs = (s.jobs ?? []).map(j => `bg job: ${j.name} — ${j.status}`).join("\n")
+            return [s.cwd, `status: ${s.state}`, jobs, `session: ${s.session ?? "—"}`,
+                    `uptime: ${s.uptime}`].filter(x => x).join("\n")
+        }
     }
 }

@@ -1,7 +1,6 @@
 import Quickshell
 import Quickshell.Io
 import QtQuick
-import QtQuick.Controls
 
 // Browser tab strip content (bottom bar, left). Pure view: tabstrip (the Go
 // daemon) owns discovery, favicon fetch/processing, and ordering; this
@@ -61,9 +60,12 @@ Row {
                 }
             }
 
-            ToolTip.visible: chip.hovered
-            ToolTip.delay: 400
-            ToolTip.text: chip.modelData.label ?? ""
+            ChipTip {
+                owner: chip
+                edge: "bottom"
+                ownerHovered: chip.hovered
+                text: chip.modelData.label ?? ""
+            }
         }
     }
 }

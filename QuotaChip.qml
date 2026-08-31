@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 
 // Usage gauge: shows one quota frame, click cycles. Accent follows the
 // WORST limit, not the shown one — critical stays loud while you browse.
@@ -36,9 +35,12 @@ Chip {
         Behavior on width { NumberAnimation { duration: Theme.animDuration } }
     }
 
-    ToolTip.visible: root.hovered
-    ToolTip.delay: 400
-    ToolTip.text: Claude.quota.frames.map(f =>
-        `${f.id}: ${f.pct.toFixed(1)}%`).join("\n")
-        + (Claude.quota.stale ? "\n(stale data)" : "")
+    ChipTip {
+        owner: root
+        edge: "bottom"
+        ownerHovered: root.hovered
+        text: Claude.quota.frames.map(f =>
+            `${f.id}: ${f.pct.toFixed(1)}%`).join("\n")
+            + (Claude.quota.stale ? "\n(stale data)" : "")
+    }
 }
