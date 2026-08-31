@@ -22,6 +22,9 @@ PanelWindow {
     anchors { top: true; bottom: true; left: true; right: true }
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.layer: WlrLayer.Overlay
+    // Hyprland blurs this namespace (layer_rule in hyprland.lua): the dim
+    // region below becomes frosted glass, which replaced the halo shadows.
+    WlrLayershell.namespace: "lastshell-overlay"
     WlrLayershell.keyboardFocus: open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     MouseArea { // click-outside dismissal + faint dim behind the card
@@ -29,22 +32,6 @@ PanelWindow {
         onClicked: root.dismiss()
         Rectangle { anchors.fill: parent; color: Theme.base; opacity: root.open ? 0.4 : 0
                     Behavior on opacity { NumberAnimation { duration: Theme.animDuration } } }
-    }
-
-    // Soft depth without shader effects: two translucent halos behind the card.
-    Repeater {
-        model: [ { pad: 14, a: 0.18 }, { pad: 6, a: 0.30 } ]
-        Rectangle {
-            required property var modelData
-            anchors.centerIn: parent
-            anchors.verticalCenterOffset: card.anchors.verticalCenterOffset + 5
-            width: card.width + modelData.pad
-            height: card.height + modelData.pad
-            radius: Theme.overlayRadius + modelData.pad / 2
-            color: Qt.alpha("#000000", modelData.a)
-            opacity: card.opacity
-            scale: card.scale
-        }
     }
 
     Rectangle {
