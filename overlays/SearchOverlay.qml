@@ -85,21 +85,26 @@ Overlay {
                     color: Qt.alpha(Theme.text, 0.35)
                 }
 
-                Text {
+                Row { // text + caret hug (outer Row spacing pushed the caret away)
                     anchors.verticalCenter: parent.verticalCenter
-                    font.family: Theme.fontFamily
-                    font.pixelSize: 17
-                    color: Theme.text
-                    text: root.query
-                }
+                    spacing: 2
 
-                Rectangle { // caret: fixed home position, rides the query
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: 2; height: 22; color: Theme.rose
-                    SequentialAnimation on opacity {
-                        running: root.open; loops: Animation.Infinite
-                        NumberAnimation { to: 0; duration: 500 }
-                        NumberAnimation { to: 1; duration: 500 }
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        font.family: Theme.fontFamily
+                        font.pixelSize: 17
+                        color: Theme.text
+                        text: root.query
+                    }
+
+                    Rectangle { // caret: rides the query's right edge
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 2; height: 22; color: Theme.rose
+                        SequentialAnimation on opacity {
+                            running: root.open; loops: Animation.Infinite
+                            NumberAnimation { to: 0; duration: 500 }
+                            NumberAnimation { to: 1; duration: 500 }
+                        }
                     }
                 }
             }
