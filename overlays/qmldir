@@ -12,3 +12,4 @@ EffectPicker 1.0 EffectPicker.qml
 ClipboardPicker 1.0 ClipboardPicker.qml
 NotificationCenter 1.0 NotificationCenter.qml
 CapturePicker 1.0 CapturePicker.qml
+HotkeySheet 1.0 HotkeySheet.qml

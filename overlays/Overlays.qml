@@ -19,6 +19,7 @@ Scope {
         function toggleEffects(): void { effects.toggle() }
         function toggleClipboard(): void { clipboard.toggle() }
         function toggleNotifications(): void { center.toggle() }
+        function toggleHotkeys(): void { hotkeys.toggle() }
         function toggleCapture(): void {
             // Print while recording = stop, no menu — matching the script.
             if (Recorder.recording)
@@ -38,4 +39,5 @@ Scope {
     NotificationPopups { id: popups }
     NotificationCenter { id: center; history: popups.historyModel }
     CapturePicker { id: capture }
+    HotkeySheet { id: hotkeys }
 }

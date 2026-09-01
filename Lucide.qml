@@ -55,6 +55,7 @@ QtObject {
         "monitor": "\ue11d",
         "square-dashed": "\ue1cb",
         "scan-barcode": "\ue535",
+        "keyboard": "\ue284",
     })
 
     function icon(name) { return glyphs[name] ?? "?" }
