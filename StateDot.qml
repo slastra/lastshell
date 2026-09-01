@@ -25,10 +25,16 @@ Item {
         visible: root.state === "waiting"
 
         property real p: 0
-        SequentialAnimation on p {
-            running: root.state === "waiting"; loops: Animation.Infinite
-            NumberAnimation { from: 0; to: 1; duration: 1100; easing.type: Easing.OutCubic }
+        Timer { // 12fps stepped ping — same reasoning as the breathing timer
+            interval: 83
+            running: root.state === "waiting"
+            repeat: true
+            onTriggered: {
+                const lin = (ping.p___raw = ((ping.p___raw ?? 0) + 83 / 1100) % 1)
+                ping.p = 1 - Math.pow(1 - lin, 3) // OutCubic by hand
+            }
         }
+        property var p___raw: 0
         onPChanged: requestPaint()
 
         onPaint: {
@@ -53,11 +59,20 @@ Item {
         Behavior on color { ColorAnimation { duration: Theme.animDuration } }
         Behavior on border.color { ColorAnimation { duration: Theme.animDuration } }
 
-        SequentialAnimation on opacity { // breathing while busy
-            running: root.state === "busy"; loops: Animation.Infinite
-            onStopped: dot.opacity = 1
-            NumberAnimation { to: 0.55; duration: 900; easing.type: Easing.InOutSine }
-            NumberAnimation { to: 1.0; duration: 900; easing.type: Easing.InOutSine }
+        // breathing while busy — stepped at 8fps by a Timer rather than a
+        // frame-driven animation: a continuous NumberAnimation forces the
+        // whole window to render at display refresh (~120fps) for a 1.8s
+        // sine pulse that reads identically at 8 steps a second.
+        Timer {
+            interval: 125
+            running: root.state === "busy"
+            repeat: true
+            property real t: 0
+            onTriggered: {
+                t = (t + interval / 1800) % 1
+                dot.opacity = 0.775 + 0.225 * Math.cos(t * 2 * Math.PI)
+            }
+            onRunningChanged: if (!running) { dot.opacity = 1; t = 0 }
         }
     }
 }
