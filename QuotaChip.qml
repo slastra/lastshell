@@ -55,10 +55,7 @@ Chip {
             }
         }
 
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-            font.family: Theme.fontFamily
-            font.pixelSize: 16
+        ValueText {
             color: root.accent
             text: `${Math.round(root.shown.pct ?? 0)}%`
             Behavior on color { ColorAnimation { duration: Theme.animDuration } }

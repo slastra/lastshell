@@ -55,10 +55,7 @@ Chip {
         leftPadding: 12
         rightPadding: 12
 
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-            font.family: Theme.fontFamily
-            font.pixelSize: 16
+        ValueText {
             color: Theme.text
             text: `${Math.round(root.vol * 100)}%`
         }

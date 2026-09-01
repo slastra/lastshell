@@ -24,10 +24,7 @@ Chip {
             state: root.session.state
         }
 
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-            font.family: Theme.fontFamily
-            font.pixelSize: 16
+        ValueText {
             color: root.session.state === "waiting" ? Theme.gold : Theme.text
             text: root.session.label
             Behavior on color { ColorAnimation { duration: Theme.animDuration } }

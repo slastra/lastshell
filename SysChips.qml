@@ -37,9 +37,7 @@ Row {
             spacing: 8
             leftPadding: 12
             rightPadding: 12
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                font.family: Theme.fontFamily; font.pixelSize: 16
+            ValueText {
                 color: Net.connected ? Theme.foam : Theme.love
                 text: Net.connected ? Net.ip : "Disconnected"
             }
@@ -59,9 +57,7 @@ Row {
             spacing: 8
             leftPadding: 12
             rightPadding: 12
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                font.family: Theme.fontFamily; font.pixelSize: 16
+            ValueText {
                 color: Theme.level(SysStat.cpuPct, 25, 50)
                 text: `${SysStat.cpuPct}%`
             }
@@ -87,10 +83,7 @@ Row {
             leftPadding: 12
             rightPadding: 12
 
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                font.family: Theme.fontFamily
-                font.pixelSize: 16
+            ValueText {
                 color: Theme.level(SysStat.tempC, 70, 80)
                 text: `${SysStat.tempC}°C`
             }
@@ -148,9 +141,7 @@ Row {
             spacing: 8
             leftPadding: 12
             rightPadding: 12
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                font.family: Theme.fontFamily; font.pixelSize: 16
+            ValueText {
                 color: Theme.level(SysStat.diskPct, 70, 90)
                 text: `${SysStat.diskPct}%`
             }
@@ -174,9 +165,7 @@ Row {
             spacing: 8
             leftPadding: 12
             rightPadding: 12
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                font.family: Theme.fontFamily; font.pixelSize: 16
+            ValueText {
                 color: Theme.level(SysStat.memPct, 50, 75)
                 text: `${SysStat.memPct}%`
             }
@@ -208,9 +197,7 @@ Row {
                 name: "circle-dot"
                 color: Theme.love
             }
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                font.family: Theme.fontFamily; font.pixelSize: 16
+            ValueText {
                 color: Theme.love
                 text: "REC"
             }
@@ -282,9 +269,7 @@ Row {
             spacing: 8
             leftPadding: 12
             rightPadding: 12
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                font.family: Theme.fontFamily; font.pixelSize: 16
+            ValueText {
                 color: Theme.foam
                 text: `${Weather.now.temp ?? "?"}°F`
             }

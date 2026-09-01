@@ -19,10 +19,7 @@ Chip {
         leftPadding: 12
         rightPadding: 12
 
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-            font.family: Theme.fontFamily
-            font.pixelSize: 16
+        ValueText {
             color: Theme.text
             text: root.showDate
                 ? Qt.formatDateTime(clock.date, "ddd, dd MMM yyyy")

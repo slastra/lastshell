@@ -55,10 +55,7 @@ Chip {
                 color: Qt.alpha(Theme.text, 0.7)
             }
         }
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-            font.family: Theme.fontFamily
-            font.pixelSize: 16
+        ValueText {
             font.italic: root.paused
             color: Theme.text
             text: {
