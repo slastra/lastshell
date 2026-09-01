@@ -135,30 +135,58 @@ Overlay {
 
                     Repeater {
                         model: parent.modelData.rows
-                        Row {
+                        Item {
+                            id: bindRow
                             required property var modelData
-                            spacing: 10
-                            Rectangle { // keycap
-                                width: 168; height: 22; radius: 5
-                                color: Theme.overlay
-                                border.color: Qt.alpha(Theme.rose, 0.35)
-                                border.width: 1
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: parent.parent.modelData.key
-                                    color: Theme.rose
-                                    font.family: Theme.fontFamily; font.pixelSize: 12
-                                    elide: Text.ElideRight
-                                    width: parent.width - 10
-                                    horizontalAlignment: Text.AlignHCenter
+                            width: 356; height: 26
+                            // one block per key, joined by quiet "+" glue —
+                            // "SUPER + SHIFT + C" reads as three caps
+                            readonly property var caps: modelData.key.trim().split(" + ")
+
+                            Row {
+                                anchors.verticalCenter: parent.verticalCenter
+                                spacing: 5
+
+                                Repeater {
+                                    model: bindRow.caps
+                                    Row {
+                                        required property string modelData
+                                        required property int index
+                                        spacing: 5
+                                        Text {
+                                            visible: index > 0
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            text: "+"
+                                            color: Qt.alpha(Theme.text, 0.35)
+                                            font.family: Theme.fontFamily; font.pixelSize: 11
+                                        }
+                                        Rectangle { // keycap
+                                            width: capText.implicitWidth + 14
+                                            height: 21; radius: 5
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            color: Theme.overlay
+                                            border.color: Qt.alpha(Theme.rose, 0.35)
+                                            border.width: 1
+                                            Text {
+                                                id: capText
+                                                anchors.centerIn: parent
+                                                text: parent.parent.modelData
+                                                color: Theme.rose
+                                                font.family: Theme.fontFamily; font.pixelSize: 11
+                                            }
+                                        }
+                                    }
                                 }
                             }
+
                             Text {
+                                anchors.right: parent.right
                                 anchors.verticalCenter: parent.verticalCenter
-                                text: parent.modelData.desc
+                                text: bindRow.modelData.desc
                                 color: Qt.alpha(Theme.text, 0.85)
                                 font.family: Theme.fontFamily; font.pixelSize: 13
-                                width: 178; elide: Text.ElideRight
+                                width: 150; elide: Text.ElideRight
+                                horizontalAlignment: Text.AlignRight
                             }
                         }
                     }
