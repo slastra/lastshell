@@ -14,20 +14,32 @@ Item {
         state === "waiting" ? Theme.gold :
         state === "busy" ? Theme.foam : Qt.alpha(Theme.text, 0.45)
 
-    Rectangle { // sonar ping (waiting only)
+    Canvas { // sonar ping (waiting only) — drawn, not transform-scaled:
+             // scaling a Rectangle's stroke across fractional device pixels
+             // (1.25 display scale) renders lopsided and the pulse looks
+             // off-center. An arc painted at the exact center each frame
+             // stays concentric at any radius.
+        id: ping
         anchors.centerIn: parent
-        width: 10; height: 10; radius: 5
-        color: "transparent"
-        border.color: Theme.gold
-        border.width: 1.5
+        width: 26; height: 26
         visible: root.state === "waiting"
-        SequentialAnimation on scale {
+
+        property real p: 0
+        SequentialAnimation on p {
             running: root.state === "waiting"; loops: Animation.Infinite
-            NumberAnimation { from: 0.8; to: 2.1; duration: 1100; easing.type: Easing.OutCubic }
+            NumberAnimation { from: 0; to: 1; duration: 1100; easing.type: Easing.OutCubic }
         }
-        SequentialAnimation on opacity {
-            running: root.state === "waiting"; loops: Animation.Infinite
-            NumberAnimation { from: 0.9; to: 0; duration: 1100 }
+        onPChanged: requestPaint()
+
+        onPaint: {
+            const ctx = getContext("2d")
+            ctx.reset()
+            if (root.state !== "waiting") return
+            ctx.strokeStyle = Qt.alpha(Theme.gold, 0.9 * (1 - p))
+            ctx.lineWidth = 1.5
+            ctx.beginPath()
+            ctx.arc(width / 2, height / 2, 4 + 7.5 * p, 0, 2 * Math.PI)
+            ctx.stroke()
         }
     }
 
