@@ -50,6 +50,11 @@ QtObject {
         "bell": "\ue059",
         "trash-2": "\ue18e",
         "inbox": "\ue0f7",
+        "camera": "\ue064",
+        "video": "\ue1a5",
+        "monitor": "\ue11d",
+        "square-dashed": "\ue1cb",
+        "scan-barcode": "\ue535",
     })
 
     function icon(name) { return glyphs[name] ?? "?" }
