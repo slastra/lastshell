@@ -94,6 +94,9 @@ Rectangle {
 
         Text {
             anchors.centerIn: parent
+            // the glyph's ink sits high in its em box; nudge down to center
+            // it inside the ring optically
+            anchors.verticalCenterOffset: 1
             text: "✕"; color: Qt.alpha(Theme.text, 0.55)
             font.pixelSize: 12
         }
