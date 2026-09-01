@@ -12,7 +12,7 @@ Overlay {
     property var items: []
     property string query: ""
     property string typeIcon: "search"   // lucide name marking what this modal is
-    property int maxRows: 14
+    property int visibleRows: 12         // viewport height; matches beyond it scroll
     signal activated(var item)
 
     cardWidth: 560
@@ -27,7 +27,7 @@ Overlay {
                 out.push(Object.assign({ _score: m.score, _idx: m.idx }, it))
         }
         out.sort((a, b) => b._score - a._score || (b.weight ?? 0) - (a.weight ?? 0))
-        return out.slice(0, maxRows)
+        return out   // no truncation — the list scrolls
     }
     property int cursor: 0
     onQueryChanged: cursor = 0
@@ -112,100 +112,116 @@ Overlay {
 
         Rectangle { width: parent.width; height: 1; color: Qt.alpha("#000000", 0.35) }
 
-        Item { // ── body: results
+        Item { // ── body: a real ListView — wheel scrolls, cursor follows,
+               //    the rose outline is the view's own gliding highlight
             width: parent.width
-            height: (root.filtered.length > 0
-                ? root.filtered.length * root.rowH + (root.filtered.length - 1) * 2
-                : 40) + 20
+            height: (Math.max(1, Math.min(root.filtered.length, root.visibleRows)) * (root.rowH + 2)) + 18
 
-            Item {
+            ListView {
+                id: list
                 x: 10; y: 10
                 width: parent.width - 20
                 height: parent.height - 20
+                clip: true
+                spacing: 2
+                model: root.filtered
+                currentIndex: root.cursor
+                keyNavigationEnabled: false
+                boundsBehavior: Flickable.StopAtBounds
 
-                Rectangle { // gliding rose-outline cursor plate
-                    visible: root.filtered.length > 0
-                    y: root.cursor * (root.rowH + 2)
-                    width: parent.width
-                    height: root.rowH
+                highlight: Rectangle {
                     radius: 6
                     color: Theme.overlay
                     border.width: 2
                     border.color: Qt.alpha(Theme.rose, 0.8)
-                    Behavior on y { NumberAnimation { duration: 110; easing.type: Easing.OutCubic } }
                 }
+                highlightMoveDuration: 110
+                highlightResizeDuration: 0
+                highlightRangeMode: ListView.ApplyRange
+                preferredHighlightBegin: root.rowH
+                preferredHighlightEnd: height - root.rowH
 
-                Column {
-                    width: parent.width
-                    spacing: 2
+                delegate: Item {
+                    id: row
+                    required property var modelData
+                    required property int index
+                    width: list.width
+                    height: root.rowH
 
-                    Repeater {
-                        model: root.filtered
-
-                        Item {
-                            id: row
-                            required property var modelData
-                            required property int index
-                            width: parent.width
-                            height: root.rowH
-
-                            Row {
-                                anchors.verticalCenter: parent.verticalCenter
-                                x: 14
-                                spacing: 10
-                                Image {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: 20; height: 20
-                                    source: row.modelData.iconSource ?? ""
-                                    sourceSize: Qt.size(40, 40)
-                                    visible: source != ""
-                                }
-                                LucideIcon {
-                                    visible: (row.modelData.lucideIcon ?? "") !== ""
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    name: row.modelData.lucideIcon ?? ""
-                                    font.pixelSize: 15
-                                    color: Qt.alpha(Theme.iris, 0.8)
-                                }
-                                Text {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    font.family: Theme.fontFamily
-                                    font.pixelSize: 15
-                                    color: row.modelData.current ? Theme.iris
-                                         : row.index === root.cursor ? Theme.text : Qt.alpha(Theme.text, 0.75)
-                                    textFormat: Text.StyledText
-                                    text: Fuzzy.highlight(row.modelData.label, row.modelData._idx, Theme.gold.toString())
-                                    width: 450
-                                    elide: Text.ElideRight
-                                }
-                            }
-
-                            LucideIcon { // current-selection mark
-                                visible: row.modelData.current ?? false
-                                anchors.right: parent.right
-                                anchors.rightMargin: 14
-                                anchors.verticalCenter: parent.verticalCenter
-                                name: "check"
-                                font.pixelSize: 14
-                                color: Theme.iris
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: { root.cursor = row.index; root.activate() }
-                            }
+                    Row {
+                        anchors.verticalCenter: parent.verticalCenter
+                        x: 14
+                        spacing: 10
+                        Image {
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: 20; height: 20
+                            source: row.modelData.iconSource ?? ""
+                            sourceSize: Qt.size(40, 40)
+                            visible: source != ""
+                        }
+                        LucideIcon {
+                            visible: (row.modelData.lucideIcon ?? "") !== ""
+                            anchors.verticalCenter: parent.verticalCenter
+                            name: row.modelData.lucideIcon ?? ""
+                            font.pixelSize: 15
+                            color: Qt.alpha(Theme.iris, 0.8)
+                        }
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            font.family: Theme.fontFamily
+                            font.pixelSize: 15
+                            color: row.modelData.current ? Theme.iris
+                                 : row.index === root.cursor ? Theme.text : Qt.alpha(Theme.text, 0.75)
+                            textFormat: Text.StyledText
+                            text: Fuzzy.highlight(row.modelData.label, row.modelData._idx, Theme.gold.toString())
+                            width: 450
+                            elide: Text.ElideRight
                         }
                     }
-                }
 
-                Text { // empty state
-                    visible: root.filtered.length === 0
-                    anchors.centerIn: parent
-                    text: "no matches"
-                    color: Qt.alpha(Theme.love, 0.7)
-                    font.family: Theme.fontFamily; font.pixelSize: 14
-                    font.italic: true
+                    LucideIcon { // current-selection mark
+                        visible: row.modelData.current ?? false
+                        anchors.right: parent.right
+                        anchors.rightMargin: 14
+                        anchors.verticalCenter: parent.verticalCenter
+                        name: "check"
+                        font.pixelSize: 14
+                        color: Theme.iris
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: { root.cursor = row.index; root.activate() }
+                    }
                 }
+            }
+
+            Rectangle { // top fade: content continues above
+                visible: !list.atYBeginning && list.contentHeight > list.height
+                anchors.top: list.top
+                x: list.x; width: list.width; height: 18
+                gradient: Gradient {
+                    GradientStop { position: 0; color: Theme.surface }
+                    GradientStop { position: 1; color: "transparent" }
+                }
+            }
+            Rectangle { // bottom fade: content continues below
+                visible: !list.atYEnd && list.contentHeight > list.height
+                anchors.bottom: list.bottom
+                x: list.x; width: list.width; height: 18
+                gradient: Gradient {
+                    GradientStop { position: 0; color: "transparent" }
+                    GradientStop { position: 1; color: Theme.surface }
+                }
+            }
+
+            Text { // empty state
+                visible: root.filtered.length === 0
+                anchors.centerIn: parent
+                text: "no matches"
+                color: Qt.alpha(Theme.love, 0.7)
+                font.family: Theme.fontFamily; font.pixelSize: 14
+                font.italic: true
             }
         }
 

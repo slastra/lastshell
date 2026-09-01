@@ -13,7 +13,7 @@ SearchOverlay {
     id: root
 
     typeIcon: "camera"
-    maxRows: 8
+    visibleRows: 8
 
     readonly property string script:
         Quickshell.env("HOME") + "/.config/rofi/scripts/capture.sh"

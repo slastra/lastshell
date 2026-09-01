@@ -9,7 +9,7 @@ SearchOverlay {
     id: root
 
     typeIcon: "volume-2"
-    maxRows: 10
+    visibleRows: 10
 
     PwObjectTracker { objects: Pipewire.nodes.values.filter(n => n.isSink && !n.isStream) }
 

@@ -12,7 +12,7 @@ SearchOverlay {
     id: root
 
     typeIcon: "clipboard-list"
-    maxRows: 12
+    visibleRows: 12
 
     property var entries: []
 

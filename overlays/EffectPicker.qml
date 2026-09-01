@@ -10,7 +10,7 @@ SearchOverlay {
     id: root
 
     typeIcon: "wand-sparkles"
-    maxRows: 12
+    visibleRows: 12
 
     property var effects: []
     property string current: ""
