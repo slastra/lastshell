@@ -1,6 +1,6 @@
 import QtQuick
 
-// The bottom bar: browser tabs left, (mpris + claude strip to come) right.
+// The bottom bar: browser tabs left, claude strip centre, mpris + volume right.
 // One window, one exclusive zone — content items only below here.
 BarWindow {
     anchors.bottom: true
@@ -16,9 +16,12 @@ BarWindow {
         anchors.horizontalCenter: parent.horizontalCenter
     }
 
-    MprisChip {
+    Row {
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         anchors.rightMargin: 8
+        spacing: 8
+        MprisChip {}
+        VolumeChip {}
     }
 }

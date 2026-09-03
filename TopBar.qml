@@ -26,7 +26,7 @@ BarWindow {
         spacing: 8
         Tray {}
         SysChips {}
-        VolumeChip {}
+        HdrChip {}
         BatteryChip {}
         ClockChip {}
     }

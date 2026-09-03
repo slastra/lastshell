@@ -6,7 +6,7 @@ import QtQuick
 // wheel steps 1%, glyph tracks level / mute / bluetooth.
 Chip {
     id: root
-    edge: "top"
+    edge: "bottom"
 
     readonly property PwNode sink: Pipewire.defaultAudioSink
     PwObjectTracker { objects: [root.sink] }
@@ -21,7 +21,7 @@ Chip {
 
     Popout {
         owner: root
-        edge: "top"
+        edge: "bottom"
         ownerHovered: root.hovered
 
         Column {

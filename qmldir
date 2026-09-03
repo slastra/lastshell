@@ -31,3 +31,5 @@ singleton Lucide 1.0 Lucide.qml
 LucideIcon 1.0 LucideIcon.qml
 TrayMenu 1.0 TrayMenu.qml
 ValueText 1.0 ValueText.qml
+HdrChip 1.0 HdrChip.qml
+singleton Hdr 1.0 services/Hdr.qml

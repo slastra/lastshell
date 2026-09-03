@@ -43,7 +43,9 @@ Item {
 
                 ChipText {
                     text: wsChip.modelData
-                    height: wsChip.height
+                    // measured (bar.png ink rows): full chip height sat 1px low of the
+                    // right-side ValueText line; -2 centres the digits on it
+                    height: wsChip.height - 2
                     rightPadding: 12
                     // empty workspaces read dim but legible — overlay-on-surface
                     // was too faint to count at a glance
