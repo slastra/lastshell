@@ -29,6 +29,11 @@ Rectangle {
     // Motion is owned by the ListView (add/remove/displaced transitions);
     // the card only decides WHEN to go and asks the stack to remove it.
     signal wantsOut(bool dismissToo)
+    // Activation wants the compositor to jump to the sender's window. The
+    // lookup can't live here: wantsOut() dismisses, which destroys this
+    // delegate before an async hyprctl query returns. Hand the sender's
+    // identity up to the stable Popups scope instead.
+    signal focusSender(string desktopEntry, string appName)
 
     Timer {
         id: expiry
@@ -42,6 +47,12 @@ Rectangle {
         onTapped: {
             const def = root.notif.actions?.find(a => a.identifier === "default") ?? root.notif.actions?.[0]
             if (def) def.invoke()
+            // Invoking the action tells the app what to do, but doesn't carry
+            // focus to its window if it lives on another workspace. Read the
+            // sender's identity NOW (notif dies with the dismiss below) and
+            // let Popups find + focus the window — that jumps the compositor
+            // to the right virtual desktop.
+            root.focusSender(root.notif.desktopEntry ?? "", root.notif.appName ?? "")
             root.wantsOut(true)
         }
     }

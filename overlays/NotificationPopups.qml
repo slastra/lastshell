@@ -1,4 +1,6 @@
 import Quickshell
+import Quickshell.Io
+import Quickshell.Hyprland
 import Quickshell.Services.Notifications
 import Quickshell.Wayland
 import QtQuick
@@ -41,13 +43,46 @@ Scope {
         if (dismissToo) n.dismiss()
     }
 
+    // Focus the window that sent an activated notification, so activation
+    // carries the compositor to its virtual desktop. Match by desktop-entry
+    // hint first (most reliable), then app name, against open Hyprland
+    // clients. Lives here (not in the toast) because the toast delegate is
+    // destroyed by the dismiss that accompanies activation.
+    property var focusCands: []
+    function focusSender(desktopEntry, appName) {
+        focusCands = [desktopEntry, appName].filter(s => s).map(s => s.toLowerCase())
+        if (focusCands.length > 0) clientsProc.running = true
+    }
+    Process {
+        id: clientsProc
+        command: ["hyprctl", "clients", "-j"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                let clients
+                try { clients = JSON.parse(text) } catch (e) { return }
+                const cands = root.focusCands
+                const norm = c => (c ?? "").toLowerCase()
+                // exact class match beats a heuristic/substring one
+                const hit = clients.find(c => c.mapped && cands.includes(norm(c.class)))
+                    ?? clients.find(c => c.mapped && cands.some(k =>
+                        norm(c.class).includes(k) || k.includes(norm(c.class)) ||
+                        norm(DesktopEntries.heuristicLookup(c.class)?.id) === k))
+                if (hit) Hyprland.dispatch(`hl.dsp.focus({ window = "address:${hit.address}" })`)
+            }
+        }
+    }
+
     Timer { // prune dismissed notifications from both models
         interval: 2000; running: toasts.count > 0 || history.count > 0; repeat: true
         onTriggered: {
-            for (let i = toasts.count - 1; i >= 0; i--)
-                if (!toasts.get(i).notif.tracked) toasts.remove(i)
-            for (let i = history.count - 1; i >= 0; i--)
-                if (!history.get(i).notif.tracked) history.remove(i)
+            for (let i = toasts.count - 1; i >= 0; i--) {
+                const n = toasts.get(i).notif
+                if (!n || !n.tracked) toasts.remove(i)
+            }
+            for (let i = history.count - 1; i >= 0; i--) {
+                const n = history.get(i).notif
+                if (!n || !n.tracked) history.remove(i)
+            }
         }
     }
 
@@ -75,6 +110,7 @@ Scope {
                 // `notif` is the component's own required property; the model
                 // role fills it — redeclaring here shadows and breaks it
                 onWantsOut: dismissToo => root.drop(notif, dismissToo)
+                onFocusSender: (entry, app) => root.focusSender(entry, app)
             }
 
             add: Transition {
