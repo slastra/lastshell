@@ -23,9 +23,13 @@ PopupWindow {
     }
     function hide() { visible = false; stack = [] }
 
+    // Stay bound to the root menu while hidden so its layout is fetched
+    // and the rows are built BEFORE show(): binding on open meant the popup
+    // mapped empty and grew as the DBus reply landed (visible stutter).
+    // show() then re-selects the same handle — no refetch, no resize.
     QsMenuOpener {
         id: opener
-        menu: root.stack.length > 0 ? root.stack[root.stack.length - 1] : null
+        menu: root.stack.length > 0 ? root.stack[root.stack.length - 1] : root.handle
     }
 
     // Dismiss on click-away: the grab holds while the menu is up and clears
