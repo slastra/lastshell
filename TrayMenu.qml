@@ -1,10 +1,13 @@
 import Quickshell
+import Quickshell.Hyprland
 import QtQuick
 
 // DBus menu rendered in lastshell's own chrome (QsMenuAnchor hands menus
 // to a native QtWidgets popup that ignores our design entirely).
 // QsMenuOpener exposes the menu as a model; rows invoke entry.triggered().
 // Submenus drill in: the opener's handle swaps and a back row appears.
+// A PopupWindow has no native "click away" — the focus grab below closes
+// it on any click outside the card.
 PopupWindow {
     id: root
 
@@ -23,6 +26,16 @@ PopupWindow {
     QsMenuOpener {
         id: opener
         menu: root.stack.length > 0 ? root.stack[root.stack.length - 1] : null
+    }
+
+    // Dismiss on click-away: the grab holds while the menu is up and clears
+    // the moment the pointer is pressed outside the popup. Keyed on
+    // backingWindowVisible, not visible: `visible` flips before the popup's
+    // surface is mapped, and a grab on an unmapped window silently no-ops.
+    HyprlandFocusGrab {
+        windows: [root]
+        active: root.backingWindowVisible
+        onCleared: root.hide()
     }
 
     anchor {
