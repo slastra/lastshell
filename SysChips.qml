@@ -127,9 +127,34 @@ Row {
             }
         }
 
-        ChipTip {
-            owner: temp; edge: "top"; ownerHovered: temp.hovered
-            text: `package temperature ${SysStat.tempC}°C\nwarning 70°C · critical 80°C`
+        Popout {
+            owner: temp
+            edge: "top"
+            ownerHovered: temp.hovered
+            Column {
+                spacing: 6
+                Row {
+                    spacing: 8
+                    Text {
+                        text: "package temperature"
+                        color: Theme.text; font.family: Theme.fontFamily; font.pixelSize: 14
+                    }
+                    Text {
+                        text: `${SysStat.tempC}°C`
+                        color: Theme.level(SysStat.tempC, 70, 80)
+                        font.family: Theme.fontFamily; font.pixelSize: 14
+                    }
+                }
+                Text {
+                    readonly property var h: SysStat.tempHistory
+                    text: h.length > 1
+                        ? `5 min: low ${Math.min(...h)}°  ·  high ${Math.max(...h)}°`
+                        : "collecting…"
+                    color: Qt.alpha(Theme.text, 0.6)
+                    font.family: Theme.fontFamily; font.pixelSize: 12
+                }
+                TempGraph { width: 240; height: 60 }
+            }
         }
     }
 
