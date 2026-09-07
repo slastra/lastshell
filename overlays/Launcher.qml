@@ -14,6 +14,14 @@ SearchOverlay {
 
     property var windows: []
 
+    // Browser windows are left out: the tab switcher (SUPER+W) already
+    // reaches every tab directly, so listing the windows here is noise.
+    // Anchored on purpose — a loose /chrom|zen/ would also swallow Chrome
+    // PWAs (chrome-<id>-Profile_N, app windows the switcher can't reach)
+    // and Zenity/zenmap.
+    readonly property var browserClass:
+        /^(firefox(-\w+)?|librewolf|zen(-\w+)?|helium|brave-browser|vivaldi(-stable)?|chromium|google-chrome(-\w+)?|chrome)$/i
+
     // Refresh the window list at the moment of summoning — focusHistoryID
     // is the compositor's own recency order (0 = the window you came from).
     onOpenChanged: if (open) clientsProc.running = true
@@ -24,7 +32,7 @@ SearchOverlay {
             onStreamFinished: {
                 try {
                     root.windows = JSON.parse(text)
-                        .filter(c => c.mapped && c.title !== "")
+                        .filter(c => c.mapped && c.title !== "" && !root.browserClass.test(c.class))
                         .sort((a, b) => a.focusHistoryID - b.focusHistoryID)
                 } catch (e) { root.windows = [] }
             }
@@ -63,10 +71,22 @@ SearchOverlay {
 
     onActivated: item => {
         if (item.address) {
-            Hyprland.dispatch(`hl.dsp.focus({ window = "address:${item.address}" })`)
+            // The overlay holds exclusive keyboard focus; SearchOverlay calls
+            // dismiss() right after this, and when the layer surface releases
+            // focus Hyprland hands it back to the PREVIOUS window (and its
+            // workspace) — stomping a focus dispatch issued before that
+            // handback. Let the release land first; the close fade hides it.
+            focusLater.address = item.address
+            focusLater.restart()
         } else {
             Frecency.record(item.key)
             item.entry.execute()
         }
+    }
+    Timer {
+        id: focusLater
+        property string address: ""
+        interval: 80
+        onTriggered: Hyprland.dispatch(`hl.dsp.focus({ window = "address:${address}" })`)
     }
 }
