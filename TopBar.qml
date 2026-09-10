@@ -28,6 +28,7 @@ BarWindow {
         SysChips {}
         HdrChip {}
         BatteryChip {}
+        DeskwatchChip {}
         ClockChip {}
     }
 }

@@ -68,6 +68,10 @@ QtObject {
         "square-dashed": "\ue1cb",
         "scan-barcode": "\ue535",
         "keyboard": "\ue284",
+        // deskwatch
+        "activity": "\ue038",
+        "shield-alert": "\ue1fe",
+        "radar": "\ue497",
     })
 
     function icon(name) { return glyphs[name] ?? "?" }
