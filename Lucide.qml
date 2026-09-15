@@ -21,6 +21,7 @@ QtObject {
         "music":         "",
         "globe":         "",
         "sparkles":      "",
+        "plus":          "\ue13d",
         // greeter
         "user":              "\ue19f",
         "circle-user-round": "\ue462",
