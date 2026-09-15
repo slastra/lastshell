@@ -47,7 +47,7 @@ PanelWindow {
         implicitHeight: inner.childrenRect.height + root.contentPadding * 2
         radius: Theme.overlayRadius
         color: Theme.surface
-        border.color: Theme.overlay
+        border.color: Theme.border
         border.width: 2
 
         opacity: root.open ? 1 : 0

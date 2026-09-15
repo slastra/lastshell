@@ -59,7 +59,7 @@ PopupWindow {
         height: rows.implicitHeight + 16
         radius: Theme.overlayRadius
         color: Theme.surface
-        border.color: Theme.overlay
+        border.color: Theme.border
         border.width: 2
 
         Column {

@@ -38,7 +38,7 @@ PopupWindow {
         height: tip.implicitHeight + 14
         radius: 6
         color: Theme.surface
-        border.color: Theme.overlay
+        border.color: Theme.border
         border.width: 2
 
         Text {

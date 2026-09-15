@@ -44,7 +44,7 @@ PanelWindow {
         id: pill
         width: 280; height: 44; radius: 10
         color: Theme.surface
-        border.color: Theme.overlay
+        border.color: Theme.border
         border.width: 2
         opacity: root.shown ? 1 : 0
         Behavior on opacity { NumberAnimation { duration: 150 } }

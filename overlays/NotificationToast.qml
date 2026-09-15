@@ -22,7 +22,7 @@ Rectangle {
     // surface washed with the urgency tone — enough to read at a glance,
     // faint enough that Rosé Pine still owns the card
     color: Qt.tint(Theme.surface, Qt.alpha(urgencyColor, 0.09))
-    border.color: Qt.tint(Theme.overlay, Qt.alpha(urgencyColor, 0.18))
+    border.color: Qt.tint(Theme.border, Qt.alpha(urgencyColor, 0.18))
     border.width: 2
     clip: true
 

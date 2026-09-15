@@ -26,11 +26,11 @@ Rectangle {
     // instance can drift a pixel from its neighbours.
     height: Theme.barHeight - 2
 
-    color: active ? accent : Theme.overlay
-    topLeftRadius: edge === "bottom" ? 8 : 0
-    topRightRadius: edge === "bottom" ? 8 : 0
-    bottomLeftRadius: edge === "top" ? 8 : 0
-    bottomRightRadius: edge === "top" ? 8 : 0
+    color: active ? accent : Theme.border
+    topLeftRadius: edge === "bottom" ? Theme.overlayRadius : 0
+    topRightRadius: edge === "bottom" ? Theme.overlayRadius : 0
+    bottomLeftRadius: edge === "top" ? Theme.overlayRadius : 0
+    bottomRightRadius: edge === "top" ? Theme.overlayRadius : 0
 
     Behavior on color { ColorAnimation { duration: Theme.animDuration } }
 
@@ -41,10 +41,10 @@ Rectangle {
         anchors.bottomMargin: chip.edge === "top" ? 2 : 0
         anchors.leftMargin: 2
         anchors.rightMargin: 2
-        topLeftRadius: chip.topLeftRadius > 0 ? 6 : 0
-        topRightRadius: chip.topRightRadius > 0 ? 6 : 0
-        bottomLeftRadius: chip.bottomLeftRadius > 0 ? 6 : 0
-        bottomRightRadius: chip.bottomRightRadius > 0 ? 6 : 0
+        topLeftRadius: chip.topLeftRadius > 0 ? Theme.overlayRadius - 2 : 0
+        topRightRadius: chip.topRightRadius > 0 ? Theme.overlayRadius - 2 : 0
+        bottomLeftRadius: chip.bottomLeftRadius > 0 ? Theme.overlayRadius - 2 : 0
+        bottomRightRadius: chip.bottomRightRadius > 0 ? Theme.overlayRadius - 2 : 0
         color: mouse.containsMouse ? Theme.overlay : Theme.surface
         implicitWidth: contentSlot.childrenRect.width
         Behavior on color { ColorAnimation { duration: Theme.animDuration } }

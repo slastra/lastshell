@@ -44,7 +44,7 @@ PopupWindow {
         implicitHeight: inner.childrenRect.height + 24
         radius: Theme.overlayRadius
         color: Theme.surface
-        border.color: Theme.overlay
+        border.color: Theme.border
         border.width: 2
 
         opacity: open ? 1 : 0
