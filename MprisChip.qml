@@ -2,20 +2,25 @@ import Quickshell
 import Quickshell.Services.Mpris
 import QtQuick
 
-// Now-playing chip (waybar mpris): title/artist capped, italic when paused,
-// click play-pause, wheel next/prev.
+// Now-playing chip for one player (waybar mpris): title/artist capped,
+// italic when paused, click play-pause, wheel next/prev. Caches its text
+// so it can slide out after the player object is gone.
 Chip {
     id: root
     edge: "bottom"
-    visible: player !== null
 
-    readonly property MprisPlayer player: {
-        const ps = Mpris.players.values
-        return ps.find(p => p.playbackState === MprisPlaybackState.Playing)
-            ?? ps.find(p => p.playbackState === MprisPlaybackState.Paused)
-            ?? ps[0] ?? null
-    }
+    property var player: null   // MprisPlayer
     readonly property bool paused: player?.playbackState === MprisPlaybackState.Paused
+
+    readonly property string liveText: {
+        if (!player) return ""
+        let dyn = [player.trackTitle, player.trackArtist].filter(x => x).join(" - ")
+        if (dyn === "") dyn = player.identity ?? ""
+        return dyn.length > 40 ? dyn.slice(0, 39) + "…" : dyn
+    }
+    property string text: ""
+    onLiveTextChanged: if (player) text = liveText
+    Component.onCompleted: text = liveText
 
     onClicked: player?.togglePlaying()
     onWheelUp: if (player?.canGoNext) player.next()
@@ -36,13 +41,7 @@ Chip {
         ValueText {
             font.italic: root.paused
             color: Theme.text
-            text: {
-                if (!root.player) return ""
-                let dyn = [root.player.trackTitle, root.player.trackArtist]
-                    .filter(x => x).join(" - ")
-                if (dyn.length > 40) dyn = dyn.slice(0, 39) + "…"
-                return dyn
-            }
+            text: root.text
         }
     }
 }

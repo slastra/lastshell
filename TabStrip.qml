@@ -5,10 +5,10 @@ import QtQuick
 // Browser tab strip content (bottom bar, left). Pure view: tabstrip (the Go
 // daemon) owns discovery, favicon fetch/processing, and ordering; this
 // renders its snapshot and sends clicks back through the same CLI.
-Row {
+ChipRow {
     id: root
 
-    property var tabs: []
+    SyncedList { id: tabs }
     spacing: 8
 
     FileView {
@@ -18,7 +18,7 @@ Row {
         onLoaded: parse()
         function parse() {
             try {
-                root.tabs = JSON.parse(text()).tabs ?? []
+                tabs.sync(JSON.parse(text()).tabs ?? [], "id")
             } catch (e) {
                 // mid-write read; the rename lands momentarily
             }
@@ -26,12 +26,15 @@ Row {
     }
 
     Repeater {
-        model: root.tabs
+        model: tabs.model
 
         Chip {
             id: chip
-            required property var modelData
+            required property var item
+            required property bool gone
             required property int index
+            readonly property var modelData: item
+            present: !gone
 
             edge: "bottom"
             active: modelData.active

@@ -8,7 +8,7 @@ import QtQuick
 Chip {
     id: root
     edge: "top"
-    visible: Deskwatch.loaded
+    present: Deskwatch.loaded
 
     readonly property bool bad: Deskwatch.bad.length > 0
     readonly property color tone:

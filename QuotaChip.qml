@@ -6,7 +6,7 @@ import QtQuick
 Chip {
     id: root
     edge: "bottom"
-    visible: Claude.quota.frames.length > 0
+    present: Claude.quota.frames.length > 0
 
     property int frame: 0
     onClicked: frame = (frame + 1) % Math.max(1, Claude.quota.frames.length)
@@ -184,7 +184,7 @@ Chip {
                 width: 264; height: 14
                 Text {
                     anchors.left: parent.left
-                    text: `${Claude.sessions.length} session${Claude.sessions.length === 1 ? "" : "s"}`
+                    text: `${Claude.sessions.count} session${Claude.sessions.count === 1 ? "" : "s"}`
                     color: Qt.alpha(Theme.text, 0.45)
                     font.family: Theme.fontFamily; font.pixelSize: 11
                 }

@@ -7,7 +7,7 @@ import QtQuick
 Chip {
     id: root
     edge: "top"
-    visible: UPower.displayDevice?.isPresent ?? false
+    present: UPower.displayDevice?.isPresent ?? false
 
     readonly property real pct: (UPower.displayDevice?.percentage ?? 0) * 100
     readonly property bool charging: UPower.displayDevice?.state === UPowerDeviceState.Charging

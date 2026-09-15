@@ -18,6 +18,7 @@ QtObject {
     readonly property int barHeight: 34
     readonly property string fontFamily: "ShureTechMono Nerd Font"
     readonly property int animDuration: 140
+    readonly property int slideDuration: 220   // chip enter/exit slide
     readonly property int overlayRadius: 12   // = hyprland rounding = libadwaita window radius
 
     // Threshold color: value against warn/crit cutoffs, foam family base.

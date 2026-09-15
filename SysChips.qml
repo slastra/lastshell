@@ -2,13 +2,12 @@ import QtQuick
 
 // The foam-family stat cluster: network, cpu, temp, disk, memory, recording,
 // weather — thin views over the polled singletons, waybar thresholds kept.
-Row {
+ChipRow {
     spacing: 8
 
     Chip {
         id: net
         edge: "top"
-        visible: true
 
         Popout {
             owner: net
@@ -209,7 +208,7 @@ Row {
     Chip {
         id: rec
         edge: "top"
-        visible: Recorder.recording
+        present: Recorder.recording
         onClicked: Recorder.stop()
         Row {
             id: recRow
@@ -238,7 +237,7 @@ Row {
     Chip {
         id: weather
         edge: "top"
-        visible: Weather.text !== ""
+        present: Weather.text !== ""
 
         Popout {
             owner: weather

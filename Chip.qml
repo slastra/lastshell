@@ -10,6 +10,10 @@ Rectangle {
 
     property string edge: "bottom"
     property bool active: false
+    // Use `present` instead of `visible`: the chip slides out of its screen
+    // edge before it actually hides, and slides back in on show. Bottom-bar
+    // chips rise from below the bar, top-bar chips drop from above it.
+    property bool present: true
     // Border accent when active; rose is the identity accent, sys chips
     // pass foam-family accents through their text instead and keep rose here.
     property color accent: Theme.rose
@@ -27,6 +31,36 @@ Rectangle {
     height: Theme.barHeight - 2
 
     color: active ? accent : Theme.border
+
+    readonly property real slideOffset: edge === "bottom" ? height : -height
+    // width collapses with the slide so neighbours glide in the same beat
+    property real widthFactor: 0
+    width: Math.round(implicitWidth * widthFactor)
+    clip: widthFactor < 1
+    visible: present || exitAnim.running
+    transform: Translate { id: slide; y: chip.slideOffset }
+    opacity: 0
+
+    onPresentChanged: {
+        if (present) { exitAnim.stop(); enterAnim.restart() }
+        else       { enterAnim.stop(); exitAnim.restart() }
+    }
+    // Repeater-created chips (tabs, tasks, tray, sessions) and startup: the
+    // enter animation runs on completion, so every appearance slides in.
+    Component.onCompleted: if (present) enterAnim.start()
+
+    ParallelAnimation {
+        id: enterAnim
+        NumberAnimation { target: slide; property: "y"; to: 0; duration: Theme.slideDuration; easing.type: Easing.OutCubic }
+        NumberAnimation { target: chip; property: "opacity"; to: 1; duration: Theme.slideDuration; easing.type: Easing.OutCubic }
+        NumberAnimation { target: chip; property: "widthFactor"; to: 1; duration: Theme.slideDuration; easing.type: Easing.OutCubic }
+    }
+    ParallelAnimation {
+        id: exitAnim
+        NumberAnimation { target: slide; property: "y"; to: chip.slideOffset; duration: Theme.slideDuration; easing.type: Easing.InCubic }
+        NumberAnimation { target: chip; property: "opacity"; to: 0; duration: Theme.slideDuration; easing.type: Easing.InCubic }
+        NumberAnimation { target: chip; property: "widthFactor"; to: 0; duration: Theme.slideDuration; easing.type: Easing.InCubic }
+    }
     topLeftRadius: edge === "bottom" ? Theme.overlayRadius : 0
     topRightRadius: edge === "bottom" ? Theme.overlayRadius : 0
     bottomLeftRadius: edge === "top" ? Theme.overlayRadius : 0

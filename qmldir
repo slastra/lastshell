@@ -36,3 +36,6 @@ HdrChip 1.0 HdrChip.qml
 singleton Hdr 1.0 services/Hdr.qml
 DeskwatchChip 1.0 DeskwatchChip.qml
 singleton Deskwatch 1.0 services/Deskwatch.qml
+SyncedList 1.0 SyncedList.qml
+ChipRow 1.0 ChipRow.qml
+MprisStrip 1.0 MprisStrip.qml

@@ -5,7 +5,7 @@ import QtQuick
 BarWindow {
     anchors.top: true
 
-    Row {
+    ChipRow {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.leftMargin: 8
@@ -16,13 +16,18 @@ BarWindow {
 
     Taskbar {
         anchors.top: parent.top
-        anchors.horizontalCenter: parent.horizontalCenter
+        // positioned by binding, not anchor, so a width change (a chip
+        // coming or going) glides the whole strip instead of jumping it
+        x: Math.round((parent.width - width) / 2)
+        Behavior on x { NumberAnimation { duration: Theme.slideDuration; easing.type: Easing.OutCubic } }
     }
 
-    Row {
+    ChipRow {
         anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.rightMargin: 8
+        // positioned by binding, not anchor, so a width change (a chip
+        // coming or going) glides the whole strip instead of jumping it
+        x: parent.width - width - 8
+        Behavior on x { NumberAnimation { duration: Theme.slideDuration; easing.type: Easing.OutCubic } }
         spacing: 8
         Tray {}
         SysChips {}

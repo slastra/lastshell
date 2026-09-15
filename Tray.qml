@@ -6,7 +6,7 @@ import QtQuick
 // per-icon pattern. Interaction goes through Chip's own signals — content
 // MouseAreas never fire, because Chip's MouseArea sits above the content
 // (that's why the first version's clicks went nowhere).
-Row {
+ChipRow {
     spacing: 4
     visible: SystemTray.items.values.length > 0
 
