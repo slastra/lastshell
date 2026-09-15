@@ -20,6 +20,7 @@ QtObject {
     readonly property int animDuration: 140
     readonly property int slideDuration: 220   // chip enter/exit slide
     readonly property int overlayRadius: 12   // = hyprland rounding = libadwaita window radius
+    readonly property int innerRadius: 6      // rows/pills nested inside an overlayRadius frame
 
     // Threshold color: value against warn/crit cutoffs, foam family base.
     function level(v, warn, crit, base) {

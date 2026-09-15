@@ -42,7 +42,7 @@ PanelWindow {
 
     Rectangle {
         id: pill
-        width: 280; height: 44; radius: 10
+        width: 280; height: 44; radius: Theme.overlayRadius
         color: Theme.surface
         border.color: Theme.border
         border.width: 2

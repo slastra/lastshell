@@ -186,7 +186,7 @@ Rectangle {
                 model: parent.shownActions
                 Rectangle {
                     required property var modelData
-                    width: actionText.implicitWidth + 22; height: 26; radius: 6
+                    width: actionText.implicitWidth + 22; height: 26; radius: Theme.innerRadius
                     color: actionHover.hovered ? Theme.overlay : "transparent"
                     border.color: Qt.alpha(Theme.iris, 0.5)
                     border.width: 1

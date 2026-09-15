@@ -50,7 +50,7 @@ Overlay {
                 anchors.verticalCenter: parent.verticalCenter
                 width: clearRow.implicitWidth + 20
                 height: 28
-                radius: 6
+                radius: Theme.innerRadius
                 color: clearHover.hovered ? Qt.alpha(Theme.love, 0.15) : "transparent"
                 border.color: Qt.alpha(Theme.love, 0.5)
                 border.width: 1

@@ -391,7 +391,7 @@ Scope {
                     Rectangle { // the cursor
                         x: 8; width: parent.width - 16; height: parent.rowH
                         y: 9 + root.sessionIndex * (parent.rowH + 2)
-                        radius: 6; color: "transparent"
+                        radius: Theme.innerRadius; color: "transparent"
                         border.color: Theme.rose; border.width: 2
                         visible: root.sessions.length > 0
                         Behavior on y { NumberAnimation { duration: Theme.animDuration; easing.type: Easing.OutCubic } }

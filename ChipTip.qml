@@ -36,7 +36,7 @@ PopupWindow {
         id: card
         width: tip.implicitWidth + 20
         height: tip.implicitHeight + 14
-        radius: 6
+        radius: Theme.overlayRadius
         color: Theme.surface
         border.color: Theme.border
         border.width: 2

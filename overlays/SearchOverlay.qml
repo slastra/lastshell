@@ -130,7 +130,7 @@ Overlay {
                 boundsBehavior: Flickable.StopAtBounds
 
                 highlight: Rectangle {
-                    radius: 6
+                    radius: Theme.innerRadius
                     color: Theme.overlay
                     border.width: 2
                     border.color: Qt.alpha(Theme.rose, 0.8)

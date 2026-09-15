@@ -162,7 +162,7 @@ Overlay {
                                         }
                                         Rectangle { // keycap
                                             width: capText.implicitWidth + 14
-                                            height: 21; radius: 5
+                                            height: 21; radius: Theme.innerRadius
                                             anchors.verticalCenter: parent.verticalCenter
                                             color: Theme.overlay
                                             border.color: Qt.alpha(Theme.rose, 0.35)

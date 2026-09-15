@@ -52,7 +52,7 @@ Column {
                 width: 30; height: 24
                 Rectangle {
                     visible: parent.isToday
-                    anchors.fill: parent; radius: 5; color: Theme.overlay
+                    anchors.fill: parent; radius: Theme.innerRadius; color: Theme.overlay
                     border.color: Theme.rose; border.width: 1
                 }
                 Text {

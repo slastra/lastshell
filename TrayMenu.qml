@@ -86,7 +86,7 @@ PopupWindow {
                     }
                 }
                 Rectangle {
-                    anchors.fill: parent; radius: 5; z: -1
+                    anchors.fill: parent; radius: Theme.innerRadius; z: -1
                     color: backHover.hovered ? Theme.overlay : "transparent"
                 }
                 HoverHandler { id: backHover }
@@ -116,7 +116,7 @@ PopupWindow {
                     Rectangle { // hover plate
                         visible: !row.modelData.isSeparator
                         anchors.fill: parent
-                        radius: 5
+                        radius: Theme.innerRadius
                         color: Theme.overlay
                         opacity: rowHover.hovered && row.modelData.enabled ? 1 : 0
                         Behavior on opacity { NumberAnimation { duration: 100 } }
