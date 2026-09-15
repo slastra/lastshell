@@ -25,6 +25,32 @@ ChipRow {
         }
     }
 
+    // Leading static chip: a plus, click for a new default-browser
+    // window. Sits ahead of the tabs so it never moves as they come and go.
+    Chip {
+        id: newWin
+        edge: "bottom"
+        anchors.bottom: parent.bottom
+        onClicked: Quickshell.execDetached(["firefox", "--new-window"])
+
+        Item {
+            implicitWidth: 34
+            height: newWin.height - 2
+            LucideIcon {
+                anchors.centerIn: parent
+                name: "plus"
+                font.pixelSize: 16
+                color: Theme.text
+            }
+        }
+        ChipTip {
+            owner: newWin
+            edge: "bottom"
+            ownerHovered: newWin.hovered
+            text: "New Firefox window"
+        }
+    }
+
     Repeater {
         model: tabs.model
 
