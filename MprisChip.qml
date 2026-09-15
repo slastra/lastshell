@@ -2,15 +2,50 @@ import Quickshell
 import Quickshell.Services.Mpris
 import QtQuick
 
-// Now-playing chip for one player (waybar mpris): title/artist capped,
-// italic when paused, click play-pause, wheel next/prev. Caches its text
-// so it can slide out after the player object is gone.
+// Now-playing chip (waybar mpris): one chip, one player at a time. Wheel
+// cycles which player it shows when there are several (the text swaps
+// with a slide from the bar edge, border and text in the accent for the
+// beat) and skips tracks when there's one; click play-pauses. Left
+// alone it follows the player that's actually playing.
 Chip {
     id: root
     edge: "bottom"
+    clip: true
+    active: swap.running
 
-    property var player: null   // MprisPlayer
+    readonly property var players: Mpris.players.values
+    present: players.length > 0
+
+    property var player: null
     readonly property bool paused: player?.playbackState === MprisPlaybackState.Paused
+
+    // Pick when the roster changes: keep the current one if it's still
+    // here, else prefer playing > paused > first. Hand-picked via wheel
+    // sticks until that player goes away.
+    property bool pinned: false
+    onPlayersChanged: {
+        if (player && players.includes(player)) return
+        pinned = false
+        player = players.find(p => p.playbackState === MprisPlaybackState.Playing)
+            ?? players.find(p => p.playbackState === MprisPlaybackState.Paused)
+            ?? players[0] ?? null
+    }
+    Component.onCompleted: playersChanged()
+
+    // One player: wheel skips tracks. Several: wheel picks the player.
+    function cycle(step) {
+        if (players.length < 2) {
+            if (step > 0 && player?.canGoNext) player.next()
+            if (step < 0 && player?.canGoPrevious) player.previous()
+            return
+        }
+        const i = Math.max(0, players.indexOf(player))
+        pinned = true
+        player = players[(i + step + players.length) % players.length]
+    }
+    onWheelUp: cycle(1)
+    onWheelDown: cycle(-1)
+    onClicked: player?.togglePlaying()
 
     readonly property string liveText: {
         if (!player) return ""
@@ -19,29 +54,45 @@ Chip {
         return dyn.length > 40 ? dyn.slice(0, 39) + "…" : dyn
     }
     property string text: ""
-    onLiveTextChanged: if (player) text = liveText
-    Component.onCompleted: text = liveText
+    onLiveTextChanged: if (!swap.running) text = liveText
+    onPlayerChanged: if (text !== "") swap.restart(); else text = liveText
 
-    onClicked: player?.togglePlaying()
-    onWheelUp: if (player?.canGoNext) player.next()
-    onWheelDown: if (player?.canGoPrevious) player.previous()
+    SequentialAnimation {
+        id: swap
+        readonly property int half: Theme.slideDuration / 2
+        ParallelAnimation {
+            NumberAnimation { target: slide; property: "y"; to: -root.height; duration: swap.half; easing.type: Easing.InCubic }
+            NumberAnimation { target: content; property: "opacity"; to: 0; duration: swap.half; easing.type: Easing.InCubic }
+        }
+        ScriptAction { script: { root.text = root.liveText; slide.y = root.height } }
+        ParallelAnimation {
+            NumberAnimation { target: slide; property: "y"; to: 0; duration: swap.half; easing.type: Easing.OutCubic }
+            NumberAnimation { target: content; property: "opacity"; to: 1; duration: swap.half; easing.type: Easing.OutCubic }
+        }
+        PauseAnimation { duration: Theme.slideDuration }
+    }
 
     Row {
+        id: content
         height: root.height - 2
         spacing: 8
         leftPadding: 12
         rightPadding: 12
+        transform: Translate { id: slide }
 
         LucideIcon {
             anchors.verticalCenter: parent.verticalCenter
             name: root.paused ? "pause" : "play"
             font.pixelSize: 13
-            color: Qt.alpha(Theme.text, 0.7)
+            color: Qt.alpha(root.active ? Theme.rose : Theme.text, 0.7)
+            Behavior on color { ColorAnimation { duration: Theme.animDuration } }
         }
         ValueText {
             font.italic: root.paused
-            color: Theme.text
+            color: root.active ? Theme.rose : Theme.text
+            Behavior on color { ColorAnimation { duration: Theme.animDuration } }
             text: root.text
+            Behavior on width { NumberAnimation { duration: Theme.slideDuration; easing.type: Easing.OutCubic } }
         }
     }
 }

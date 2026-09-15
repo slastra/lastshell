@@ -26,7 +26,7 @@ BarWindow {
         x: parent.width - width - 8
         Behavior on x { NumberAnimation { duration: Theme.slideDuration; easing.type: Easing.OutCubic } }
         spacing: 8
-        MprisStrip {}
+        MprisChip {}
         VolumeChip {}
     }
 }
