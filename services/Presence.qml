@@ -19,6 +19,11 @@ Singleton {
     property int state: 0           // sensor target: 0 none 1 moving 2 static 3 both
     property int distance: 0        // cm, closest reported target
     property double since: 0        // ms epoch of the last verdict flip
+    // last 60 s of the signal the verdict is made from: max moving energy in
+    // the near gates per 500 ms bin, oldest first, plus the verdict per bin
+    property var history: []
+    property var historyPresent: []
+    property int threshold: 0
 
     readonly property string stateWord:
         state === 1 ? "moving" : state === 2 ? "static" : state === 3 ? "both" : "none"
@@ -32,6 +37,21 @@ Singleton {
 
     function openView() {
         Quickshell.execDetached(["xdg-open", "http://127.0.0.1:7391/"])
+    }
+
+    FileView {
+        path: Quickshell.env("HOME") + "/.local/state/deskpresence/history.json"
+        watchChanges: true
+        onFileChanged: reload()
+        onLoaded: parse()
+        function parse() {
+            try {
+                const j = JSON.parse(text())
+                root.history = j.near ?? []
+                root.historyPresent = j.present ?? []
+                root.threshold = j.threshold ?? 0
+            } catch (e) { /* mid-write */ }
+        }
     }
 
     FileView {

@@ -54,7 +54,7 @@ Chip {
 
         Column {
             spacing: 6
-            width: 240
+            width: 280
 
             Row {
                 spacing: 8
@@ -80,6 +80,13 @@ Chip {
                 text: "No frames from the LD2410C. Nothing is blanking the OLED."
                 color: Qt.alpha(Theme.love, 0.9)
                 font.family: Theme.fontFamily; font.pixelSize: 12
+            }
+
+            PresenceGraph { width: parent.width; height: 64 }
+            Text {
+                text: `near-gate moving energy, 60 s  ·  present ≥ ${Presence.threshold}`
+                color: Qt.alpha(Theme.text, 0.45)
+                font.family: Theme.fontFamily; font.pixelSize: 11
             }
 
             Repeater {
