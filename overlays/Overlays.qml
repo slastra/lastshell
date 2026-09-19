@@ -43,6 +43,7 @@ Scope {
     // the eight modals load on demand.
     VolumeOsd {}
     NotificationPopups { id: popups }
+    DimOverlay {}
 
     LazyLoader { id: switcher; TabSwitcher {} }
     LazyLoader { id: launcher; Launcher {} }

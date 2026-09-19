@@ -19,6 +19,7 @@ Singleton {
     property int state: 0           // sensor target: 0 none 1 moving 2 static 3 both
     property int distance: 0        // cm, closest reported target
     property double since: 0        // ms epoch of the last verdict flip
+    property real fade: 0           // 0..1: how far the absence timer has run into its warning window
     // last 60 s of the signal the verdict is made from: max moving energy in
     // the near gates per 500 ms bin, oldest first, plus the verdict per bin
     property var history: []
@@ -71,6 +72,7 @@ Singleton {
                 root.state = j.state ?? 0
                 root.distance = j.distance ?? 0
                 root.since = j.since ?? 0
+                root.fade = j.fade ?? 0
                 root.loaded = true
             } catch (e) { /* mid-write */ }
         }

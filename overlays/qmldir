@@ -13,3 +13,4 @@ ClipboardPicker 1.0 ClipboardPicker.qml
 NotificationCenter 1.0 NotificationCenter.qml
 CapturePicker 1.0 CapturePicker.qml
 HotkeySheet 1.0 HotkeySheet.qml
+DimOverlay 1.0 DimOverlay.qml
