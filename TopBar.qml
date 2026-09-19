@@ -33,6 +33,7 @@ BarWindow {
         SysChips {}
         HdrChip {}
         BatteryChip {}
+        PresenceChip {}
         DeskwatchChip {}
         ClockChip {}
     }

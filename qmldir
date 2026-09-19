@@ -38,3 +38,5 @@ DeskwatchChip 1.0 DeskwatchChip.qml
 singleton Deskwatch 1.0 services/Deskwatch.qml
 SyncedList 1.0 SyncedList.qml
 ChipRow 1.0 ChipRow.qml
+PresenceChip 1.0 PresenceChip.qml
+singleton Presence 1.0 services/Presence.qml
