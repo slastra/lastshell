@@ -10,7 +10,8 @@ Column {
 
     readonly property var monthStart: new Date(shown.getFullYear(), shown.getMonth(), 1)
     readonly property int daysInMonth: new Date(shown.getFullYear(), shown.getMonth() + 1, 0).getDate()
-    readonly property var today: new Date()
+    // owner passes its clock so the ring moves at midnight without a restart
+    property date today: new Date()
 
     Row {
         spacing: 8

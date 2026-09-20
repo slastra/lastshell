@@ -9,8 +9,6 @@ import ".."  // root module: Recorder (recording-aware Print behavior)
 Scope {
     id: root
 
-    property alias switcher: switcher
-
     // Modals live in LazyLoaders: eight always-instantiated fullscreen
     // windows held a large share of the shell's RSS in surface buffers.
     // Created on first summon, kept warm after — first-open jank once
@@ -31,11 +29,8 @@ Scope {
         function toggleHotkeys(): void { root.summon(hotkeys) }
         function toggleCapture(): void {
             // Print while recording = stop, no menu — matching the script.
-            if (Recorder.recording)
-                Quickshell.execDetached(["bash",
-                    Quickshell.env("HOME") + "/.config/rofi/scripts/capture.sh", "stop"])
-            else
-                root.summon(capture)
+            if (Recorder.recording) Recorder.stop()
+            else root.summon(capture)
         }
     }
 

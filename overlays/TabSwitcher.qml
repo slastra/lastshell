@@ -37,7 +37,7 @@ SearchOverlay {
             key: t.id,
             label: t.title,
             sublabel: t.browser,
-            iconSource: "file://" + t.icon,
+            iconSource: t.icon ? "file://" + t.icon : "",
             current: t.active,
         }))
         .concat(browsers.map(b => ({

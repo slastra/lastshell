@@ -67,6 +67,6 @@ Chip {
         owner: root
         edge: "top"
         ownerHovered: root.hovered
-        Calendar {}
+        Calendar { today: clock.date }
     }
 }

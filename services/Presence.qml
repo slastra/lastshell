@@ -61,6 +61,8 @@ Singleton {
             Quickshell.execDetached([Quickshell.env("HOME") + "/.config/deskpresence/light-hook", present ? "on" : "off"])
     }
 
+    // status.json is the source of truth for audioFollow (the daemon reads
+    // the flag within a tick); the flag file is only written here
     function toggleAudio() {
         audioFollow = !audioFollow
         audioFlagView.setText(audioFollow ? "on" : "off")
@@ -83,13 +85,7 @@ Singleton {
         onLoaded: root.lightFollow = text().trim() !== "off"
     }
 
-    FileView {
-        id: audioFlagView
-        path: root.audioFlag
-        watchChanges: true
-        onFileChanged: reload()
-        onLoaded: root.audioFollow = text().trim() !== "off"
-    }
+    FileView { id: audioFlagView; path: root.audioFlag }
 
     FileView {
         path: Quickshell.env("HOME") + "/.local/state/deskpresence/history.json"

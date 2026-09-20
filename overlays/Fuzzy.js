@@ -22,8 +22,6 @@ function match(query, target) {
     return qi === q.length ? { score: s, idx: idx } : { score: 0, idx: [] }
 }
 
-function score(query, target) { return match(query, target).score }
-
 // HTML for a label with its matched characters lit in `color`.
 function highlight(label, idx, color) {
     if (!idx || idx.length === 0)

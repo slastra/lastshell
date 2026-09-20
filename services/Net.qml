@@ -41,15 +41,20 @@ Singleton {
             rxF.reload(); txF.reload(); opF.reload()
             const rx = Number(rxF.text().trim()), tx = Number(txF.text().trim())
             root.connected = opF.text().trim() === "up" && root.ip !== ""
-            if (root._prev) {
-                root.rxBps = Math.max(0, (rx - root._prev.rx) / 5)
-                root.txBps = Math.max(0, (tx - root._prev.tx) / 5)
-                const h = root.history.slice(-59)
-                h.push([root.rxBps, root.txBps])
-                root.history = h
-            }
-            root._prev = { rx: rx, tx: tx }
+            sample(rx, tx)
         } catch (e) { /* interface vanished; next probe re-discovers */ }
+    }
+
+    // one counter reading -> rates against the previous one (5 s apart)
+    function sample(rx, tx) {
+        if (root._prev) {
+            root.rxBps = Math.max(0, (rx - root._prev.rx) / 5)
+            root.txBps = Math.max(0, (tx - root._prev.tx) / 5)
+            const h = root.history.slice(-59)
+            h.push([root.rxBps, root.txBps])
+            root.history = h
+        }
+        root._prev = { rx: rx, tx: tx }
     }
 
     Process {
@@ -67,14 +72,7 @@ Singleton {
                 root.iface = name
                 root.ip = addr ?? ""
                 root.connected = lines[3] === "up" && !!addr
-                if (root._prev) {
-                    root.rxBps = Math.max(0, (rx - root._prev.rx) / 5)
-                    root.txBps = Math.max(0, (tx - root._prev.tx) / 5)
-                    const h = root.history.slice(-59)
-                    h.push([root.rxBps, root.txBps])
-                    root.history = h
-                }
-                root._prev = { rx: rx, tx: tx }
+                root.sample(rx, tx)
             }
         }
     }
