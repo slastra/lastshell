@@ -6,13 +6,9 @@ import Quickshell.Wayland
 import QtQuick
 import ".."  // root module
 
-// Notification server + top-right toast stack (replaces mako). Guarded by
-// LASTSHELL_NOTIFS=1 until cutover: two servers on org.freedesktop
-// .Notifications conflict, and mako holds the name until it retires.
+// Notification server + top-right toast stack (replaced mako 2026-08-31).
 Scope {
     id: root
-
-    property bool enabled: Quickshell.env("LASTSHELL_NOTIFS") === "1"
 
     ListModel { id: toasts }
     ListModel { id: history }
@@ -26,12 +22,19 @@ Scope {
         bodyMarkupSupported: true
 
         onNotification: n => {
-            if (!root.enabled) return
             n.tracked = true
+            // closed by the sender, by expiry or by us: off both models at once
+            n.closed.connect(() => root.forget(n))
             toasts.append({ notif: n })
             if (toasts.count > 5) toasts.remove(0)
             history.insert(0, { notif: n, time: Qt.formatTime(new Date(), "hh:mm AP") })
-            if (history.count > 50) history.remove(50)
+            if (history.count > 50) {
+                // evicted from the center: release it server-side too, or it
+                // stays tracked until the app closes it
+                const old = history.get(50).notif
+                history.remove(50)
+                if (old?.tracked) old.dismiss()
+            }
             const lamp = Quickshell.env("HOME") + "/.config/lastshell/lamp.sh"
             Quickshell.execDetached(["bash", lamp, n.urgency === 2 ? "alert" : "info"])
         }
@@ -41,6 +44,15 @@ Scope {
         for (let i = 0; i < toasts.count; i++)
             if (toasts.get(i).notif === n) { toasts.remove(i); break }
         if (dismissToo) n.dismiss()
+    }
+    // A closed notification leaves both models. QML nulls a var that held a
+    // destroyed object, so rows whose notif is gone or untracked go too.
+    function forget(n) {
+        for (const m of [toasts, history])
+            for (let i = m.count - 1; i >= 0; i--) {
+                const x = m.get(i).notif
+                if (x === n || !x || !x.tracked) m.remove(i)
+            }
     }
 
     // A toast was clicked. Invoke the default action (tells the app), then
@@ -59,9 +71,8 @@ Scope {
     // time any of these async steps return.
     function activate(n) {
         drop(n, false) // off the stack now; dismissed once the action is sent
-        console.log("[notif] activate tracked=" + n.tracked + " entry=" + n.desktopEntry + " app=" + n.appName)
         // Sender may have closed it already (Firefox replaces same-tag
-        // notifications); the toast lingers until the prune timer runs.
+        // notifications) between the click and this call.
         if (!n.tracked) return
         const def = n.actions?.find(a => a.identifier === "default") ?? n.actions?.[0]
         const browser = tabctlBrowser(n.desktopEntry, n.appName)
@@ -120,14 +131,12 @@ Scope {
             if (notif) notif.dismiss()
         }
         function fallback() {
-            console.log("[notif] fallback names=" + JSON.stringify(names))
             fire()
             root.focusClient(root.byClass(names), 0)
         }
         function onList(text) {
             let tabs
-            try { tabs = JSON.parse(text) } catch (e) { console.log("[notif] list parse fail"); fallback(); return }
-            console.log("[notif] list armed=" + armed + " polls=" + polls + " n=" + tabs.length)
+            try { tabs = JSON.parse(text) } catch (e) { fallback(); return }
             const active = {}
             for (const t of tabs) if (t.active) active[t.windowId] = t
             if (armed) {
@@ -194,7 +203,6 @@ Scope {
                 let clients
                 try { clients = JSON.parse(text) } catch (e) { return }
                 const hit = root.pick ? root.pick(clients) : null
-                console.log("[notif] clients hit=" + (hit ? hit.address : "none") + " retries=" + root.pickRetries)
                 if (hit) Hyprland.dispatch(`hl.dsp.focus({ window = "address:${hit.address}" })`)
                 else if (root.pickRetries-- > 0) clientsRetry.restart()
             }
@@ -211,22 +219,16 @@ Scope {
         }
     }
 
-    Timer { // prune dismissed notifications from both models
-        interval: 2000; running: toasts.count > 0 || history.count > 0; repeat: true
-        onTriggered: {
-            for (let i = toasts.count - 1; i >= 0; i--) {
-                const n = toasts.get(i).notif
-                if (!n || !n.tracked) toasts.remove(i)
-            }
-            for (let i = history.count - 1; i >= 0; i--) {
-                const n = history.get(i).notif
-                if (!n || !n.tracked) history.remove(i)
-            }
-        }
+    // The window stays mapped for one remove transition after the last
+    // toast leaves, so that toast slides out instead of vanishing.
+    Timer { id: linger; interval: 170 }
+    Connections {
+        target: toasts
+        function onCountChanged() { if (toasts.count === 0) linger.restart() }
     }
 
     PanelWindow {
-        visible: root.enabled && toasts.count > 0
+        visible: toasts.count > 0 || linger.running
         color: "transparent"
         anchors { top: true; right: true }
         margins { top: Theme.barHeight + 10; right: 10 }

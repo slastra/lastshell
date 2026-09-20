@@ -13,7 +13,10 @@ Rectangle {
     readonly property int urgency: notif.urgency ?? 1
     readonly property color urgencyColor:
         urgency === 2 ? Theme.love : urgency === 0 ? Theme.foam : Theme.rose
-    readonly property int timeout: 6000
+    // the sender's expire_timeout when it gave one (2-30 s); 0 and -1 both
+    // fall to the default, since plenty of senders pass 0 unconditionally
+    readonly property int timeout: notif.expireTimeout > 0
+        ? Math.min(30000, Math.max(2000, notif.expireTimeout)) : 6000
     readonly property bool sticky: urgency === 2
 
     width: 380
