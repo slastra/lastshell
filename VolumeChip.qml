@@ -1,23 +1,19 @@
 import Quickshell
-import Quickshell.Services.Pipewire
 import QtQuick
 
-// Default-sink volume chip (waybar wireplumber): click toggles mute,
-// wheel steps 1%, glyph tracks level / mute / bluetooth.
+// Default-sink volume chip: click toggles mute, wheel steps 1%, glyph
+// tracks level / mute / bluetooth. State comes from the Audio singleton.
 Chip {
     id: root
     edge: "bottom"
 
-    readonly property PwNode sink: Pipewire.defaultAudioSink
-    PwObjectTracker { objects: [root.sink] }
+    readonly property real vol: Audio.vol
+    readonly property bool muted: Audio.muted
+    readonly property bool bluetooth: Audio.bluetooth
 
-    readonly property real vol: sink?.audio?.volume ?? 0
-    readonly property bool muted: sink?.audio?.muted ?? false
-    readonly property bool bluetooth: (sink?.name ?? "").startsWith("bluez")
-
-    onClicked: if (sink?.audio) sink.audio.muted = !sink.audio.muted
-    onWheelUp: if (sink?.audio) sink.audio.volume = Math.min(1.5, vol + 0.01)
-    onWheelDown: if (sink?.audio) sink.audio.volume = Math.max(0, vol - 0.01)
+    onClicked: Audio.toggleMute()
+    onWheelUp: Audio.step(0.01)
+    onWheelDown: Audio.step(-0.01)
 
     Popout {
         owner: root
@@ -27,7 +23,7 @@ Chip {
         Column {
             spacing: 8
             Text {
-                text: root.sink?.description ?? "no sink"
+                text: Audio.description
                 color: Theme.text; font.family: Theme.fontFamily; font.pixelSize: 14
                 width: 220; elide: Text.ElideRight
             }
@@ -42,8 +38,9 @@ Chip {
                 }
                 MouseArea {
                     anchors.fill: parent
-                    onPressed: mouse => { if (root.sink?.audio) root.sink.audio.volume = mouse.x / width }
-                    onPositionChanged: mouse => { if (pressed && root.sink?.audio) root.sink.audio.volume = Math.max(0, Math.min(1, mouse.x / width)) }
+                    function at(x) { Audio.setVolume(Math.max(0, Math.min(1, x / width))) }
+                    onPressed: mouse => at(mouse.x)
+                    onPositionChanged: mouse => { if (pressed) at(mouse.x) }
                 }
             }
         }

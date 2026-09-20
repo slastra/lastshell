@@ -1,5 +1,4 @@
 import Quickshell
-import Quickshell.Services.Pipewire
 import Quickshell.Wayland
 import QtQuick
 import ".."  // root module: Theme and friends
@@ -10,14 +9,11 @@ import ".."  // root module: Theme and friends
 PanelWindow {
     id: root
 
-    readonly property PwNode sink: Pipewire.defaultAudioSink
-    PwObjectTracker { objects: [root.sink] }
-
     property bool shown: false
     property bool armed: false  // suppress the startup ghost while props populate
 
-    readonly property real vol: sink?.audio?.volume ?? 0
-    readonly property bool muted: sink?.audio?.muted ?? false
+    readonly property real vol: Audio.vol
+    readonly property bool muted: Audio.muted
 
     onVolChanged: ping()
     onMutedChanged: ping()

@@ -34,6 +34,7 @@ TrayMenu 1.0 TrayMenu.qml
 ValueText 1.0 ValueText.qml
 HdrChip 1.0 HdrChip.qml
 singleton Hdr 1.0 services/Hdr.qml
+singleton Audio 1.0 services/Audio.qml
 DeskwatchChip 1.0 DeskwatchChip.qml
 singleton Deskwatch 1.0 services/Deskwatch.qml
 SyncedList 1.0 SyncedList.qml
