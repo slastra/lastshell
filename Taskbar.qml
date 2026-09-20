@@ -21,7 +21,12 @@ ChipRow {
         if (!ids.has(t)) ids.set(t, String(nextId++))
         return ids.get(t)
     }
-    function resync() { tasks.sync(ToplevelManager.toplevels.values, keyOf) }
+    function resync() {
+        const live = ToplevelManager.toplevels.values
+        tasks.sync(live, keyOf)
+        // keys for closed windows would otherwise accumulate for the session
+        for (const t of Array.from(ids.keys())) if (!live.includes(t)) ids.delete(t)
+    }
     Connections {
         target: ToplevelManager.toplevels
         function onValuesChanged() { root.resync() }

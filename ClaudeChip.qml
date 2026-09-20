@@ -27,7 +27,6 @@ Chip {
         ValueText {
             color: root.session.state === "waiting" ? Theme.gold : Theme.text
             text: root.session.label
-            Behavior on color { ColorAnimation { duration: Theme.animDuration } }
         }
 
         Rectangle { // agent-count badge, only when >1

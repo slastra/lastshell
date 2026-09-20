@@ -10,7 +10,6 @@ ChipRow {
         ClaudeChip {
             required property var item
             required property bool gone
-            required property int index
             session: item
             present: !gone
             anchors.bottom: parent.bottom

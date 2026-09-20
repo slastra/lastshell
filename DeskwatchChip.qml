@@ -83,7 +83,6 @@ Chip {
             name: Deskwatch.stale || !Deskwatch.tailUp ? "radar"
                 : root.bad ? "shield-alert" : "activity"
             color: root.tone
-            Behavior on color { ColorAnimation { duration: Theme.animDuration } }
         }
     }
 

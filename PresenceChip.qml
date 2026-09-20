@@ -34,7 +34,6 @@ Chip {
                 anchors.verticalCenter: parent.verticalCenter
                 name: row.icon
                 color: row.on ? Theme.gold : Qt.alpha(Theme.text, 0.45)
-                Behavior on color { ColorAnimation { duration: Theme.animDuration } }
             }
             Text {
                 anchors.verticalCenter: parent.verticalCenter
@@ -121,7 +120,6 @@ Chip {
             anchors.verticalCenter: parent.verticalCenter
             name: root.stale ? "radar" : Presence.paused ? "eye" : Presence.present ? "user" : "radar"
             color: root.tone
-            Behavior on color { ColorAnimation { duration: Theme.animDuration } }
         }
     }
 

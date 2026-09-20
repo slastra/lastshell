@@ -41,16 +41,16 @@ Item {
                 id: wsChip
                 required property var item
                 required property bool gone
-                readonly property int modelData: item.id
+                readonly property int wsId: item.id
                 edge: "top"
                 present: !gone
-                active: root.focusedId === modelData
+                active: root.focusedId === wsId
                 height: Theme.barHeight - 2
 
-                onClicked: Hyprland.dispatch(`hl.dsp.focus({ workspace = ${modelData} })`)
+                onClicked: Hyprland.dispatch(`hl.dsp.focus({ workspace = ${wsId} })`)
 
                 ChipText {
-                    text: wsChip.modelData
+                    text: wsChip.wsId
                     // measured (bar.png ink rows): full chip height sat 1px low of the
                     // right-side ValueText line; -2 centres the digits on it
                     height: wsChip.height - 2
@@ -58,7 +58,7 @@ Item {
                     // empty workspaces read dim but legible — overlay-on-surface
                     // was too faint to count at a glance
                     color: wsChip.active ? Theme.rose
-                         : root.occupied[wsChip.modelData] ? Theme.text
+                         : root.occupied[wsChip.wsId] ? Theme.text
                          : Qt.alpha(Theme.text, 0.45)
                 }
             }

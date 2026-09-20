@@ -22,10 +22,8 @@ Chip {
     // Pick when the roster changes: keep the current one if it's still
     // here, else prefer playing > paused > first. Hand-picked via wheel
     // sticks until that player goes away.
-    property bool pinned: false
     onPlayersChanged: {
         if (player && players.includes(player)) return
-        pinned = false
         player = players.find(p => p.playbackState === MprisPlaybackState.Playing)
             ?? players.find(p => p.playbackState === MprisPlaybackState.Paused)
             ?? players[0] ?? null
@@ -40,7 +38,6 @@ Chip {
             return
         }
         const i = Math.max(0, players.indexOf(player))
-        pinned = true
         player = players[(i + step + players.length) % players.length]
     }
     onWheelUp: cycle(1)
@@ -85,12 +82,10 @@ Chip {
             name: root.paused ? "pause" : "play"
             font.pixelSize: 13
             color: Qt.alpha(root.active ? Theme.rose : Theme.text, 0.7)
-            Behavior on color { ColorAnimation { duration: Theme.animDuration } }
         }
         ValueText {
             font.italic: root.paused
             color: root.active ? Theme.rose : Theme.text
-            Behavior on color { ColorAnimation { duration: Theme.animDuration } }
             text: root.text
             Behavior on width { NumberAnimation { duration: Theme.slideDuration; easing.type: Easing.OutCubic } }
         }

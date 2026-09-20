@@ -43,7 +43,6 @@ Chip {
         text: root.shownTitle
         // text takes the accent with the border while the swap plays
         color: root.active ? Theme.rose : Theme.text
-        Behavior on color { ColorAnimation { duration: Theme.animDuration } }
         transform: Translate { id: slide }
         // measured: caps sat 2px low of the right-side chips; -4 lands them
         height: root.height - 4

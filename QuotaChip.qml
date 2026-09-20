@@ -58,7 +58,6 @@ Chip {
         ValueText {
             color: root.accent
             text: `${Math.round(root.shown.pct ?? 0)}%`
-            Behavior on color { ColorAnimation { duration: Theme.animDuration } }
         }
 
         LucideIcon { // frame marker: hourglass for the 5h window, calendar for weeklies

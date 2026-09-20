@@ -2,7 +2,7 @@ import Quickshell
 import QtQuick
 
 // Tooltip as a real popup window: QtQuick Controls ToolTip renders inside
-// the 30px bar window and clips, so every chip tooltip goes through this.
+// the bar window and clips, so every chip tooltip goes through this.
 // Delay-on-hover, instant hide, multi-line capable.
 PopupWindow {
     id: root

@@ -59,11 +59,10 @@ ChipRow {
             required property var item
             required property bool gone
             required property int index
-            readonly property var modelData: item
             present: !gone
 
             edge: "bottom"
-            active: modelData.active
+            active: item.active
             anchors.bottom: parent.bottom
 
             onClicked: Quickshell.execDetached(
@@ -81,7 +80,7 @@ ChipRow {
                 Image {
                     anchors.centerIn: parent
                     width: 18; height: 18
-                    source: "file://" + chip.modelData.icon
+                    source: "file://" + chip.item.icon
                     sourceSize: Qt.size(36, 36) // decode above device pixels
                     smooth: true
                     // brightness is baked into the chip the daemon picked
@@ -93,7 +92,7 @@ ChipRow {
                 owner: chip
                 edge: "bottom"
                 ownerHovered: chip.hovered
-                text: chip.modelData.label ?? ""
+                text: chip.item.label ?? ""
             }
         }
     }

@@ -4,7 +4,7 @@ import QtQuick
 // Hover popout attached to a chip: a floating card just off the bar edge.
 // Shows while the chip OR the card is hovered, with a grace timer so the
 // pointer can travel across the gap. Never QtQuick ToolTip — that renders
-// inside the 26px bar window and clips.
+// inside the bar window and clips.
 PopupWindow {
     id: root
 
