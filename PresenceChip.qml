@@ -90,10 +90,10 @@ Chip {
         : Presence.present ? Theme.foam
         : Qt.alpha(Theme.text, 0.45)
 
-    // ticks once a second so "for 4m 12s" in the popout stays honest
+    // ticks once a second while the popout is up so "for 4m 12s" stays honest
+    // (the card outlives the chip hover: the pointer can sit on it)
     property double now: Date.now()
-    Timer { interval: 1000; running: root.hovered; repeat: true; onTriggered: root.now = Date.now() }
-    onHoveredChanged: if (hovered) now = Date.now()
+    Timer { interval: 1000; running: pop.visible; repeat: true; onTriggered: root.now = Date.now() }
 
     function holdLeft() {
         const s = Math.max(0, Math.round((Presence.holdUntil - now) / 1000))
@@ -126,9 +126,14 @@ Chip {
     }
 
     Popout {
+        id: pop
         owner: root
         edge: "top"
         ownerHovered: root.hovered
+        onVisibleChanged: {
+            Presence.historyWatchers += visible ? 1 : -1
+            if (visible) root.now = Date.now()
+        }
 
         Column {
             spacing: 6

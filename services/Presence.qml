@@ -25,6 +25,10 @@ Singleton {
     property var history: []
     property var historyPresent: []
     property int threshold: 0
+    // history.json is rewritten twice a second and only feeds the popout
+    // graph, so it is watched only while a popout that draws it is open
+    // (ref-counted: one chip per screen)
+    property int historyWatchers: 0
 
     readonly property string stateWord:
         state === 1 ? "moving" : state === 2 ? "static" : state === 3 ? "both" : "none"
@@ -89,7 +93,8 @@ Singleton {
 
     FileView {
         path: Quickshell.env("HOME") + "/.local/state/deskpresence/history.json"
-        watchChanges: true
+        watchChanges: root.historyWatchers > 0
+        onWatchChangesChanged: if (watchChanges) reload()
         onFileChanged: reload()
         onLoaded: parse()
         function parse() {

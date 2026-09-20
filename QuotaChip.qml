@@ -78,10 +78,17 @@ Chip {
         }
     }
 
+    // "resets in" is recomputed against this, refreshed once a minute while
+    // the card is up, instead of a Date.now() that only re-ran on new frames
+    property double now: Date.now()
+    Timer { interval: 60000; running: pop.visible; repeat: true; onTriggered: root.now = Date.now() }
+
     Popout {
+        id: pop
         owner: root
         edge: "bottom"
         ownerHovered: root.hovered
+        onVisibleChanged: if (visible) root.now = Date.now()
 
         Column {
             spacing: 10
@@ -119,7 +126,7 @@ Chip {
                     function resetsIn(v) {
                         if (!v) return ""
                         const t = typeof v === "number" ? v * 1000 : Date.parse(v)
-                        const s = (t - Date.now()) / 1000
+                        const s = (t - root.now) / 1000
                         if (!(s > 0)) return ""
                         if (s < 5400) return `resets in ${Math.round(s / 60)}m`
                         if (s < 129600) return `resets in ${Math.round(s / 3600)}h`
