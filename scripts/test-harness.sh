@@ -87,6 +87,26 @@ QS_PID=$!
 cleanup() { kill $QS_PID $BG_PID $HYPR_PID 2>/dev/null; }
 trap cleanup EXIT INT TERM
 
+# Park the nested window on an unused host workspace so it never lands on
+# top of what you are doing: pick the lowest empty id (LASTSHELL_HARNESS_WS
+# overrides), and move silently so the host stays where it is. Needs the
+# host instance, which is the inherited HYPRLAND_INSTANCE_SIGNATURE.
+if [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
+    HOST_WS=${LASTSHELL_HARNESS_WS:-$(hyprctl workspaces -j | jq -r '
+        [.[] | select(.windows > 0) | .id] as $used
+        | [range(1; 11)] | map(select(. as $i | $used | index($i) | not)) | .[0] // 10')}
+    for _ in $(seq 1 40); do
+        ADDR=$(hyprctl clients -j | jq -r --arg pid "$HYPR_PID" \
+            '.[] | select(.class == "aquamarine" and (.pid|tostring) == $pid) | .address' | head -1)
+        [ -n "$ADDR" ] && break
+        sleep 0.2
+    done
+    if [ -n "$ADDR" ]; then
+        hyprctl dispatch "hl.dsp.window.move({ workspace = $HOST_WS, window = \"address:$ADDR\", silent = true })" >/dev/null
+        echo "nested window parked on host workspace $HOST_WS"
+    fi
+fi
+
 sleep 4
 # Hyprland paints a "started without start-hyprland" error banner over the top
 # edge in debug environments — exactly where the top bar lives. Dismiss it.
