@@ -33,6 +33,12 @@ Singleton {
     // ~/.config/deskpresence/light-hook on every on|off; persists across reboots)
     property bool lightFollow: true
     readonly property string lightFlag: Quickshell.env("HOME") + "/.local/state/deskpresence/light-follow"
+    // audio fade + MPRIS pause, gated inside the daemon by its -audio-flag file
+    property bool audioFollow: true
+    readonly property string audioFlag: Quickshell.env("HOME") + "/.local/state/deskpresence/audio-follow"
+    // "keep awake": a timed pause the daemon expires itself; ms epoch, 0 = none
+    property double holdUntil: 0
+    readonly property string deskpresence: Quickshell.env("HOME") + "/go/bin/deskpresence"
 
     readonly property string pauseFile: Quickshell.env("XDG_RUNTIME_DIR") + "/deskpresence.pause"
 
@@ -51,6 +57,16 @@ Singleton {
             Quickshell.execDetached([Quickshell.env("HOME") + "/.config/deskpresence/light-hook", present ? "on" : "off"])
     }
 
+    function toggleAudio() {
+        audioFollow = !audioFollow
+        audioFlagView.setText(audioFollow ? "on" : "off")
+    }
+
+    // hold(0) releases; status.json carries hold_until back within a tick
+    function hold(minutes) {
+        Quickshell.execDetached([deskpresence, "hold", minutes > 0 ? `${minutes}m` : "off"])
+    }
+
     function openView() {
         Quickshell.execDetached(["xdg-open", "http://127.0.0.1:7391/"])
     }
@@ -61,6 +77,14 @@ Singleton {
         watchChanges: true
         onFileChanged: reload()
         onLoaded: root.lightFollow = text().trim() !== "off"
+    }
+
+    FileView {
+        id: audioFlagView
+        path: root.audioFlag
+        watchChanges: true
+        onFileChanged: reload()
+        onLoaded: root.audioFollow = text().trim() !== "off"
     }
 
     FileView {
@@ -91,6 +115,8 @@ Singleton {
                 root.sensorOk = !!j.sensor_ok
                 root.busy = !!j.busy
                 root.paused = !!j.paused
+                root.holdUntil = j.hold_until ?? 0
+                root.audioFollow = j.audio_follow ?? true
                 root.tv = j.tv ?? ""
                 root.state = j.state ?? 0
                 root.distance = j.distance ?? 0

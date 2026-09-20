@@ -60,6 +60,8 @@ QtObject {
         "wand-sparkles": "\ue357",
         "check": "\ue06c",
         "volume-2": "\ue1ab",
+        "volume-x": "\ue1ac",
+        "coffee": "\ue096",
         "clipboard-list": "\ue086",
         "image": "\ue0f6",
         "bell": "\ue059",
