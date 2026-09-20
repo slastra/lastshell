@@ -51,16 +51,11 @@ PanelWindow {
                 color: root.muted ? Theme.love : Theme.text
                 text: root.muted ? "󰝟" : root.vol < 0.34 ? "󰕿" : root.vol < 0.67 ? "󰖀" : "󰕾"
             }
-            Rectangle {
+            SliderTrack {
                 anchors.verticalCenter: parent.verticalCenter
-                width: 170; height: 8; radius: 4
-                color: Theme.overlay
-                Rectangle {
-                    width: parent.width * Math.min(1, root.vol)
-                    height: parent.height; radius: 4
-                    color: root.muted ? Theme.love : Theme.pine
-                    Behavior on width { NumberAnimation { duration: 80 } }
-                }
+                width: 170
+                frac: root.vol
+                fill: root.muted ? Theme.love : Theme.pine
             }
             Text {
                 anchors.verticalCenter: parent.verticalCenter

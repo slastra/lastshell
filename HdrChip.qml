@@ -26,21 +26,12 @@ StatChip {
                 size: 14
                 width: 220
             }
-            Rectangle { // slider track, 1.0 at the left edge
-                width: 220; height: 8; radius: 4
-                color: Qt.alpha(Theme.text, 0.22)
-                Rectangle {
-                    width: parent.width * (root.b - Hdr.min) / (Hdr.max - Hdr.min)
-                    height: parent.height; radius: 4
-                    color: Theme.gold
-                    Behavior on width { NumberAnimation { duration: 80 } }
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    function at(x) { Hdr.set(Hdr.min + (Hdr.max - Hdr.min) * Math.max(0, Math.min(1, x / width))) }
-                    onPressed: mouse => at(mouse.x)
-                    onPositionChanged: mouse => { if (pressed) at(mouse.x) }
-                }
+            SliderTrack { // 1.0 at the left edge
+                width: 220
+                frac: (root.b - Hdr.min) / (Hdr.max - Hdr.min)
+                fill: Theme.gold
+                interactive: true
+                onSeek: f => Hdr.set(Hdr.min + (Hdr.max - Hdr.min) * f)
             }
         }
     }

@@ -24,6 +24,10 @@ Popout 1.0 Popout.qml
 PopText 1.0 PopText.qml
 Divider 1.0 Divider.qml
 Card 1.0 Card.qml
+PopoutHeader 1.0 PopoutHeader.qml
+KeyValueRow 1.0 KeyValueRow.qml
+Badge 1.0 Badge.qml
+SliderTrack 1.0 SliderTrack.qml
 Calendar 1.0 Calendar.qml
 NetGraph 1.0 NetGraph.qml
 TempGraph 1.0 TempGraph.qml

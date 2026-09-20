@@ -130,21 +130,13 @@ Chip {
             spacing: 6
             width: 280
 
-            Row {
-                spacing: 8
-                PopText {
-                    text: "deskpresence"
-                    size: 14; font.bold: true
-                }
-                PopText {
-                    anchors.baseline: parent.children[0].baseline
-                    text: root.stale ? "sensor silent"
-                        : Presence.holdUntil > 0 ? "held awake"
-                        : Presence.paused ? "paused"
-                        : Presence.present ? "present" : "away"
-                    color: root.tone
-                    size: 13
-                }
+            PopoutHeader {
+                title: "deskpresence"
+                status: root.stale ? "sensor silent"
+                    : Presence.holdUntil > 0 ? "held awake"
+                    : Presence.paused ? "paused"
+                    : Presence.present ? "present" : "away"
+                tone: root.tone
             }
 
             PopText {
@@ -163,27 +155,9 @@ Chip {
                 size: 11
             }
 
-            Repeater {
-                model: [
-                    ["for", root.held()],
-                    ["tv", Presence.busy ? `${Presence.tv || "?"} (switching)` : (Presence.tv || "unknown")],
-                    ["target", Presence.state === 0 ? "none" : `${Presence.stateWord} at ${Presence.distance} cm`],
-                ]
-                Row {
-                    required property var modelData
-                    spacing: 8
-                    PopText {
-                        width: 60
-                        text: modelData[0]
-                        dim: 0.5
-                        size: 13
-                    }
-                    PopText {
-                        text: modelData[1]
-                        size: 13
-                    }
-                }
-            }
+            KeyValueRow { key: "for"; value: root.held() }
+            KeyValueRow { key: "tv"; value: Presence.busy ? `${Presence.tv || "?"} (switching)` : (Presence.tv || "unknown") }
+            KeyValueRow { key: "target"; value: Presence.state === 0 ? "none" : `${Presence.stateWord} at ${Presence.distance} cm` }
 
             // divider, then the controls
             Divider { width: parent.width }

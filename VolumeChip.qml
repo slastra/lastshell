@@ -25,21 +25,12 @@ Chip {
                 size: 14
                 width: 220; elide: Text.ElideRight
             }
-            Rectangle { // slider track
-                width: 220; height: 8; radius: 4
-                color: Qt.alpha(Theme.text, 0.22)
-                Rectangle {
-                    width: parent.width * Math.min(1, root.vol)
-                    height: parent.height; radius: 4
-                    color: root.muted ? Theme.love : Theme.pine
-                    Behavior on width { NumberAnimation { duration: 80 } }
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    function at(x) { Audio.setVolume(Math.max(0, Math.min(1, x / width))) }
-                    onPressed: mouse => at(mouse.x)
-                    onPositionChanged: mouse => { if (pressed) at(mouse.x) }
-                }
+            SliderTrack {
+                width: 220
+                frac: root.vol
+                fill: root.muted ? Theme.love : Theme.pine
+                interactive: true
+                onSeek: f => Audio.setVolume(f)
             }
         }
     }

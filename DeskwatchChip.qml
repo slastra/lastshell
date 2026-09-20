@@ -55,22 +55,11 @@ Chip {
 
     ChipBody {
 
-        Rectangle { // attention badge, only when crit/high is live
+        Badge { // attention count, only when crit/high is live
             visible: Deskwatch.attention > 0
             anchors.verticalCenter: parent.verticalCenter
-            width: badgeText.implicitWidth + 10
-            height: 16
-            radius: 8
-            color: Theme.overlay
-            border.color: Qt.alpha(Theme.love, 0.6)
-            border.width: 1
-            PopText {
-                id: badgeText
-                anchors.centerIn: parent
-                size: 11
-                color: Theme.love
-                text: String(Deskwatch.attention)
-            }
+            tone: Theme.love
+            text: String(Deskwatch.attention)
         }
 
         LucideIcon {
@@ -88,20 +77,12 @@ Chip {
             spacing: 8
             width: 360
 
-            Row {
-                spacing: 8
-                PopText {
-                    text: "deskwatch"
-                    size: 14; font.bold: true
-                }
-                PopText {
-                    anchors.baseline: parent.children[0].baseline
-                    text: Deskwatch.stale ? "stale snapshot"
-                        : !Deskwatch.tailUp ? "gateway tail down"
-                        : root.bad ? root.levelLabel(Deskwatch.level) : "all clear"
-                    color: root.tone
-                    size: 13
-                }
+            PopoutHeader {
+                title: "deskwatch"
+                status: Deskwatch.stale ? "stale snapshot"
+                    : !Deskwatch.tailUp ? "gateway tail down"
+                    : root.bad ? root.levelLabel(Deskwatch.level) : "all clear"
+                tone: root.tone
             }
 
             Repeater {

@@ -25,22 +25,11 @@ Chip {
             text: root.session.label
         }
 
-        Rectangle { // agent-count badge, only when >1
+        Badge { // agent count, only when >1
             visible: root.session.agents > 1
             anchors.verticalCenter: parent.verticalCenter
-            width: badgeText.implicitWidth + 10
-            height: 16
-            radius: 8
-            color: Theme.overlay
-            border.color: Qt.alpha(Theme.iris, 0.6)
-            border.width: 1
-            PopText {
-                id: badgeText
-                anchors.centerIn: parent
-                size: 11
-                color: Theme.iris
-                text: `×${root.session.agents}`
-            }
+            tone: Theme.iris
+            text: `×${root.session.agents}`
         }
     }
 
