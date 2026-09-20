@@ -65,12 +65,11 @@ Chip {
             name: root.shown.id === "5h" ? "hourglass" : "calendar-days"
         }
 
-        Text { // model name, only where the calendar alone is ambiguous
+        PopText { // model name, only where the calendar alone is ambiguous
             visible: root.shown.id !== "5h" && root.shown.id !== "wk"
             anchors.verticalCenter: parent.verticalCenter
-            font.family: Theme.fontFamily
-            font.pixelSize: 12
-            color: Qt.alpha(Theme.text, 0.5)
+            size: 12
+            dim: 0.5
             text: root.shown.id
         }
     }
@@ -96,16 +95,15 @@ Chip {
                     color: Theme.rose
                     font.pixelSize: 14
                 }
-                Text {
+                PopText {
                     anchors.verticalCenter: parent.verticalCenter
                     text: "Claude Code Usage"
-                    color: Theme.text; font.family: Theme.fontFamily
-                    font.pixelSize: 14; font.bold: true
+                    size: 14; font.bold: true
                     font.letterSpacing: 0.5
                 }
             }
 
-            Rectangle { width: 264; height: 1; color: Theme.overlay }
+            Divider { width: 264 }
 
             Repeater {
                 model: Claude.quota.frames
@@ -142,26 +140,26 @@ Chip {
                                     color: Qt.alpha(Theme.text, 0.55)
                                     font.pixelSize: 13
                                 }
-                                Text {
+                                PopText {
                                     text: frameRow.names[frameRow.modelData.id] ?? frameRow.modelData.id
-                                    color: Qt.alpha(Theme.text, 0.85)
-                                    font.family: Theme.fontFamily; font.pixelSize: 13
+                                    dim: 0.85
+                                    size: 13
                                 }
-                                Text {
+                                PopText {
                                     visible: text !== ""
                                     text: {
                                         const r = frameRow.resetsIn(frameRow.modelData.resets)
                                         return r ? `(${r})` : ""
                                     }
-                                    color: Qt.alpha(Theme.text, 0.4)
-                                    font.family: Theme.fontFamily; font.pixelSize: 12
+                                    dim: 0.4
+                                    size: 12
                                 }
                             }
-                            Text {
+                            PopText {
                                 anchors.right: parent.right
                                 text: `${frameRow.modelData.pct.toFixed(0)}%`
                                 color: frameRow.tone
-                                font.family: Theme.fontFamily; font.pixelSize: 13; font.bold: true
+                                size: 13; font.bold: true
                             }
                         }
 
@@ -180,21 +178,21 @@ Chip {
                 }
             }
 
-            Rectangle { width: 264; height: 1; color: Theme.overlay }
+            Divider { width: 264 }
 
             Item { // freshness footer
                 width: 264; height: 14
-                Text {
+                PopText {
                     anchors.left: parent.left
                     text: `${Claude.sessions.count} session${Claude.sessions.count === 1 ? "" : "s"}`
-                    color: Qt.alpha(Theme.text, 0.45)
-                    font.family: Theme.fontFamily; font.pixelSize: 11
+                    dim: 0.45
+                    size: 11
                 }
-                Text {
+                PopText {
                     anchors.right: parent.right
                     text: Claude.quota.stale ? "stale data" : "live"
                     color: Claude.quota.stale ? Qt.alpha(Theme.gold, 0.8) : Qt.alpha(Theme.foam, 0.6)
-                    font.family: Theme.fontFamily; font.pixelSize: 11
+                    size: 11
                     font.italic: Claude.quota.stale
                 }
             }

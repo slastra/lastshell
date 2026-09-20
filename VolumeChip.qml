@@ -20,9 +20,9 @@ Chip {
 
         Column {
             spacing: 8
-            Text {
+            PopText {
                 text: Audio.description
-                color: Theme.text; font.family: Theme.fontFamily; font.pixelSize: 14
+                size: 14
                 width: 220; elide: Text.ElideRight
             }
             Rectangle { // slider track

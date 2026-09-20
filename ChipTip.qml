@@ -32,22 +32,16 @@ PopupWindow {
         onTriggered: if (root.ownerHovered && root.text !== "") root.visible = true
     }
 
-    Rectangle {
+    Card {
         id: card
         width: tip.implicitWidth + 20
         height: tip.implicitHeight + 14
-        radius: Theme.overlayRadius
-        color: Theme.surface
-        border.color: Theme.border
-        border.width: 2
 
-        Text {
+        PopText {
             id: tip
             anchors.centerIn: parent
             text: root.text
-            color: Theme.text
-            font.family: Theme.fontFamily
-            font.pixelSize: 13
+            size: 13
             textFormat: Text.PlainText
         }
     }

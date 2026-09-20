@@ -36,11 +36,10 @@ Chip {
             color: Theme.overlay
             border.color: Qt.alpha(Theme.iris, 0.6)
             border.width: 1
-            Text {
+            PopText {
                 id: badgeText
                 anchors.centerIn: parent
-                font.family: Theme.fontFamily
-                font.pixelSize: 11
+                size: 11
                 color: Theme.iris
                 text: `×${root.session.agents}`
             }
@@ -53,35 +52,34 @@ Chip {
         Column {
             spacing: 6
 
-            Text {
+            PopText {
                 text: root.session.cwd
-                color: Theme.text; font.family: Theme.fontFamily
-                font.pixelSize: 14; font.bold: true
+                size: 14; font.bold: true
             }
             Row {
                 spacing: 8
                 StateDot { anchors.verticalCenter: parent.verticalCenter; state: root.session.state }
-                Text {
+                PopText {
                     anchors.verticalCenter: parent.verticalCenter
                     text: root.session.state === "waiting" ? "waiting on you" : root.session.state
                     color: root.session.state === "waiting" ? Theme.gold : Qt.alpha(Theme.text, 0.8)
-                    font.family: Theme.fontFamily; font.pixelSize: 13
+                    size: 13
                 }
             }
             Repeater {
                 model: root.session.jobs ?? []
-                Text {
+                PopText {
                     required property var modelData
                     text: `󰒓 ${modelData.name} — ${modelData.status}`
-                    color: Qt.alpha(Theme.text, 0.7)
-                    font.family: Theme.fontFamily; font.pixelSize: 13
+                    dim: 0.7
+                    size: 13
                 }
             }
-            Rectangle { width: 220; height: 1; color: Theme.overlay }
-            Text {
+            Divider { width: 220 }
+            PopText {
                 text: `${root.session.session ?? "—"}\nup ${root.session.uptime}`
-                color: Qt.alpha(Theme.text, 0.55)
-                font.family: Theme.fontFamily; font.pixelSize: 12
+                dim: 0.55
+                size: 12
                 lineHeight: 1.3
             }
         }

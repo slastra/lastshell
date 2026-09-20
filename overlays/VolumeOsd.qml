@@ -36,12 +36,9 @@ PanelWindow {
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
     mask: Region {} // click-through, always
 
-    Rectangle {
+    Card {
         id: pill
-        width: 280; height: 44; radius: Theme.overlayRadius
-        color: Theme.surface
-        border.color: Theme.border
-        border.width: 2
+        width: 280; height: 44
         opacity: root.shown ? 1 : 0
         Behavior on opacity { NumberAnimation { duration: 150 } }
 

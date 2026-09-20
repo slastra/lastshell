@@ -53,14 +53,10 @@ PopupWindow {
     implicitWidth: card.width
     implicitHeight: card.height
 
-    Rectangle {
+    Card {
         id: card
         width: Math.max(180, rows.implicitWidth + 24)
         height: rows.implicitHeight + 16
-        radius: Theme.overlayRadius
-        color: Theme.surface
-        border.color: Theme.border
-        border.width: 2
 
         Column {
             id: rows
@@ -75,14 +71,14 @@ PopupWindow {
                 Row {
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: 8
-                    Text {
+                    PopText {
                         text: "‹"
-                        color: Theme.iris; font.family: Theme.fontFamily; font.pixelSize: 15
+                        color: Theme.iris; size: 15
                     }
-                    Text {
+                    PopText {
                         text: "back"
-                        color: Qt.alpha(Theme.text, 0.6)
-                        font.family: Theme.fontFamily; font.pixelSize: 13
+                        dim: 0.6
+                        size: 13
                     }
                 }
                 Rectangle {
@@ -129,11 +125,11 @@ PopupWindow {
                         x: 8
                         spacing: 8
 
-                        Text { // check mark space (checkbox/radio entries)
+                        PopText { // check mark space (checkbox/radio entries)
                             visible: row.modelData.buttonType !== 0
                             text: row.modelData.checkState === Qt.Checked ? "✓" : " "
                             color: Theme.rose
-                            font.family: Theme.fontFamily; font.pixelSize: 13
+                            size: 13
                             width: 12
                         }
                         Image {
@@ -143,22 +139,22 @@ PopupWindow {
                             source: row.modelData.icon ?? ""
                             sourceSize: Qt.size(32, 32)
                         }
-                        Text {
+                        PopText {
                             anchors.verticalCenter: parent.verticalCenter
                             text: row.modelData.text
                             color: row.modelData.enabled ? Theme.text : Qt.alpha(Theme.text, 0.35)
-                            font.family: Theme.fontFamily; font.pixelSize: 14
+                            size: 14
                         }
                     }
 
-                    Text { // submenu marker
+                    PopText { // submenu marker
                         visible: !row.modelData.isSeparator && row.modelData.hasChildren
                         anchors.right: parent.right
                         anchors.rightMargin: 6
                         anchors.verticalCenter: parent.verticalCenter
                         text: "›"
                         color: Theme.iris
-                        font.family: Theme.fontFamily; font.pixelSize: 15
+                        size: 15
                     }
 
                     HoverHandler { id: rowHover }

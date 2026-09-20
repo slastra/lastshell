@@ -13,17 +13,17 @@ ChipRow {
             owner: net
             Column {
                 spacing: 6
-                Text {
+                PopText {
                     text: `${Net.iface}: ${Net.ip}`
-                    color: Theme.text; font.family: Theme.fontFamily; font.pixelSize: 14
+                    size: 14
                 }
-                Text {
+                PopText {
                     function fmt(b) {
                         return b > 1e6 ? `${(b / 1e6).toFixed(1)} MB/s`
                              : b > 1e3 ? `${(b / 1e3).toFixed(0)} kB/s` : `${b.toFixed(0)} B/s`
                     }
                     text: `↓ ${fmt(Net.rxBps)}   ↑ ${fmt(Net.txBps)}`
-                    color: Theme.foam; font.family: Theme.fontFamily; font.pixelSize: 14
+                    color: Theme.foam; size: 14
                 }
                 NetGraph { width: 240; height: 60 }
             }
@@ -124,23 +124,23 @@ ChipRow {
                 spacing: 6
                 Row {
                     spacing: 8
-                    Text {
+                    PopText {
                         text: "package temperature"
-                        color: Theme.text; font.family: Theme.fontFamily; font.pixelSize: 14
+                        size: 14
                     }
-                    Text {
+                    PopText {
                         text: `${SysStat.tempC}°C`
                         color: Theme.level(SysStat.tempC, 70, 80)
-                        font.family: Theme.fontFamily; font.pixelSize: 14
+                        size: 14
                     }
                 }
-                Text {
+                PopText {
                     readonly property var h: SysStat.tempHistory
                     text: h.length > 1
                         ? `5 min: low ${Math.min(...h)}°  ·  high ${Math.max(...h)}°`
                         : "collecting…"
-                    color: Qt.alpha(Theme.text, 0.6)
-                    font.family: Theme.fontFamily; font.pixelSize: 12
+                    dim: 0.6
+                    size: 12
                 }
                 TempGraph { width: 240; height: 60 }
             }
@@ -231,39 +231,38 @@ ChipRow {
 
                 Row {
                     spacing: 8
-                    Text {
+                    PopText {
                         text: `${Weather.now.condition ?? "—"}`
-                        color: Theme.text; font.family: Theme.fontFamily
-                        font.pixelSize: 15; font.bold: true
+                        size: 15; font.bold: true
                     }
-                    Text {
+                    PopText {
                         text: `${Weather.now.temp ?? "?"}°`
-                        color: Theme.foam; font.family: Theme.fontFamily
-                        font.pixelSize: 15
+                        color: Theme.foam
+                        size: 15
                     }
                 }
-                Text {
+                PopText {
                     text: `feels ${Weather.now.feels ?? "?"}°  ·  ${Weather.now.wind ?? ""}  ·  ${Weather.now.humidity ?? ""}`
-                    color: Qt.alpha(Theme.text, 0.6)
-                    font.family: Theme.fontFamily; font.pixelSize: 12
+                    dim: 0.6
+                    size: 12
                 }
-                Rectangle { width: 200; height: 1; color: Theme.overlay }
+                Divider { width: 200 }
                 Repeater {
                     model: Weather.days
                     Item {
                         required property var modelData
                         width: 200; height: 20
-                        Text {
+                        PopText {
                             anchors.left: parent.left
                             text: modelData.name
-                            color: Qt.alpha(Theme.text, 0.8)
-                            font.family: Theme.fontFamily; font.pixelSize: 13
+                            dim: 0.8
+                            size: 13
                         }
-                        Text {
+                        PopText {
                             anchors.right: parent.right
                             text: `${modelData.hi}° / ${modelData.lo}°`
                             color: Theme.foam
-                            font.family: Theme.fontFamily; font.pixelSize: 13
+                            size: 13
                         }
                     }
                 }

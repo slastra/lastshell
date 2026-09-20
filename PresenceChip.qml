@@ -35,11 +35,10 @@ Chip {
                 name: row.icon
                 color: row.on ? Theme.gold : Qt.alpha(Theme.text, 0.45)
             }
-            Text {
+            PopText {
                 anchors.verticalCenter: parent.verticalCenter
                 text: row.label
-                color: Theme.text
-                font.family: Theme.fontFamily; font.pixelSize: 13
+                size: 13
             }
         }
         Row {
@@ -47,11 +46,11 @@ Chip {
             anchors.right: parent.right
             anchors.rightMargin: 8
             spacing: 8
-            Text {
+            PopText {
                 anchors.verticalCenter: parent.verticalCenter
                 text: row.word
                 color: row.on ? Qt.alpha(Theme.gold, 0.9) : Qt.alpha(Theme.text, 0.45)
-                font.family: Theme.fontFamily; font.pixelSize: 12
+                size: 12
                 Behavior on color { ColorAnimation { duration: Theme.animDuration } }
             }
             // switch: track + knob, gold when on
@@ -135,36 +134,35 @@ Chip {
 
             Row {
                 spacing: 8
-                Text {
+                PopText {
                     text: "deskpresence"
-                    color: Theme.text; font.family: Theme.fontFamily
-                    font.pixelSize: 14; font.bold: true
+                    size: 14; font.bold: true
                 }
-                Text {
+                PopText {
                     anchors.baseline: parent.children[0].baseline
                     text: root.stale ? "sensor silent"
                         : Presence.holdUntil > 0 ? "held awake"
                         : Presence.paused ? "paused"
                         : Presence.present ? "present" : "away"
                     color: root.tone
-                    font.family: Theme.fontFamily; font.pixelSize: 13
+                    size: 13
                 }
             }
 
-            Text {
+            PopText {
                 visible: root.stale
                 width: parent.width
                 wrapMode: Text.WordWrap
                 text: "No frames from the LD2410C. Nothing is blanking the OLED."
                 color: Qt.alpha(Theme.love, 0.9)
-                font.family: Theme.fontFamily; font.pixelSize: 12
+                size: 12
             }
 
             PresenceGraph { width: parent.width; height: 64 }
-            Text {
+            PopText {
                 text: `near-gate moving energy, 60 s  ·  present ≥ ${Presence.threshold}`
-                color: Qt.alpha(Theme.text, 0.45)
-                font.family: Theme.fontFamily; font.pixelSize: 11
+                dim: 0.45
+                size: 11
             }
 
             Repeater {
@@ -176,22 +174,21 @@ Chip {
                 Row {
                     required property var modelData
                     spacing: 8
-                    Text {
+                    PopText {
                         width: 60
                         text: modelData[0]
-                        color: Qt.alpha(Theme.text, 0.5)
-                        font.family: Theme.fontFamily; font.pixelSize: 13
+                        dim: 0.5
+                        size: 13
                     }
-                    Text {
+                    PopText {
                         text: modelData[1]
-                        color: Theme.text
-                        font.family: Theme.fontFamily; font.pixelSize: 13
+                        size: 13
                     }
                 }
             }
 
             // divider, then the controls
-            Rectangle { width: parent.width; height: 1; color: Qt.alpha(Theme.text, 0.1) }
+            Divider { width: parent.width }
 
             ActionRow {
                 icon: Presence.lightFollow ? "lightbulb" : "lightbulb-off"
@@ -215,12 +212,12 @@ Chip {
                 onClicked: Presence.hold(on ? 0 : 30)
             }
 
-            Rectangle { width: parent.width; height: 1; color: Qt.alpha(Theme.text, 0.1) }
+            Divider { width: parent.width }
 
-            Text {
+            PopText {
                 text: "click: live view  ·  right-click: " + (Presence.paused ? "resume" : "pause")
-                color: Qt.alpha(Theme.text, 0.45)
-                font.family: Theme.fontFamily; font.pixelSize: 12
+                dim: 0.45
+                size: 12
             }
         }
     }

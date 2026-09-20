@@ -16,16 +16,16 @@ Column {
     Row {
         spacing: 8
         anchors.horizontalCenter: parent.horizontalCenter
-        Text {
-            text: "󰅁"; color: Theme.iris; font.family: Theme.fontFamily; font.pixelSize: 16
+        PopText {
+            text: "󰅁"; color: Theme.iris; size: 16
             MouseArea { anchors.fill: parent; onClicked: root.shown = new Date(root.shown.getFullYear(), root.shown.getMonth() - 1, 1) }
         }
-        Text {
+        PopText {
             text: Qt.formatDate(root.shown, "MMMM yyyy")
-            color: Theme.text; font.family: Theme.fontFamily; font.pixelSize: 16; font.bold: true
+            size: 16; font.bold: true
         }
-        Text {
-            text: "󰅂"; color: Theme.iris; font.family: Theme.fontFamily; font.pixelSize: 16
+        PopText {
+            text: "󰅂"; color: Theme.iris; size: 16
             MouseArea { anchors.fill: parent; onClicked: root.shown = new Date(root.shown.getFullYear(), root.shown.getMonth() + 1, 1) }
         }
     }
@@ -36,10 +36,10 @@ Column {
 
         Repeater {
             model: ["Su","Mo","Tu","We","Th","Fr","Sa"]
-            Text {
+            PopText {
                 required property string modelData
                 text: modelData; width: 30; horizontalAlignment: Text.AlignHCenter
-                color: Theme.iris; font.family: Theme.fontFamily; font.pixelSize: 13
+                color: Theme.iris; size: 13
             }
         }
         Repeater {
@@ -56,11 +56,11 @@ Column {
                     anchors.fill: parent; radius: Theme.innerRadius; color: Theme.overlay
                     border.color: Theme.rose; border.width: 1
                 }
-                Text {
+                PopText {
                     anchors.centerIn: parent
                     text: parent.day > 0 ? parent.day : ""
                     color: parent.isToday ? Theme.rose : Theme.text
-                    font.family: Theme.fontFamily; font.pixelSize: 14
+                    size: 14
                 }
             }
         }

@@ -36,16 +36,12 @@ PopupWindow {
         onTriggered: if (!root.shouldShow) card.open = false
     }
 
-    Rectangle {
+    Card {
         id: card
         property bool open: false
         anchors.centerIn: parent
         implicitWidth: inner.childrenRect.width + 24
         implicitHeight: inner.childrenRect.height + 24
-        radius: Theme.overlayRadius
-        color: Theme.surface
-        border.color: Theme.border
-        border.width: 2
 
         opacity: open ? 1 : 0
         scale: open ? 1 : 0.96

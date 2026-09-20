@@ -66,11 +66,10 @@ Chip {
             color: Theme.overlay
             border.color: Qt.alpha(Theme.love, 0.6)
             border.width: 1
-            Text {
+            PopText {
                 id: badgeText
                 anchors.centerIn: parent
-                font.family: Theme.fontFamily
-                font.pixelSize: 11
+                size: 11
                 color: Theme.love
                 text: String(Deskwatch.attention)
             }
@@ -93,18 +92,17 @@ Chip {
 
             Row {
                 spacing: 8
-                Text {
+                PopText {
                     text: "deskwatch"
-                    color: Theme.text; font.family: Theme.fontFamily
-                    font.pixelSize: 14; font.bold: true
+                    size: 14; font.bold: true
                 }
-                Text {
+                PopText {
                     anchors.baseline: parent.children[0].baseline
                     text: Deskwatch.stale ? "stale snapshot"
                         : !Deskwatch.tailUp ? "gateway tail down"
                         : root.bad ? root.levelLabel(Deskwatch.level) : "all clear"
                     color: root.tone
-                    font.family: Theme.fontFamily; font.pixelSize: 13
+                    size: 13
                 }
             }
 
@@ -122,33 +120,32 @@ Chip {
                             color: root.levelTone(modelData.level)
                             font.pixelSize: 13
                         }
-                        Text {
+                        PopText {
                             anchors.verticalCenter: parent.verticalCenter
                             text: modelData.key
                             color: root.levelTone(modelData.level)
-                            font.family: Theme.fontFamily; font.pixelSize: 13
+                            size: 13
                         }
                     }
-                    Text {
+                    PopText {
                         width: parent.width
                         text: modelData.detail
                         wrapMode: Text.WordWrap
-                        color: Qt.alpha(Theme.text, 0.85)
-                        font.family: Theme.fontFamily; font.pixelSize: 13
+                        dim: 0.85
+                        size: 13
                     }
-                    Text {
+                    PopText {
                         visible: (modelData.fix ?? "") !== ""
                         width: parent.width
                         text: `$ ${modelData.fix}`
                         wrapMode: Text.WrapAnywhere
                         color: Qt.alpha(Theme.foam, 0.8)
-                        font.family: Theme.fontFamily; font.pixelSize: 12
+                        size: 12
                     }
                 }
             }
 
-            Rectangle { width: parent.width; height: 1; color: Theme.overlay
-                        visible: Deskwatch.verdicts.length > 0 }
+            Divider { width: parent.width; visible: Deskwatch.verdicts.length > 0 }
 
             Repeater {
                 model: Deskwatch.verdicts.slice(0, 3)
@@ -171,35 +168,35 @@ Chip {
                             color: parent.vtone
                             font.pixelSize: 12
                         }
-                        Text {
+                        PopText {
                             anchors.verticalCenter: parent.verticalCenter
                             width: parent.width - 18
                             elide: Text.ElideMiddle
                             text: modelData.gkey.split("|").slice(0, 2).join(" ")
                             color: parent.vtone
-                            font.family: Theme.fontFamily; font.pixelSize: 12
+                            size: 12
                         }
                     }
-                    Text {
+                    PopText {
                         width: parent.width
                         text: modelData.reason
                         wrapMode: Text.WordWrap
                         maximumLineCount: 2
                         elide: Text.ElideRight
-                        color: Qt.alpha(Theme.text, 0.55)
-                        font.family: Theme.fontFamily; font.pixelSize: 12
+                        dim: 0.55
+                        size: 12
                     }
                 }
             }
 
-            Text {
+            PopText {
                 text: [
                     Deskwatch.presence ? `presence ${Deskwatch.presence}` : "",
                     `${Deskwatch.evalsLastHour} evals/h`,
                     `gateway ${Deskwatch.age}s ago`,
                 ].filter(s => s).join("  ·  ")
-                color: Qt.alpha(Theme.text, 0.45)
-                font.family: Theme.fontFamily; font.pixelSize: 12
+                dim: 0.45
+                size: 12
             }
         }
     }

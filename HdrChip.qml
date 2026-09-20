@@ -19,9 +19,9 @@ Chip {
 
         Column {
             spacing: 8
-            Text {
+            PopText {
                 text: `SDR brightness ${root.b.toFixed(2)}×`
-                color: Theme.text; font.family: Theme.fontFamily; font.pixelSize: 14
+                size: 14
                 width: 220
             }
             Rectangle { // slider track, 1.0 at the left edge
