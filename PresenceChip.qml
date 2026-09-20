@@ -109,9 +109,7 @@ Chip {
     onClicked: Presence.openView()
     onRightClicked: Presence.togglePause()
 
-    Row {
-        height: root.height - 2
-        spacing: 8
+    ChipBody {
 
         LucideIcon {
             anchors.verticalCenter: parent.verticalCenter

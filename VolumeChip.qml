@@ -44,8 +44,7 @@ Chip {
         }
     }
 
-    Row {
-        height: root.height - 2
+    ChipBody {
         spacing: 9
 
         ValueText {

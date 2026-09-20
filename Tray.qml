@@ -29,16 +29,7 @@ ChipRow {
                 handle: slot.modelData.menu
             }
 
-            Item {
-                implicitWidth: 34
-                height: slot.height - 2
-                Image {
-                    anchors.centerIn: parent
-                    width: 18; height: 18
-                    source: slot.modelData.icon
-                    sourceSize: Qt.size(36, 36)
-                }
-            }
+            IconChipBody { source: slot.modelData.icon }
 
             ChipTip {
                 owner: slot

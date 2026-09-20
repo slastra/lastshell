@@ -2,13 +2,15 @@ import QtQuick
 
 // SDR brightness chip: the desktop's lift against the HDR range. Click
 // toggles 1.0 ↔ last value, wheel steps 0.05, popout drags 1.0–3.0.
-Chip {
+StatChip {
     id: root
     edge: "top"
 
     readonly property real b: Hdr.brightness
     readonly property bool lifted: b > 1.0
-    readonly property color tone: lifted ? Theme.gold : Theme.text
+    tone: lifted ? Theme.gold : Theme.text
+    value: `${b.toFixed(1)}×`
+    icon: "sun"
 
     onClicked: Hdr.toggle()
     onWheelUp: Hdr.nudge(Hdr.step)
@@ -43,17 +45,4 @@ Chip {
         }
     }
 
-    Row {
-        height: root.height - 2
-        spacing: 8
-        ValueText {
-            color: root.tone
-            text: `${root.b.toFixed(1)}×`
-        }
-        LucideIcon {
-            anchors.verticalCenter: parent.verticalCenter
-            name: "sun"
-            color: root.tone
-        }
-    }
 }

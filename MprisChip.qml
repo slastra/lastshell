@@ -69,11 +69,9 @@ Chip {
         PauseAnimation { duration: Theme.slideDuration }
     }
 
-    Row {
+    ChipBody {
         id: content
-        height: root.height - 2
-        spacing: 8
-        transform: Translate { id: slide }
+                transform: Translate { id: slide }
 
         LucideIcon {
             anchors.verticalCenter: parent.verticalCenter

@@ -13,9 +13,7 @@ Chip {
     onClicked: if (session.address)
         Hyprland.dispatch(`hl.dsp.focus({ window = "address:${session.address}" })`)
 
-    Row {
-        height: root.height - 2
-        spacing: 8
+    ChipBody {
 
         StateDot {
             anchors.verticalCenter: parent.verticalCenter

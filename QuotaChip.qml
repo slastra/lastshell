@@ -21,9 +21,7 @@ Chip {
     onShownChanged: drawnPct = shown.pct ?? 0
     Component.onCompleted: drawnPct = shown.pct ?? 0
 
-    Row {
-        height: root.height - 2
-        spacing: 8
+    ChipBody {
 
         Canvas { // the ring
             id: ring

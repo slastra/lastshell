@@ -72,18 +72,7 @@ ChipRow {
             onClicked: item?.activate()
             onRightClicked: item?.fullscreen()
 
-            Item {
-                implicitWidth: 40
-                // the chip's 2px border sits only on the bottom (edge "top"),
-                // so center within the borderless region or the icon reads low
-                height: task.height - 2
-                Image {
-                    anchors.centerIn: parent
-                    width: 18; height: 18
-                    source: task.iconSource
-                    sourceSize: Qt.size(36, 36)
-                }
-            }
+            IconChipBody { slot: 40; source: task.iconSource }
 
             ChipTip {
                 owner: task

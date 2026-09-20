@@ -5,9 +5,12 @@ import QtQuick
 ChipRow {
     spacing: 8
 
-    Chip {
+    StatChip {
         id: net
         edge: "top"
+        tone: Net.connected ? Theme.foam : Theme.love
+        value: Net.connected ? Net.ip : "Disconnected"
+        icon: Net.connected ? "ethernet-port" : "unplug"
 
         Popout {
             owner: net
@@ -28,38 +31,14 @@ ChipRow {
                 NetGraph { width: 240; height: 60 }
             }
         }
-
-        Row {
-            height: net.height - 2
-            spacing: 8
-            ValueText {
-                color: Net.connected ? Theme.foam : Theme.love
-                text: Net.connected ? Net.ip : "Disconnected"
-            }
-            LucideIcon {
-                anchors.verticalCenter: parent.verticalCenter
-                name: Net.connected ? "ethernet-port" : "unplug"
-                color: Net.connected ? Theme.foam : Theme.love
-            }
-        }
     }
 
-    Chip {
+    StatChip {
         id: cpu
         edge: "top"
-        Row {
-            height: cpu.height - 2
-            spacing: 8
-            ValueText {
-                color: Theme.level(SysStat.cpuPct, 25, 50)
-                text: `${SysStat.cpuPct}%`
-            }
-            LucideIcon {
-                anchors.verticalCenter: parent.verticalCenter
-                name: "cpu"
-                color: Theme.level(SysStat.cpuPct, 25, 50)
-            }
-        }
+        tone: Theme.level(SysStat.cpuPct, 25, 50)
+        value: `${SysStat.cpuPct}%`
+        icon: "cpu"
         ChipTip {
             owner: cpu
             text: `CPU ${SysStat.cpuPct}%\nload ${SysStat.loadAvg}`
@@ -70,10 +49,7 @@ ChipRow {
         id: temp
         edge: "top"
 
-        Row {
-            height: temp.height - 2
-            spacing: 8
-
+        ChipBody {
             ValueText {
                 color: Theme.level(SysStat.tempC, 70, 80)
                 text: `${SysStat.tempC}°C`
@@ -147,44 +123,24 @@ ChipRow {
         }
     }
 
-    Chip {
+    StatChip {
         id: disk
         edge: "top"
-        Row {
-            height: disk.height - 2
-            spacing: 8
-            ValueText {
-                color: Theme.level(SysStat.diskPct, 70, 90)
-                text: `${SysStat.diskPct}%`
-            }
-            LucideIcon {
-                anchors.verticalCenter: parent.verticalCenter
-                name: "hard-drive"
-                color: Theme.level(SysStat.diskPct, 70, 90)
-            }
-        }
+        tone: Theme.level(SysStat.diskPct, 70, 90)
+        value: `${SysStat.diskPct}%`
+        icon: "hard-drive"
         ChipTip {
             owner: disk
             text: `/ — ${SysStat.diskUsed} of ${SysStat.diskTotal} used`
         }
     }
 
-    Chip {
+    StatChip {
         id: mem
         edge: "top"
-        Row {
-            height: mem.height - 2
-            spacing: 8
-            ValueText {
-                color: Theme.level(SysStat.memPct, 50, 75)
-                text: `${SysStat.memPct}%`
-            }
-            LucideIcon {
-                anchors.verticalCenter: parent.verticalCenter
-                name: "memory-stick"
-                color: Theme.level(SysStat.memPct, 50, 75)
-            }
-        }
+        tone: Theme.level(SysStat.memPct, 50, 75)
+        value: `${SysStat.memPct}%`
+        icon: "memory-stick"
         ChipTip {
             owner: mem
             text: `${SysStat.memUsedGiB.toFixed(1)} / ${SysStat.memTotalGiB.toFixed(1)} GiB`
@@ -196,10 +152,8 @@ ChipRow {
         edge: "top"
         present: Recorder.recording
         onClicked: Recorder.stop()
-        Row {
+        ChipBody {
             id: recRow
-            height: rec.height - 2
-            spacing: 8
             LucideIcon {
                 anchors.verticalCenter: parent.verticalCenter
                 name: "circle-dot"
@@ -218,9 +172,12 @@ ChipRow {
         }
     }
 
-    Chip {
+    StatChip {
         id: weather
         edge: "top"
+        tone: Theme.foam
+        value: `${Weather.now.temp ?? "?"}°F`
+        icon: Weather.icon
         present: Weather.text !== ""
 
         Popout {
@@ -266,20 +223,6 @@ ChipRow {
                         }
                     }
                 }
-            }
-        }
-
-        Row {
-            height: weather.height - 2
-            spacing: 8
-            ValueText {
-                color: Theme.foam
-                text: `${Weather.now.temp ?? "?"}°F`
-            }
-            LucideIcon {
-                anchors.verticalCenter: parent.verticalCenter
-                name: Weather.icon
-                color: Theme.foam
             }
         }
     }

@@ -74,19 +74,9 @@ ChipRow {
             onWheelDown: Quickshell.execDetached(
                 [Quickshell.env("HOME") + "/.local/bin/tabstrip", "prev"])
 
-            Item {
-                implicitWidth: 34
-                height: chip.height - 2
-                Image {
-                    anchors.centerIn: parent
-                    width: 18; height: 18
-                    source: "file://" + chip.item.icon
-                    sourceSize: Qt.size(36, 36) // decode above device pixels
-                    smooth: true
-                    // brightness is baked into the chip the daemon picked
-                    // (bright vs -dim.png, by window focus) — don't re-dim
-                }
-            }
+            // brightness is baked into the chip the daemon picked (bright vs
+            // -dim.png, by window focus) — don't re-dim
+            IconChipBody { source: "file://" + chip.item.icon }
 
             ChipTip {
                 owner: chip

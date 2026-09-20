@@ -53,9 +53,7 @@ Chip {
     onClicked: Quickshell.execDetached(
         ["kitty", "--hold", "-e", Quickshell.env("HOME") + "/go/bin/deskwatch", "status"])
 
-    Row {
-        height: root.height - 2
-        spacing: 8
+    ChipBody {
 
         Rectangle { // attention badge, only when crit/high is live
             visible: Deskwatch.attention > 0
