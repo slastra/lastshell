@@ -29,6 +29,11 @@ Singleton {
     readonly property string stateWord:
         state === 1 ? "moving" : state === 2 ? "static" : state === 3 ? "both" : "none"
 
+    // Office Light follows presence unless this says "off" (read by
+    // ~/.config/deskpresence/light-hook on every on|off; persists across reboots)
+    property bool lightFollow: true
+    readonly property string lightFlag: Quickshell.env("HOME") + "/.local/state/deskpresence/light-follow"
+
     readonly property string pauseFile: Quickshell.env("XDG_RUNTIME_DIR") + "/deskpresence.pause"
 
     function togglePause() {
@@ -36,8 +41,26 @@ Singleton {
             `if [ -e "${pauseFile}" ]; then rm -f "${pauseFile}"; else : > "${pauseFile}"; fi`])
     }
 
+    // flip the flag; on re-enable, bring the light in line with the verdict
+    // right away instead of waiting for the next presence change
+    function toggleLight() {
+        const next = lightFollow ? "off" : "on"
+        lightFollow = next !== "off"   // our own write does not re-emit loaded
+        lightFlagView.setText(next)
+        if (next === "on" && known)
+            Quickshell.execDetached([Quickshell.env("HOME") + "/.config/deskpresence/light-hook", present ? "on" : "off"])
+    }
+
     function openView() {
         Quickshell.execDetached(["xdg-open", "http://127.0.0.1:7391/"])
+    }
+
+    FileView {
+        id: lightFlagView
+        path: root.lightFlag
+        watchChanges: true
+        onFileChanged: reload()
+        onLoaded: root.lightFollow = text().trim() !== "off"
     }
 
     FileView {

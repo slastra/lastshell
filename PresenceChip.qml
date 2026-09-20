@@ -4,7 +4,8 @@ import QtQuick
 // while you are here, muted while away, love when the sensor has gone
 // quiet (the OLED is unguarded), gold while paused. Hover for the verdict,
 // how long it has held, the TV state and the closest target. Click opens
-// the live gate view; right-click toggles the daemon's pause file.
+// the live gate view; right-click toggles the daemon's pause file. The
+// popout has a row to stop the Office Light following presence.
 Chip {
     id: root
     edge: "top"
@@ -109,6 +110,40 @@ Chip {
                         color: Theme.text
                         font.family: Theme.fontFamily; font.pixelSize: 13
                     }
+                }
+            }
+
+            // Office Light follow toggle: gold while following, muted when
+            // left alone. Clickable from the popout (ChipTip-style card hover
+            // keeps it open while the pointer is here).
+            Rectangle {
+                width: parent.width
+                height: 28
+                radius: 6
+                color: lightArea.containsMouse ? Qt.alpha(Theme.text, 0.08) : "transparent"
+                Row {
+                    anchors.verticalCenter: parent.verticalCenter
+                    x: 6
+                    spacing: 8
+                    LucideIcon {
+                        anchors.verticalCenter: parent.verticalCenter
+                        name: Presence.lightFollow ? "lightbulb" : "lightbulb-off"
+                        color: Presence.lightFollow ? Theme.gold : Qt.alpha(Theme.text, 0.45)
+                        Behavior on color { ColorAnimation { duration: Theme.animDuration } }
+                    }
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: "office light " + (Presence.lightFollow ? "follows presence" : "left alone")
+                        color: Theme.text
+                        font.family: Theme.fontFamily; font.pixelSize: 13
+                    }
+                }
+                MouseArea {
+                    id: lightArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: Presence.toggleLight()
                 }
             }
 

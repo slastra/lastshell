@@ -35,6 +35,8 @@ QtObject {
         "shield-check":      "\ue1ff",
         "terminal":          "\ue181",
         "sun": "\ue178",
+        "lightbulb": "\ue1c2",
+        "lightbulb-off": "\ue208",
         "moon": "\ue11e",
         "cloud": "\ue088",
         "cloud-sun": "\ue216",
@@ -73,6 +75,11 @@ QtObject {
         "activity": "\ue038",
         "shield-alert": "\ue1fe",
         "radar": "\ue497",
+        // deskwatch level glyphs, worst to mildest
+        "siren":          "\ue2ef",
+        "alert-octagon":  "\ue127",
+        "eye":            "\ue0ba",
+        "info":           "\ue0f9",
     })
 
     function icon(name) { return glyphs[name] ?? "?" }
