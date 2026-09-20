@@ -30,19 +30,15 @@ Overlay {
         }
     }
 
-    readonly property var filtered: {
-        if (query === "") return sections
-        const q = query.toLowerCase()
-        const out = []
-        for (const sec of sections) {
-            const rows = sec.rows.filter(r =>
-                (r.key + " " + r.desc + " " + sec.section).toLowerCase().includes(q))
-            if (rows.length > 0)
-                out.push({ section: sec.section, rows: rows })
-        }
-        return out
+    // Filtering hides rows rather than rebuilding them: the model stays
+    // fixed, so a keystroke toggles `visible` on ~300 existing delegates
+    // instead of tearing them down (Column and Flow skip hidden children).
+    readonly property string q: query.toLowerCase()
+    function hit(row, section) {
+        return q === "" || (row.key + " " + row.desc + " " + section).toLowerCase().includes(q)
     }
-    readonly property int shownCount: filtered.reduce((n, s) => n + s.rows.length, 0)
+    readonly property int shownCount: sections.reduce((n, s) =>
+        n + s.rows.reduce((m, r) => m + (hit(r, s.section) ? 1 : 0), 0), 0)
 
     Column {
         width: parent.width
@@ -118,10 +114,13 @@ Overlay {
             spacing: 26
 
             Repeater {
-                model: root.filtered
+                model: root.sections
 
                 Column {
+                    id: section
                     required property var modelData
+                    readonly property int hits: modelData.rows.reduce((m, r) => m + (root.hit(r, modelData.section) ? 1 : 0), 0)
+                    visible: hits > 0
                     width: 356
                     spacing: 3
 
@@ -134,10 +133,11 @@ Overlay {
                     }
 
                     Repeater {
-                        model: parent.modelData.rows
+                        model: section.modelData.rows
                         Item {
                             id: bindRow
                             required property var modelData
+                            visible: root.hit(modelData, section.modelData.section)
                             width: 356; height: 26
                             // one block per key, joined by quiet "+" glue —
                             // "SUPER + SHIFT + C" reads as three caps
