@@ -30,6 +30,7 @@ ChipRow {
     Chip {
         id: newWin
         edge: "bottom"
+        contentPadding: 0   // fixed-width icon slot
         anchors.bottom: parent.bottom
         onClicked: Quickshell.execDetached(["firefox", "--new-window"])
 
@@ -45,8 +46,6 @@ ChipRow {
         }
         ChipTip {
             owner: newWin
-            edge: "bottom"
-            ownerHovered: newWin.hovered
             text: "New Firefox window"
         }
     }
@@ -62,6 +61,7 @@ ChipRow {
             present: !gone
 
             edge: "bottom"
+            contentPadding: 0   // fixed-width icon slot
             active: item.active
             anchors.bottom: parent.bottom
 
@@ -90,8 +90,6 @@ ChipRow {
 
             ChipTip {
                 owner: chip
-                edge: "bottom"
-                ownerHovered: chip.hovered
                 text: chip.item.label ?? ""
             }
         }

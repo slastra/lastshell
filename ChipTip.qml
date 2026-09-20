@@ -7,9 +7,9 @@ import QtQuick
 PopupWindow {
     id: root
 
-    required property Item owner
-    property string edge: "top"
-    property bool ownerHovered: false
+    required property Chip owner          // edge and hover follow it
+    property string edge: owner.edge
+    property bool ownerHovered: owner.hovered
     property string text: ""
 
     visible: false

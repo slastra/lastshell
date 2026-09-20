@@ -16,8 +16,6 @@ Chip {
 
     Popout {
         owner: root
-        edge: "top"
-        ownerHovered: root.hovered
 
         Column {
             spacing: 8
@@ -48,8 +46,6 @@ Chip {
     Row {
         height: root.height - 2
         spacing: 8
-        leftPadding: 12
-        rightPadding: 12
         ValueText {
             color: root.tone
             text: `${root.b.toFixed(1)}×`

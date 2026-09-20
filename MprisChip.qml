@@ -73,8 +73,6 @@ Chip {
         id: content
         height: root.height - 2
         spacing: 8
-        leftPadding: 12
-        rightPadding: 12
         transform: Translate { id: slide }
 
         LucideIcon {

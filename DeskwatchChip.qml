@@ -56,8 +56,6 @@ Chip {
     Row {
         height: root.height - 2
         spacing: 8
-        leftPadding: 12
-        rightPadding: 12
 
         Rectangle { // attention badge, only when crit/high is live
             visible: Deskwatch.attention > 0
@@ -88,8 +86,6 @@ Chip {
 
     Popout {
         owner: root
-        edge: "top"
-        ownerHovered: root.hovered
 
         Column {
             spacing: 8

@@ -18,6 +18,8 @@ Rectangle {
     // pass foam-family accents through their text instead and keep rose here.
     property color accent: Theme.rose
     property alias hovered: mouse.containsMouse
+    // horizontal room around the content; 0 for content that carries its own
+    property int contentPadding: 12
     default property alias content: contentSlot.data
 
     signal clicked()
@@ -80,7 +82,7 @@ Rectangle {
         bottomLeftRadius: chip.bottomLeftRadius > 0 ? Theme.overlayRadius - 2 : 0
         bottomRightRadius: chip.bottomRightRadius > 0 ? Theme.overlayRadius - 2 : 0
         color: mouse.containsMouse ? Theme.overlay : Theme.surface
-        implicitWidth: contentSlot.childrenRect.width
+        implicitWidth: contentSlot.childrenRect.width + 2 * chip.contentPadding
         Behavior on color { ColorAnimation { duration: Theme.animDuration } }
 
         Item {
@@ -89,6 +91,8 @@ Rectangle {
             // text ink rides high in its em box; one uniform pixel down
             // centers every chip's ensemble optically (measured, not felt)
             anchors.topMargin: 1
+            anchors.leftMargin: chip.contentPadding
+            anchors.rightMargin: chip.contentPadding
         }
     }
 

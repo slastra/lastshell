@@ -16,8 +16,6 @@ Chip {
     Row {
         height: root.height - 2
         spacing: 8
-        leftPadding: 12
-        rightPadding: 12
 
         StateDot {
             anchors.verticalCenter: parent.verticalCenter
@@ -51,8 +49,6 @@ Chip {
 
     Popout {
         owner: root
-        edge: "bottom"
-        ownerHovered: root.hovered
 
         Column {
             spacing: 6

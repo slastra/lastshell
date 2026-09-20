@@ -113,8 +113,6 @@ Chip {
     Row {
         height: root.height - 2
         spacing: 8
-        leftPadding: 12
-        rightPadding: 12
 
         LucideIcon {
             anchors.verticalCenter: parent.verticalCenter
@@ -126,8 +124,6 @@ Chip {
     Popout {
         id: pop
         owner: root
-        edge: "top"
-        ownerHovered: root.hovered
         onVisibleChanged: {
             Presence.historyWatchers += visible ? 1 : -1
             if (visible) root.now = Date.now()

@@ -16,8 +16,6 @@ Chip {
     Row {
         height: root.height - 2
         spacing: 9
-        leftPadding: 12
-        rightPadding: 12
 
         ValueText {
             color: Theme.text
@@ -65,8 +63,6 @@ Chip {
 
     Popout {
         owner: root
-        edge: "top"
-        ownerHovered: root.hovered
         Calendar { today: clock.date }
     }
 }

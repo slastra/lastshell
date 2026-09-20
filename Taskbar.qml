@@ -44,6 +44,7 @@ ChipRow {
             present: !gone
             active: item?.activated ?? false
             height: Theme.barHeight - 2
+            contentPadding: 0   // fixed-width icon slot
 
             // Cached while the toplevel is alive; survives its destruction
             // for the slide-out.
@@ -86,8 +87,6 @@ ChipRow {
 
             ChipTip {
                 owner: task
-                edge: "top"
-                ownerHovered: task.hovered
                 text: task.title === "Picture in picture" ? "MPV" : task.title
             }
         }

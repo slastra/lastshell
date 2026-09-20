@@ -18,6 +18,7 @@ ChipRow {
             required property SystemTrayItem modelData
 
             edge: "top"
+            contentPadding: 0   // fixed-width icon slot
 
             onClicked: modelData.onlyMenu ? menu.show() : modelData.activate()
             onRightClicked: if (modelData.hasMenu) menu.show()
@@ -41,8 +42,6 @@ ChipRow {
 
             ChipTip {
                 owner: slot
-                edge: "top"
-                ownerHovered: slot.hovered
                 text: slot.modelData.tooltipTitle || slot.modelData.title || ""
             }
         }

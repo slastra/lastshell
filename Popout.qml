@@ -8,9 +8,9 @@ import QtQuick
 PopupWindow {
     id: root
 
-    required property Item owner   // the chip
-    property string edge: "top"    // which bar the owner lives on
-    property bool ownerHovered: false
+    required property Chip owner          // the chip; edge and hover follow it
+    property string edge: owner.edge
+    property bool ownerHovered: owner.hovered
     default property alias content: inner.data
 
     readonly property bool shouldShow: ownerHovered || cardHover.hovered

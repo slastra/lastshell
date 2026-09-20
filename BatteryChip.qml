@@ -7,6 +7,7 @@ import QtQuick
 Chip {
     id: root
     edge: "top"
+    contentPadding: 0   // ChipText pads itself
     present: UPower.displayDevice?.isPresent ?? false
 
     readonly property real pct: (UPower.displayDevice?.percentage ?? 0) * 100

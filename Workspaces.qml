@@ -43,6 +43,7 @@ Item {
                 required property bool gone
                 readonly property int wsId: item.id
                 edge: "top"
+                contentPadding: 0   // ChipText pads itself
                 present: !gone
                 active: root.focusedId === wsId
                 height: Theme.barHeight - 2

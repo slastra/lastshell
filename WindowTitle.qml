@@ -9,6 +9,7 @@ import QtQuick
 Chip {
     id: root
     edge: "top"
+    contentPadding: 0   // ChipText pads itself
     clip: true
     // border lights up in the accent for the swap and eases back after
     active: swap.running

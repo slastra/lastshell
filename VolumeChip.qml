@@ -17,8 +17,6 @@ Chip {
 
     Popout {
         owner: root
-        edge: "bottom"
-        ownerHovered: root.hovered
 
         Column {
             spacing: 8
@@ -49,8 +47,6 @@ Chip {
     Row {
         height: root.height - 2
         spacing: 9
-        leftPadding: 12
-        rightPadding: 12
 
         ValueText {
             color: Theme.text

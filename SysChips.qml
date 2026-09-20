@@ -11,8 +11,6 @@ ChipRow {
 
         Popout {
             owner: net
-            edge: "top"
-            ownerHovered: net.hovered
             Column {
                 spacing: 6
                 Text {
@@ -34,8 +32,6 @@ ChipRow {
         Row {
             height: net.height - 2
             spacing: 8
-            leftPadding: 12
-            rightPadding: 12
             ValueText {
                 color: Net.connected ? Theme.foam : Theme.love
                 text: Net.connected ? Net.ip : "Disconnected"
@@ -54,8 +50,6 @@ ChipRow {
         Row {
             height: cpu.height - 2
             spacing: 8
-            leftPadding: 12
-            rightPadding: 12
             ValueText {
                 color: Theme.level(SysStat.cpuPct, 25, 50)
                 text: `${SysStat.cpuPct}%`
@@ -67,7 +61,7 @@ ChipRow {
             }
         }
         ChipTip {
-            owner: cpu; edge: "top"; ownerHovered: cpu.hovered
+            owner: cpu
             text: `CPU ${SysStat.cpuPct}%\nload ${SysStat.loadAvg}`
         }
     }
@@ -79,8 +73,6 @@ ChipRow {
         Row {
             height: temp.height - 2
             spacing: 8
-            leftPadding: 12
-            rightPadding: 12
 
             ValueText {
                 color: Theme.level(SysStat.tempC, 70, 80)
@@ -128,8 +120,6 @@ ChipRow {
 
         Popout {
             owner: temp
-            edge: "top"
-            ownerHovered: temp.hovered
             Column {
                 spacing: 6
                 Row {
@@ -163,8 +153,6 @@ ChipRow {
         Row {
             height: disk.height - 2
             spacing: 8
-            leftPadding: 12
-            rightPadding: 12
             ValueText {
                 color: Theme.level(SysStat.diskPct, 70, 90)
                 text: `${SysStat.diskPct}%`
@@ -176,7 +164,7 @@ ChipRow {
             }
         }
         ChipTip {
-            owner: disk; edge: "top"; ownerHovered: disk.hovered
+            owner: disk
             text: `/ — ${SysStat.diskUsed} of ${SysStat.diskTotal} used`
         }
     }
@@ -187,8 +175,6 @@ ChipRow {
         Row {
             height: mem.height - 2
             spacing: 8
-            leftPadding: 12
-            rightPadding: 12
             ValueText {
                 color: Theme.level(SysStat.memPct, 50, 75)
                 text: `${SysStat.memPct}%`
@@ -200,7 +186,7 @@ ChipRow {
             }
         }
         ChipTip {
-            owner: mem; edge: "top"; ownerHovered: mem.hovered
+            owner: mem
             text: `${SysStat.memUsedGiB.toFixed(1)} / ${SysStat.memTotalGiB.toFixed(1)} GiB`
         }
     }
@@ -214,8 +200,6 @@ ChipRow {
             id: recRow
             height: rec.height - 2
             spacing: 8
-            leftPadding: 12
-            rightPadding: 12
             LucideIcon {
                 anchors.verticalCenter: parent.verticalCenter
                 name: "circle-dot"
@@ -241,8 +225,6 @@ ChipRow {
 
         Popout {
             owner: weather
-            edge: "top"
-            ownerHovered: weather.hovered
 
             Column {
                 spacing: 8
@@ -291,8 +273,6 @@ ChipRow {
         Row {
             height: weather.height - 2
             spacing: 8
-            leftPadding: 12
-            rightPadding: 12
             ValueText {
                 color: Theme.foam
                 text: `${Weather.now.temp ?? "?"}°F`
