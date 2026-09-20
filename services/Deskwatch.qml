@@ -23,14 +23,19 @@ Singleton {
     readonly property int attention: (counts.crit ?? 0) + (counts.high ?? 0)
     readonly property bool ok: level === "ok" && !stale && tailUp
 
-    readonly property var rank: ({ crit: 0, high: 1, watch: 2, low: 3, min: 4 })
+    readonly property var rank: ({ crit: 0, high: 1, watch: 2, low: 3 })
 
-    function tone(lvl) {
+    // Per-flag levels arrive in the daemon's own words (urgent/default/min);
+    // the aggregate uses crit/watch/low. Fold them so the chip speaks one
+    // vocabulary. Colouring lives in DeskwatchChip: Theme is not in scope
+    // here, and a Theme.* reference from a service resolves to undefined,
+    // which paints black.
+    function norm(lvl) {
         switch (lvl) {
-        case "crit": case "high": return Theme.love
-        case "watch": return Theme.gold
-        case "low": return Theme.foam
-        default: return Theme.text
+        case "urgent": return "crit"
+        case "default": return "watch"
+        case "min": return "low"
+        default: return lvl
         }
     }
 
@@ -47,6 +52,7 @@ Singleton {
                 root.level = h.level ?? "ok"
                 root.counts = h.counts ?? { crit: 0, high: 0, watch: 0, low: 0 }
                 const flags = (h.flags ?? []).filter(f => f.bad)
+                    .map(f => Object.assign({}, f, { level: root.norm(f.level) }))
                 flags.sort((a, b) => (root.rank[a.level] ?? 9) - (root.rank[b.level] ?? 9))
                 root.bad = flags
                 root.verdicts = h.verdicts ?? []

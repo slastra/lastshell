@@ -11,9 +11,43 @@ Chip {
     present: Deskwatch.loaded
 
     readonly property bool bad: Deskwatch.bad.length > 0
+
+    function levelTone(lvl) {
+        switch (lvl) {
+        case "crit": case "high": return Theme.love
+        case "watch": return Theme.gold
+        case "low": return Theme.foam
+        default: return Theme.text
+        }
+    }
+
+    // The header's word for the worst level. "watch" is avoided: it is the
+    // daemon's self-check key prefix and its LLM verdict word, and a third
+    // meaning in the same card was one too many.
+    function levelLabel(lvl) {
+        switch (lvl) {
+        case "crit": return "critical"
+        case "high": return "high"
+        case "watch": return "attention"
+        default: return "low"
+        }
+    }
+
+    // One glyph per level so the rows read at a glance: siren for crit,
+    // octagon for high, eye for watch (the daemon's "default": look, don't
+    // jump), info for low.
+    function levelIcon(lvl) {
+        switch (lvl) {
+        case "crit": return "siren"
+        case "high": return "alert-octagon"
+        case "watch": return "eye"
+        default: return "info"
+        }
+    }
+
     readonly property color tone:
         Deskwatch.stale || !Deskwatch.tailUp ? Qt.alpha(Theme.text, 0.45)
-        : bad ? Deskwatch.tone(Deskwatch.level)
+        : bad ? levelTone(Deskwatch.level)
         : Theme.foam
 
     onClicked: Quickshell.execDetached(
@@ -73,7 +107,7 @@ Chip {
                     anchors.baseline: parent.children[0].baseline
                     text: Deskwatch.stale ? "stale snapshot"
                         : !Deskwatch.tailUp ? "gateway tail down"
-                        : root.bad ? Deskwatch.level : "all clear"
+                        : root.bad ? root.levelLabel(Deskwatch.level) : "all clear"
                     color: root.tone
                     font.family: Theme.fontFamily; font.pixelSize: 13
                 }
@@ -85,10 +119,20 @@ Chip {
                     required property var modelData
                     width: parent.width
                     spacing: 2
-                    Text {
-                        text: `${modelData.key}  ·  ${modelData.level}`
-                        color: Deskwatch.tone(modelData.level)
-                        font.family: Theme.fontFamily; font.pixelSize: 13
+                    Row {
+                        spacing: 6
+                        LucideIcon {
+                            anchors.verticalCenter: parent.verticalCenter
+                            name: root.levelIcon(modelData.level)
+                            color: root.levelTone(modelData.level)
+                            font.pixelSize: 13
+                        }
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: modelData.key
+                            color: root.levelTone(modelData.level)
+                            font.family: Theme.fontFamily; font.pixelSize: 13
+                        }
                     }
                     Text {
                         width: parent.width
@@ -117,13 +161,29 @@ Chip {
                     required property var modelData
                     width: parent.width
                     spacing: 1
-                    Text {
+                    // Verdicts use the same glyph language as the flags:
+                    // escalate is a siren, watch an eye, benign a check.
+                    Row {
                         width: parent.width
-                        elide: Text.ElideMiddle
-                        text: `${modelData.verdict}  ${modelData.gkey.split("|").slice(0, 2).join(" ")}`
-                        color: modelData.verdict === "benign" ? Qt.alpha(Theme.text, 0.6)
-                             : modelData.verdict === "watch" ? Theme.gold : Theme.love
-                        font.family: Theme.fontFamily; font.pixelSize: 12
+                        spacing: 6
+                        readonly property color vtone:
+                            modelData.verdict === "benign" ? Theme.text
+                          : modelData.verdict === "watch" ? Theme.gold : Theme.love
+                        LucideIcon {
+                            anchors.verticalCenter: parent.verticalCenter
+                            name: modelData.verdict === "benign" ? "check"
+                                : modelData.verdict === "watch" ? "eye" : "siren"
+                            color: parent.vtone
+                            font.pixelSize: 12
+                        }
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width - 18
+                            elide: Text.ElideMiddle
+                            text: modelData.gkey.split("|").slice(0, 2).join(" ")
+                            color: parent.vtone
+                            font.family: Theme.fontFamily; font.pixelSize: 12
+                        }
                     }
                     Text {
                         width: parent.width

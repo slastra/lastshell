@@ -43,15 +43,148 @@ Scope {
         if (dismissToo) n.dismiss()
     }
 
-    // Focus the window that sent an activated notification, so activation
-    // carries the compositor to its virtual desktop. Match by desktop-entry
-    // hint first (most reliable), then app name, against open Hyprland
-    // clients. Lives here (not in the toast) because the toast delegate is
-    // destroyed by the dismiss that accompanies activation.
-    property var focusCands: []
-    function focusSender(desktopEntry, appName) {
-        focusCands = [desktopEntry, appName].filter(s => s).map(s => s.toLowerCase())
-        if (focusCands.length > 0) clientsProc.running = true
+    // A toast was clicked. Invoke the default action (tells the app), then
+    // carry the compositor to the sender's window — activation alone never
+    // does: Quickshell hands out no xdg-activation token, and Firefox's
+    // raise request without one produces not even an `urgent` event.
+    //
+    // Browsers are the hard case. A web notification carries no tab or
+    // window identity (just desktop-entry=firefox), yet the browser does
+    // switch to the sender's tab on ActionInvoked. So: snapshot each
+    // window's active tab via tabctl, invoke, re-list, and the window whose
+    // active tab changed is the one to focus — by its (now renamed) title.
+    // Everything else, and any failure along the way, falls back to a
+    // class match against Hyprland clients, most recently focused first.
+    // Lives here (not in the toast): the toast delegate is gone by the
+    // time any of these async steps return.
+    function activate(n) {
+        drop(n, false) // off the stack now; dismissed once the action is sent
+        console.log("[notif] activate tracked=" + n.tracked + " entry=" + n.desktopEntry + " app=" + n.appName)
+        // Sender may have closed it already (Firefox replaces same-tag
+        // notifications); the toast lingers until the prune timer runs.
+        if (!n.tracked) return
+        const def = n.actions?.find(a => a.identifier === "default") ?? n.actions?.[0]
+        const browser = tabctlBrowser(n.desktopEntry, n.appName)
+        if (browser && def) {
+            tabFocus.begin(browser, n, def)
+            return
+        }
+        if (def) def.invoke()
+        n.dismiss()
+        focusClient(byClass([n.desktopEntry, n.appName]), 0)
+    }
+
+    // Which tabctl mediator (if any) speaks for this sender.
+    function tabctlBrowser(desktopEntry, appName) {
+        const id = [desktopEntry, appName].filter(s => s).join(" ").toLowerCase()
+        for (const b of ["firefox", "chromium", "chrome", "brave", "zen", "helium"])
+            if (id.includes(b)) return b
+        return ""
+    }
+    // Hyprland classes: google-chrome / chromium / brave-browser / zen / …
+    function classFrag(browser) { return browser === "chrome" ? "chrom" : browser }
+
+    // Window title minus the browser's own suffix = the active tab's title
+    // (same table as tabstrip's snapshot.go).
+    readonly property var titleSuffixes: [
+        " — Mozilla Firefox", " — Mozilla Firefox Private Browsing",
+        " - Google Chrome", " - Chromium", " - Brave", " — Zen Browser", " - Helium"]
+    function pageTitle(t) {
+        for (const suf of titleSuffixes)
+            if (t.endsWith(suf)) return t.slice(0, -suf.length)
+        return t
+    }
+
+    QtObject {
+        id: tabFocus
+        property string browser
+        property var notif: null
+        property var action: null
+        // Captured up front: the sender may close the notification (Firefox
+        // does, on click) and QML nulls a var that held a destroyed object.
+        property var names: []
+        property bool armed: false   // action still to be sent (pre-invoke list)
+        property var before: ({})    // windowId -> active tabId, pre-invoke
+        property int polls: 0
+
+        function begin(b, n, def) {
+            browser = b; notif = n; action = def; armed = true; polls = 0
+            names = [n.desktopEntry, n.appName]
+            tabList.running = true
+        }
+        // Send the action exactly once, then let the sender close.
+        function fire() {
+            if (!armed) return
+            armed = false
+            if (action) action.invoke()
+            if (notif) notif.dismiss()
+        }
+        function fallback() {
+            console.log("[notif] fallback names=" + JSON.stringify(names))
+            fire()
+            root.focusClient(root.byClass(names), 0)
+        }
+        function onList(text) {
+            let tabs
+            try { tabs = JSON.parse(text) } catch (e) { console.log("[notif] list parse fail"); fallback(); return }
+            console.log("[notif] list armed=" + armed + " polls=" + polls + " n=" + tabs.length)
+            const active = {}
+            for (const t of tabs) if (t.active) active[t.windowId] = t
+            if (armed) {
+                const snap = {}
+                for (const w in active) snap[w] = active[w].id
+                before = snap
+                fire()
+                pollTimer.restart()
+                return
+            }
+            const changed = Object.keys(active).find(w => before[w] !== active[w].id)
+            if (changed !== undefined) {
+                // The browser renames the window as the tab lands; give
+                // Hyprland a few beats to reflect it.
+                const want = active[changed].title
+                const frag = root.classFrag(browser)
+                root.focusClient(cs => cs.find(c => c.mapped &&
+                    c.class.toLowerCase().includes(frag) && root.pageTitle(c.title) === want), 4)
+            } else if (++polls < 5) {
+                pollTimer.restart()
+            } else {
+                // Tab was already active in its window: nothing moved, so
+                // the window is unknowable from here. Best guess by class.
+                fallback()
+            }
+        }
+    }
+    Timer { id: pollTimer; interval: 120; onTriggered: tabList.running = true }
+    Process {
+        id: tabList
+        command: ["tabctl", "--browser", tabFocus.browser, "list", "--format", "json"]
+        stdout: StdioCollector { onStreamFinished: tabFocus.onList(text) }
+        onExited: (code, status) => { if (code !== 0) tabFocus.fallback() }
+    }
+
+    // Focus whichever Hyprland client `pick` selects from the live list,
+    // retrying `retries` times for state that is still settling.
+    property var pick: null
+    property int pickRetries: 0
+    function focusClient(pickFn, retries) {
+        pick = pickFn; pickRetries = retries
+        clientsProc.running = true
+    }
+    // Matcher: desktop-entry / app-name against window class, exact before
+    // heuristic, and among ties the most recently focused window (a Firefox
+    // with three windows open used to send you to the first one listed).
+    function byClass(names) {
+        const cands = names.filter(s => s).map(s => s.toLowerCase())
+        const norm = c => (c ?? "").toLowerCase()
+        const recent = list => list.sort((a, b) => a.focusHistoryID - b.focusHistoryID)[0]
+        return clients => {
+            const mapped = clients.filter(c => c.mapped)
+            return recent(mapped.filter(c => cands.includes(norm(c.class))))
+                ?? recent(mapped.filter(c => cands.some(k =>
+                    norm(c.class).includes(k) || k.includes(norm(c.class)) ||
+                    norm(DesktopEntries.heuristicLookup(c.class)?.id) === k)))
+        }
     }
     Process {
         id: clientsProc
@@ -60,15 +193,21 @@ Scope {
             onStreamFinished: {
                 let clients
                 try { clients = JSON.parse(text) } catch (e) { return }
-                const cands = root.focusCands
-                const norm = c => (c ?? "").toLowerCase()
-                // exact class match beats a heuristic/substring one
-                const hit = clients.find(c => c.mapped && cands.includes(norm(c.class)))
-                    ?? clients.find(c => c.mapped && cands.some(k =>
-                        norm(c.class).includes(k) || k.includes(norm(c.class)) ||
-                        norm(DesktopEntries.heuristicLookup(c.class)?.id) === k))
+                const hit = root.pick ? root.pick(clients) : null
+                console.log("[notif] clients hit=" + (hit ? hit.address : "none") + " retries=" + root.pickRetries)
                 if (hit) Hyprland.dispatch(`hl.dsp.focus({ window = "address:${hit.address}" })`)
+                else if (root.pickRetries-- > 0) clientsRetry.restart()
             }
+        }
+    }
+    Timer { id: clientsRetry; interval: 100; onTriggered: clientsProc.running = true }
+
+    // Test hook: `qs -c lastshell ipc call notifs activateLatest` is a click
+    // on the newest toast.
+    IpcHandler {
+        target: "notifs"
+        function activateLatest(): void {
+            if (toasts.count > 0) root.activate(toasts.get(toasts.count - 1).notif)
         }
     }
 
@@ -110,7 +249,7 @@ Scope {
                 // `notif` is the component's own required property; the model
                 // role fills it — redeclaring here shadows and breaks it
                 onWantsOut: dismissToo => root.drop(notif, dismissToo)
-                onFocusSender: (entry, app) => root.focusSender(entry, app)
+                onActivated: root.activate(notif)
             }
 
             add: Transition {
