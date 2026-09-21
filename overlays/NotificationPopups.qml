@@ -75,7 +75,7 @@ Scope {
         // notifications) between the click and this call.
         if (!n.tracked) return
         const def = n.actions?.find(a => a.identifier === "default") ?? n.actions?.[0]
-        const browser = tabctlBrowser(n.desktopEntry, n.appName)
+        const browser = Browsers.mediatorFor(n.desktopEntry, n.appName)
         if (browser && def) {
             tabFocus.begin(browser, n, def)
             return
@@ -83,27 +83,6 @@ Scope {
         if (def) def.invoke()
         n.dismiss()
         focusClient(byClass([n.desktopEntry, n.appName]), 0)
-    }
-
-    // Which tabctl mediator (if any) speaks for this sender.
-    function tabctlBrowser(desktopEntry, appName) {
-        const id = [desktopEntry, appName].filter(s => s).join(" ").toLowerCase()
-        for (const b of ["firefox", "chromium", "chrome", "brave", "zen", "helium"])
-            if (id.includes(b)) return b
-        return ""
-    }
-    // Hyprland classes: google-chrome / chromium / brave-browser / zen / …
-    function classFrag(browser) { return browser === "chrome" ? "chrom" : browser }
-
-    // Window title minus the browser's own suffix = the active tab's title
-    // (same table as tabstrip's snapshot.go).
-    readonly property var titleSuffixes: [
-        " — Mozilla Firefox", " — Mozilla Firefox Private Browsing",
-        " - Google Chrome", " - Chromium", " - Brave", " — Zen Browser", " - Helium"]
-    function pageTitle(t) {
-        for (const suf of titleSuffixes)
-            if (t.endsWith(suf)) return t.slice(0, -suf.length)
-        return t
     }
 
     QtObject {
@@ -152,9 +131,9 @@ Scope {
                 // The browser renames the window as the tab lands; give
                 // Hyprland a few beats to reflect it.
                 const want = active[changed].title
-                const frag = root.classFrag(browser)
+                const frag = Browsers.classFrag(browser)
                 root.focusClient(cs => cs.find(c => c.mapped &&
-                    c.class.toLowerCase().includes(frag) && root.pageTitle(c.title) === want), 4)
+                    c.class.toLowerCase().includes(frag) && Browsers.pageTitle(c.title) === want), 4)
             } else if (++polls < 5) {
                 pollTimer.restart()
             } else {

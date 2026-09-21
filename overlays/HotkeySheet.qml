@@ -1,5 +1,4 @@
 import Quickshell
-import Quickshell.Io
 import QtQuick
 import ".."  // root module
 
@@ -20,14 +19,10 @@ Overlay {
         if (open) { query = ""; loader.running = true }
     }
 
-    Process {
+    JsonProcess {
         id: loader
         command: ["python3", Quickshell.env("HOME") + "/.config/rofi/scripts/hotkeys.py", "--json"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                try { root.sections = JSON.parse(text) } catch (e) { root.sections = [] }
-            }
-        }
+        onResult: sections => root.sections = sections
     }
 
     // Filtering hides rows rather than rebuilding them: the model stays

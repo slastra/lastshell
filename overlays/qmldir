@@ -9,6 +9,9 @@ VolumeOsd 1.0 VolumeOsd.qml
 Launcher 1.0 Launcher.qml
 singleton Frecency 1.0 Frecency.qml
 NotificationToast 1.0 NotificationToast.qml
+NotifBody 1.0 NotifBody.qml
+JsonProcess 1.0 JsonProcess.qml
+singleton Browsers 1.0 Browsers.qml
 NotificationPopups 1.0 NotificationPopups.qml
 AudioPicker 1.0 AudioPicker.qml
 EffectPicker 1.0 EffectPicker.qml

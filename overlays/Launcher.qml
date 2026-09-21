@@ -1,5 +1,4 @@
 import Quickshell
-import Quickshell.Io
 import Quickshell.Hyprland
 import QtQuick
 import ".."  // root module: Theme and friends
@@ -16,27 +15,15 @@ SearchOverlay {
 
     // Browser windows are left out: the tab switcher (SUPER+W) already
     // reaches every tab directly, so listing the windows here is noise.
-    // Anchored on purpose — a loose /chrom|zen/ would also swallow Chrome
-    // PWAs (chrome-<id>-Profile_N, app windows the switcher can't reach)
-    // and Zenity/zenmap.
-    readonly property var browserClass:
-        /^(firefox(-\w+)?|librewolf|zen(-\w+)?|helium|brave-browser|vivaldi(-stable)?|chromium|google-chrome(-\w+)?|chrome)$/i
-
     // Refresh the window list at the moment of summoning — focusHistoryID
     // is the compositor's own recency order (0 = the window you came from).
     onOpenChanged: if (open) clientsProc.running = true
-    Process {
+    JsonProcess {
         id: clientsProc
         command: ["hyprctl", "clients", "-j"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                try {
-                    root.windows = JSON.parse(text)
-                        .filter(c => c.mapped && c.title !== "" && !root.browserClass.test(c.class))
-                        .sort((a, b) => a.focusHistoryID - b.focusHistoryID)
-                } catch (e) { root.windows = [] }
-            }
-        }
+        onResult: clients => root.windows = clients
+            .filter(c => c.mapped && c.title !== "" && !Browsers.isBrowserClass(c.class))
+            .sort((a, b) => a.focusHistoryID - b.focusHistoryID)
     }
 
     items: {

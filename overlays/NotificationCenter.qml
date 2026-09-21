@@ -81,9 +81,6 @@ Overlay {
                 width: list.width
                 implicitHeight: rowCol.implicitHeight + 20
 
-                readonly property color tone:
-                    notif.urgency === 2 ? Theme.love : notif.urgency === 0 ? Theme.foam : Theme.rose
-
                 Rectangle {
                     anchors.fill: parent
                     color: Qt.alpha(Theme.overlay, 0.6)
@@ -94,41 +91,13 @@ Overlay {
                 }
                 HoverHandler { id: rowHover }
 
-                Column {
+                NotifBody {
                     id: rowCol
                     x: 18; y: 10
                     width: parent.width - 60
-                    spacing: 2
-                    Row {
-                        spacing: 8
-                        Text {
-                            id: rowApp
-                            text: row.notif.appName ?? ""
-                            color: Qt.alpha(row.tone, 0.9)
-                            font.family: Theme.fontFamily; font.pixelSize: 11
-                        }
-                        Text {
-                            anchors.baseline: rowApp.baseline
-                            text: row.time
-                            color: Qt.alpha(Theme.text, 0.35)
-                            font.family: Theme.fontFamily; font.pixelSize: 11
-                        }
-                    }
-                    Text {
-                        text: row.notif.summary ?? ""
-                        color: Theme.text; font.family: Theme.fontFamily
-                        font.pixelSize: 14; font.bold: true
-                        width: parent.width; elide: Text.ElideRight
-                    }
-                    Text {
-                        text: row.notif.body ?? ""
-                        color: Qt.alpha(Theme.text, 0.65)
-                        font.family: Theme.fontFamily; font.pixelSize: 12
-                        width: parent.width; wrapMode: Text.Wrap
-                        maximumLineCount: 2; elide: Text.ElideRight
-                        visible: text !== ""
-                        textFormat: Text.StyledText
-                    }
+                    notif: row.notif
+                    time: row.time
+                    compact: true
                 }
 
                 Text { // per-row dismiss — fades rather than popping

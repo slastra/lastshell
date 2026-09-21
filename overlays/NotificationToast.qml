@@ -11,8 +11,7 @@ Rectangle {
     required property var notif
 
     readonly property int urgency: notif.urgency ?? 1
-    readonly property color urgencyColor:
-        urgency === 2 ? Theme.love : urgency === 0 ? Theme.foam : Theme.rose
+    readonly property color urgencyColor: body.tone
     // the sender's expire_timeout when it gave one (2-30 s); 0 and -1 both
     // fall to the default, since plenty of senders pass 0 unconditionally
     readonly property int timeout: notif.expireTimeout > 0
@@ -128,38 +127,11 @@ Rectangle {
                         ? n.appIcon : Quickshell.iconPath(n.appIcon, "")
                 }
             }
-            Column {
+            NotifBody {
+                id: body
                 width: headRow.width - (appImage.visible ? appImage.width + headRow.spacing : 0) - 28
-                spacing: 2
-                Row {
-                    spacing: 8
-                    Text {
-                        id: appName
-                        text: root.notif.appName ?? ""
-                        color: Qt.alpha(root.urgencyColor, 0.9)
-                        font.family: Theme.fontFamily; font.pixelSize: 12
-                        visible: text !== ""
-                    }
-                    Text {
-                        anchors.baseline: appName.baseline
-                        text: Qt.formatTime(new Date(), "hh:mm AP")
-                        color: Qt.alpha(Theme.text, 0.35)
-                        font.family: Theme.fontFamily; font.pixelSize: 11
-                    }
-                }
-                Text {
-                    text: root.notif.summary ?? ""
-                    color: Theme.text; font.family: Theme.fontFamily; font.pixelSize: 15
-                    font.bold: true; width: parent.width; elide: Text.ElideRight
-                }
-                Text {
-                    text: root.notif.body ?? ""
-                    color: Qt.alpha(Theme.text, 0.75)
-                    font.family: Theme.fontFamily; font.pixelSize: 13
-                    width: parent.width; wrapMode: Text.Wrap; maximumLineCount: 3
-                    elide: Text.ElideRight; visible: text !== ""
-                    textFormat: Text.StyledText
-                }
+                notif: root.notif
+                time: Qt.formatTime(new Date(), "hh:mm AP")
             }
         }
 
