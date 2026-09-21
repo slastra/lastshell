@@ -115,7 +115,7 @@ PopupWindow {
                         radius: Theme.innerRadius
                         color: Theme.overlay
                         opacity: rowHover.hovered && row.modelData.enabled ? 1 : 0
-                        Behavior on opacity { NumberAnimation { duration: 100 } }
+                        Behavior on opacity { NumberAnimation { duration: Theme.animDuration } }
                     }
 
                     Row {

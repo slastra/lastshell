@@ -32,7 +32,7 @@ PopupWindow {
     }
     Timer {
         id: hideTimer
-        interval: 250
+        interval: Theme.popoutGrace
         onTriggered: if (!root.shouldShow) card.open = false
     }
 

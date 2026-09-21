@@ -114,7 +114,7 @@ Overlay {
                     opacity: rowHover.hovered ? 1 : 0
                     // opacity, not color: fading a fixed fill moves smoothly
                     // between rows where restarting color animations stuttered
-                    Behavior on opacity { NumberAnimation { duration: 100 } }
+                    Behavior on opacity { NumberAnimation { duration: Theme.animDuration } }
                 }
                 HoverHandler { id: rowHover }
 
@@ -157,7 +157,7 @@ Overlay {
 
                 Text { // per-row dismiss — fades rather than popping
                     opacity: rowHover.hovered ? 1 : 0
-                    Behavior on opacity { NumberAnimation { duration: 100 } }
+                    Behavior on opacity { NumberAnimation { duration: Theme.animDuration } }
                     anchors.right: parent.right
                     anchors.rightMargin: 16
                     anchors.verticalCenter: parent.verticalCenter

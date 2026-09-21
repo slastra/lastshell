@@ -23,9 +23,9 @@ Chip {
         signal clicked()
         width: parent.width
         height: 30
-        radius: 6
+        radius: Theme.innerRadius
         color: area.containsMouse ? Qt.alpha(Theme.text, 0.08) : "transparent"
-        Behavior on color { ColorAnimation { duration: 120 } }
+        Behavior on color { ColorAnimation { duration: Theme.animDuration } }
         Row {
             anchors.verticalCenter: parent.verticalCenter
             x: 8

@@ -28,7 +28,7 @@ PopupWindow {
     function hide() { showTimer.stop(); visible = false }
     Timer {
         id: showTimer
-        interval: 400
+        interval: Theme.tipDelay
         onTriggered: if (root.ownerHovered && root.text !== "") root.visible = true
     }
 

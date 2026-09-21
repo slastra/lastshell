@@ -168,8 +168,8 @@ ChipRow {
             SequentialAnimation on opacity {
                 running: Recorder.recording
                 loops: Animation.Infinite
-                NumberAnimation { to: 0.5; duration: 500 }
-                NumberAnimation { to: 1.0; duration: 500 }
+                NumberAnimation { to: 0.5; duration: Theme.blinkDuration }
+                NumberAnimation { to: 1.0; duration: Theme.blinkDuration }
             }
         }
     }
@@ -192,12 +192,12 @@ ChipRow {
                     spacing: 8
                     PopText {
                         text: `${Weather.now.condition ?? "—"}`
-                        size: 15; font.bold: true
+                        size: 14; font.bold: true
                     }
                     PopText {
                         text: `${Weather.now.temp ?? "?"}°`
                         color: Theme.foam
-                        size: 15
+                        size: 14
                     }
                 }
                 PopText {

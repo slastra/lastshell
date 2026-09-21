@@ -17,7 +17,7 @@ Chip {
     // The animated value the arc actually draws — sweeps on frame change
     // and on live quota movement alike.
     property real drawnPct: 0
-    Behavior on drawnPct { NumberAnimation { duration: 320; easing.type: Easing.OutCubic } }
+    Behavior on drawnPct { NumberAnimation { duration: Theme.sweepDuration; easing.type: Easing.OutCubic } }
     onShownChanged: drawnPct = shown.pct ?? 0
     Component.onCompleted: drawnPct = shown.pct ?? 0
 

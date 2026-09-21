@@ -102,8 +102,8 @@ Overlay {
                         width: 2; height: 22; color: Theme.rose
                         SequentialAnimation on opacity {
                             running: root.open; loops: Animation.Infinite
-                            NumberAnimation { to: 0; duration: 500 }
-                            NumberAnimation { to: 1; duration: 500 }
+                            NumberAnimation { to: 0; duration: Theme.blinkDuration }
+                            NumberAnimation { to: 1; duration: Theme.blinkDuration }
                         }
                     }
                 }

@@ -14,7 +14,6 @@ Chip {
     SystemClock { id: clock; precision: SystemClock.Minutes } // display is hh:mm; second-ticks were 86k wasted evals a day
 
     ChipBody {
-        spacing: 9
 
         ValueText {
             color: Theme.text

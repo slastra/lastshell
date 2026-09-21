@@ -36,7 +36,6 @@ Chip {
     }
 
     ChipBody {
-        spacing: 9
 
         ValueText {
             color: Theme.text
