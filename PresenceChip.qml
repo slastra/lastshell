@@ -148,7 +148,7 @@ Chip {
                 size: 12
             }
 
-            PresenceGraph { width: parent.width; height: 64 }
+            PresenceGraph { width: parent.width; height: 64; live: pop.visible }
             PopText {
                 text: `near-gate moving energy, 60 s  ·  present ≥ ${Presence.threshold}`
                 dim: 0.45

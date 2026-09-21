@@ -29,6 +29,7 @@ KeyValueRow 1.0 KeyValueRow.qml
 Badge 1.0 Badge.qml
 SliderTrack 1.0 SliderTrack.qml
 Calendar 1.0 Calendar.qml
+Sparkline 1.0 Sparkline.qml
 NetGraph 1.0 NetGraph.qml
 TempGraph 1.0 TempGraph.qml
 ClaudeStrip 1.0 ClaudeStrip.qml

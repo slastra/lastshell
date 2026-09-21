@@ -13,6 +13,7 @@ ChipRow {
         icon: Net.connected ? "ethernet-port" : "unplug"
 
         Popout {
+            id: netPop
             owner: net
             Column {
                 spacing: 6
@@ -28,7 +29,7 @@ ChipRow {
                     text: `↓ ${fmt(Net.rxBps)}   ↑ ${fmt(Net.txBps)}`
                     color: Theme.foam; size: 14
                 }
-                NetGraph { width: 240; height: 60 }
+                NetGraph { width: 240; height: 60; live: netPop.visible }
             }
         }
     }
@@ -95,6 +96,7 @@ ChipRow {
         }
 
         Popout {
+            id: tempPop
             owner: temp
             Column {
                 spacing: 6
@@ -118,7 +120,7 @@ ChipRow {
                     dim: 0.6
                     size: 12
                 }
-                TempGraph { width: 240; height: 60 }
+                TempGraph { width: 240; height: 60; live: tempPop.visible }
             }
         }
     }
