@@ -177,8 +177,8 @@ Chip {
                 onClicked: Presence.toggleAudio()
             }
             // away timer: how long the desk must read empty before the TV
-            // goes off. Longer for a film night, when sitting still reads as
-            // gone; shorter when the OLED matters more than the odd blink.
+            // goes off, 10 s to 30 min. Longer for a film night, when sitting
+            // still reads as gone; shorter when the OLED matters more.
             Item {
                 width: parent.width
                 height: 30
