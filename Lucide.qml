@@ -55,6 +55,7 @@ QtObject {
         "volume-2": "\ue1ab",
         "volume-x": "\ue1ac",
         "coffee": "\ue096",
+        "timer": "\ue1e0",
         "clipboard-list": "\ue086",
         "image": "\ue0f6",
         "bell": "\ue059",

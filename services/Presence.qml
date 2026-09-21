@@ -42,6 +42,12 @@ Singleton {
     readonly property string audioFlag: Quickshell.env("HOME") + "/.local/state/deskpresence/audio-follow"
     // "keep awake": a timed pause the daemon expires itself; ms epoch, 0 = none
     property double holdUntil: 0
+    // away timer, live from the daemon; the slider writes it back through
+    // `deskpresence absence Ns` (debounced, so a drag is one write)
+    property int absenceSecs: 0
+    readonly property int absenceMin: 10
+    readonly property int absenceMax: 180
+    property int pendingAbsence: 0
     readonly property string deskpresence: Quickshell.env("HOME") + "/go/bin/deskpresence"
 
     readonly property string pauseFile: Quickshell.env("XDG_RUNTIME_DIR") + "/deskpresence.pause"
@@ -66,6 +72,17 @@ Singleton {
     function toggleAudio() {
         audioFollow = !audioFollow
         audioFlagView.setText(audioFollow ? "on" : "off")
+    }
+
+    function setAbsence(secs) {
+        pendingAbsence = Math.round(Math.max(absenceMin, Math.min(absenceMax, secs)) / 5) * 5
+        absenceSecs = pendingAbsence   // shown at once; status.json confirms within a tick
+        absenceWrite.restart()
+    }
+    Timer {
+        id: absenceWrite
+        interval: 150
+        onTriggered: Quickshell.execDetached([root.deskpresence, "absence", `${root.pendingAbsence}s`])
     }
 
     // hold(0) releases; status.json carries hold_until back within a tick
@@ -117,6 +134,7 @@ Singleton {
                 root.busy = !!j.busy
                 root.paused = !!j.paused
                 root.holdUntil = j.hold_until ?? 0
+                if (!absenceWrite.running) root.absenceSecs = Math.round((j.rule?.absence_ms ?? 0) / 1000)
                 root.audioFollow = j.audio_follow ?? true
                 root.tv = j.tv ?? ""
                 root.state = j.state ?? 0

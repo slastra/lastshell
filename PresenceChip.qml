@@ -176,6 +176,47 @@ Chip {
                 word: on ? "fades" : "manual"
                 onClicked: Presence.toggleAudio()
             }
+            // away timer: how long the desk must read empty before the TV
+            // goes off. Longer for a film night, when sitting still reads as
+            // gone; shorter when the OLED matters more than the odd blink.
+            Item {
+                width: parent.width
+                height: 30
+                Row {
+                    anchors.verticalCenter: parent.verticalCenter
+                    x: 8
+                    spacing: 8
+                    LucideIcon {
+                        anchors.verticalCenter: parent.verticalCenter
+                        name: "timer"
+                        color: Theme.textMuted
+                    }
+                    PopText { anchors.verticalCenter: parent.verticalCenter; text: "away after" }
+                }
+                Row {
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.right: parent.right
+                    anchors.rightMargin: 8
+                    spacing: 8
+                    PopText {
+                        anchors.verticalCenter: parent.verticalCenter
+                        size: 12
+                        color: Qt.alpha(Theme.gold, 0.9)
+                        text: Presence.absenceSecs >= 60
+                            ? `${Math.floor(Presence.absenceSecs / 60)}m${Presence.absenceSecs % 60 ? " " + Presence.absenceSecs % 60 + "s" : ""}`
+                            : `${Presence.absenceSecs}s`
+                    }
+                    SliderTrack {
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 110
+                        frac: (Presence.absenceSecs - Presence.absenceMin) / (Presence.absenceMax - Presence.absenceMin)
+                        fill: Theme.gold
+                        interactive: true
+                        onSeek: f => Presence.setAbsence(Presence.absenceMin + f * (Presence.absenceMax - Presence.absenceMin))
+                    }
+                }
+            }
+
             ActionRow {
                 icon: "coffee"
                 on: Presence.holdUntil > 0
