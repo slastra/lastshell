@@ -18,30 +18,8 @@ Overlay {
         focus: true
         Keys.onEscapePressed: root.dismiss()
 
-        Rectangle { // header
-            width: parent.width
-            height: 54
-            topLeftRadius: 6
-            topRightRadius: 6
-            color: Theme.overlay
-
-            Row {
-                anchors.verticalCenter: parent.verticalCenter
-                x: 18
-                spacing: 12
-                LucideIcon {
-                    anchors.verticalCenter: parent.verticalCenter
-                    name: "bell"
-                    font.pixelSize: 18
-                    color: Theme.rose
-                }
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: "Notifications"
-                    color: Theme.text; font.family: Theme.fontFamily
-                    font.pixelSize: 16; font.bold: true
-                }
-            }
+        ModalHeader {
+            icon: "bell"; title: "Notifications"; showQuery: false
 
             Rectangle { // clear all
                 visible: root.history.count > 0
@@ -79,8 +57,6 @@ Overlay {
                 }
             }
         }
-
-        Rectangle { width: parent.width; height: 1; color: Qt.alpha("#000000", 0.35) }
 
         ListView { // body
             id: list
@@ -194,30 +170,6 @@ Overlay {
             }
         }
 
-        Rectangle { width: parent.width; height: 1; color: Qt.alpha("#000000", 0.35) }
-
-        Rectangle { // footer
-            width: parent.width
-            height: 30
-            bottomLeftRadius: 6
-            bottomRightRadius: 6
-            color: Qt.alpha(Theme.overlay, 0.55)
-            Text {
-                anchors.left: parent.left
-                anchors.leftMargin: 18
-                anchors.verticalCenter: parent.verticalCenter
-                text: "esc close"
-                color: Qt.alpha(Theme.iris, 0.55)
-                font.family: Theme.fontFamily; font.pixelSize: 12
-            }
-            Text {
-                anchors.right: parent.right
-                anchors.rightMargin: 18
-                anchors.verticalCenter: parent.verticalCenter
-                text: `${root.history.count}`
-                color: Qt.alpha(Theme.text, 0.4)
-                font.family: Theme.fontFamily; font.pixelSize: 12
-            }
-        }
+        ModalFooter { hint: "esc close"; count: `${root.history.count}` }
     }
 }

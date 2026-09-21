@@ -1,5 +1,8 @@
 Overlay 1.0 Overlay.qml
 SearchOverlay 1.0 SearchOverlay.qml
+QueryInput 1.0 QueryInput.qml
+ModalHeader 1.0 ModalHeader.qml
+ModalFooter 1.0 ModalFooter.qml
 TabSwitcher 1.0 TabSwitcher.qml
 Overlays 1.0 Overlays.qml
 VolumeOsd 1.0 VolumeOsd.qml

@@ -59,58 +59,7 @@ Overlay {
             event.accepted = true
         }
 
-        Rectangle { // ── header: identity + input
-            width: parent.width
-            height: 54
-            topLeftRadius: 6
-            topRightRadius: 6
-            color: Theme.overlay
-
-            Row {
-                anchors.verticalCenter: parent.verticalCenter
-                x: 18
-                spacing: 12
-
-                LucideIcon {
-                    anchors.verticalCenter: parent.verticalCenter
-                    name: root.typeIcon
-                    font.pixelSize: 18
-                    color: Theme.rose
-                }
-
-                LucideIcon { // chevron leads from identity into the input
-                    anchors.verticalCenter: parent.verticalCenter
-                    name: "chevron-right"
-                    font.pixelSize: 14
-                    color: Qt.alpha(Theme.text, 0.35)
-                }
-
-                Row { // text + caret hug (outer Row spacing pushed the caret away)
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 2
-
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        font.family: Theme.fontFamily
-                        font.pixelSize: 17
-                        color: Theme.text
-                        text: root.query
-                    }
-
-                    Rectangle { // caret: rides the query's right edge
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 2; height: 22; color: Theme.rose
-                        SequentialAnimation on opacity {
-                            running: root.open; loops: Animation.Infinite
-                            NumberAnimation { to: 0; duration: Theme.blinkDuration }
-                            NumberAnimation { to: 1; duration: Theme.blinkDuration }
-                        }
-                    }
-                }
-            }
-        }
-
-        Rectangle { width: parent.width; height: 1; color: Qt.alpha("#000000", 0.35) }
+        ModalHeader { icon: root.typeIcon; query: root.query; active: root.open }
 
         Item { // ── body: a real ListView — wheel scrolls, cursor follows,
                //    the rose outline is the view's own gliding highlight
@@ -225,31 +174,9 @@ Overlay {
             }
         }
 
-        Rectangle { width: parent.width; height: 1; color: Qt.alpha("#000000", 0.35) }
-
-        Rectangle { // ── footer: hints + count
-            width: parent.width
-            height: 32
-            bottomLeftRadius: 6
-            bottomRightRadius: 6
-            color: Qt.alpha(Theme.overlay, 0.55)
-
-            Text {
-                anchors.left: parent.left
-                anchors.leftMargin: 18
-                anchors.verticalCenter: parent.verticalCenter
-                text: "↑↓ navigate   ↵ open   esc close"
-                color: Qt.alpha(Theme.iris, 0.55)
-                font.family: Theme.fontFamily; font.pixelSize: 12
-            }
-            Text {
-                anchors.right: parent.right
-                anchors.rightMargin: 18
-                anchors.verticalCenter: parent.verticalCenter
-                text: root.query === "" ? `${root.items.length}` : `${root.filtered.length}/${root.items.length}`
-                color: Qt.alpha(Theme.text, 0.4)
-                font.family: Theme.fontFamily; font.pixelSize: 12
-            }
+        ModalFooter {
+            hint: "↑↓ navigate   ↵ open   esc close"
+            count: root.query === "" ? `${root.items.length}` : `${root.filtered.length}/${root.items.length}`
         }
     }
 }

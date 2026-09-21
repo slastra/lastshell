@@ -56,55 +56,7 @@ Overlay {
             event.accepted = true
         }
 
-        Rectangle { // header
-            width: parent.width
-            height: 54
-            topLeftRadius: 6
-            topRightRadius: 6
-            color: Theme.overlay
-
-            Row {
-                anchors.verticalCenter: parent.verticalCenter
-                x: 18
-                spacing: 12
-                LucideIcon {
-                    anchors.verticalCenter: parent.verticalCenter
-                    name: "keyboard"; font.pixelSize: 18; color: Theme.rose
-                }
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: "Hotkeys"
-                    color: Theme.text; font.family: Theme.fontFamily
-                    font.pixelSize: 16; font.bold: true
-                }
-                LucideIcon {
-                    anchors.verticalCenter: parent.verticalCenter
-                    name: "chevron-right"; font.pixelSize: 14
-                    color: Qt.alpha(Theme.text, 0.35)
-                }
-                Row {
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 2
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        font.family: Theme.fontFamily; font.pixelSize: 16
-                        color: Theme.text
-                        text: root.query
-                    }
-                    Rectangle {
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 2; height: 20; color: Theme.rose
-                        SequentialAnimation on opacity {
-                            running: root.open; loops: Animation.Infinite
-                            NumberAnimation { to: 0; duration: Theme.blinkDuration }
-                            NumberAnimation { to: 1; duration: Theme.blinkDuration }
-                        }
-                    }
-                }
-            }
-        }
-
-        Rectangle { width: parent.width; height: 1; color: Qt.alpha("#000000", 0.35) }
+        ModalHeader { icon: "keyboard"; title: "Hotkeys"; query: root.query; active: root.open }
 
         Flow { // body: sections flow into columns
             width: parent.width - 36
@@ -194,30 +146,6 @@ Overlay {
             }
         }
 
-        Rectangle { width: parent.width; height: 1; color: Qt.alpha("#000000", 0.35) }
-
-        Rectangle { // footer
-            width: parent.width
-            height: 30
-            bottomLeftRadius: 6
-            bottomRightRadius: 6
-            color: Qt.alpha(Theme.overlay, 0.55)
-            Text {
-                anchors.left: parent.left
-                anchors.leftMargin: 18
-                anchors.verticalCenter: parent.verticalCenter
-                text: "type to filter   esc close"
-                color: Qt.alpha(Theme.iris, 0.55)
-                font.family: Theme.fontFamily; font.pixelSize: 12
-            }
-            Text {
-                anchors.right: parent.right
-                anchors.rightMargin: 18
-                anchors.verticalCenter: parent.verticalCenter
-                text: `${root.shownCount} binds`
-                color: Qt.alpha(Theme.text, 0.4)
-                font.family: Theme.fontFamily; font.pixelSize: 12
-            }
-        }
+        ModalFooter { hint: "type to filter   esc close"; count: `${root.shownCount} binds` }
     }
 }
