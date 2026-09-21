@@ -9,7 +9,6 @@ import QtQuick
 Chip {
     id: root
     edge: "top"
-    contentPadding: 0   // ChipText pads itself
     clip: true
     // border lights up in the accent for the swap and eases back after
     active: swap.running
@@ -39,18 +38,17 @@ Chip {
         PauseAnimation { duration: Theme.slideDuration }   // let the highlight linger
     }
 
-    ChipText {
-        id: label
-        text: root.shownTitle
-        // text takes the accent with the border while the swap plays
-        color: root.active ? Theme.rose : Theme.text
-        transform: Translate { id: slide }
-        // measured: caps sat 2px low of the right-side chips; -4 lands them
-        height: root.height - 4
-        rightPadding: 12
-        elide: Text.ElideRight
-        width: Math.min(implicitWidth, 900)
-        // chip resizes with the swap rather than snapping to the new title
-        Behavior on width { NumberAnimation { duration: Theme.slideDuration; easing.type: Easing.OutCubic } }
+    ChipBody {
+        ValueText {
+            id: label
+            text: root.shownTitle
+            // text takes the accent with the border while the swap plays
+            color: root.active ? Theme.rose : Theme.text
+            transform: Translate { id: slide }
+            elide: Text.ElideRight
+            width: Math.min(implicitWidth, 900)
+            // chip resizes with the swap rather than snapping to the new title
+            Behavior on width { NumberAnimation { duration: Theme.slideDuration; easing.type: Easing.OutCubic } }
+        }
     }
 }

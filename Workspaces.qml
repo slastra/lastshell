@@ -43,24 +43,21 @@ Item {
                 required property bool gone
                 readonly property int wsId: item.id
                 edge: "top"
-                contentPadding: 0   // ChipText pads itself
                 present: !gone
                 active: root.focusedId === wsId
                 height: Theme.barHeight - 2
 
                 onClicked: Hyprland.dispatch(`hl.dsp.focus({ workspace = ${wsId} })`)
 
-                ChipText {
-                    text: wsChip.wsId
-                    // measured (bar.png ink rows): full chip height sat 1px low of the
-                    // right-side ValueText line; -2 centres the digits on it
-                    height: wsChip.height - 2
-                    rightPadding: 12
-                    // empty workspaces read dim but legible — overlay-on-surface
-                    // was too faint to count at a glance
-                    color: wsChip.active ? Theme.rose
-                         : root.occupied[wsChip.wsId] ? Theme.text
-                         : Qt.alpha(Theme.text, 0.45)
+                ChipBody {
+                    ValueText {
+                        text: wsChip.wsId
+                        // empty workspaces read dim but legible — overlay-on-surface
+                        // was too faint to count at a glance
+                        color: wsChip.active ? Theme.rose
+                             : root.occupied[wsChip.wsId] ? Theme.text
+                             : Theme.textMuted
+                    }
                 }
             }
         }
