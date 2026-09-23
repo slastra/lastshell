@@ -2,6 +2,7 @@ pragma Singleton
 import Quickshell
 import Quickshell.Io
 import QtQuick
+import ".."  // root module: Host
 
 // Desk presence, from deskpresence's status snapshot (written tmp+rename, so
 // every change is one reload). The daemon owns the sensor and the TV; this
@@ -60,6 +61,7 @@ Singleton {
     // flip the flag; on re-enable, bring the light in line with the verdict
     // right away instead of waiting for the next presence change
     function toggleLight() {
+        if (!Host.desk) return
         const next = lightFollow ? "off" : "on"
         lightFollow = next !== "off"   // our own write does not re-emit loaded
         lightFlagView.setText(next)
@@ -99,7 +101,7 @@ Singleton {
 
     FileView {
         id: lightFlagView
-        path: root.lightFlag
+        path: Host.desk ? root.lightFlag : ""
         watchChanges: true
         onFileChanged: reload()
         onLoaded: root.lightFollow = text().trim() !== "off"

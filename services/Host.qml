@@ -13,6 +13,9 @@ Singleton {
     readonly property string name: Quickshell.env("LASTSHELL_HOST") || hostname.text().trim()
     readonly property bool desk: name === "desk"
     readonly property bool laptop: name === "lap"
+    // machines running deskpresence: the desk on its mmWave radar, the
+    // laptop on its time-of-flight sensor
+    readonly property bool presence: desk || laptop
 
     FileView {
         id: hostname

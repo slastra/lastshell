@@ -60,7 +60,7 @@ BarWindow {
         Loader { active: Host.desk; visible: active; sourceComponent: Component { HdrChip {} } }
         BrightnessChip {}
         BatteryChip {}
-        Loader { active: Host.desk; visible: active; sourceComponent: Component { PresenceChip {} } }
+        Loader { active: Host.presence; visible: active; sourceComponent: Component { PresenceChip {} } }
         Loader { active: Host.desk; visible: active; sourceComponent: Component { DeskwatchChip {} } }
         ClockChip {}
     }

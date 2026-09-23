@@ -148,21 +148,24 @@ Chip {
                 size: 12
             }
 
-            PresenceGraph { width: parent.width; height: 64; live: pop.visible }
+            // gate energy is the radar's; the laptop's ToF sensor has none
+            PresenceGraph { width: parent.width; height: 64; live: pop.visible; visible: Host.desk }
             PopText {
+                visible: Host.desk
                 text: `near-gate moving energy, 60 s  ·  present ≥ ${Presence.threshold}`
                 dim: 0.45
                 size: 11
             }
 
             KeyValueRow { key: "for"; value: root.held() }
-            KeyValueRow { key: "tv"; value: Presence.busy ? `${Presence.tv || "?"} (switching)` : (Presence.tv || "unknown") }
+            KeyValueRow { key: Host.desk ? "tv" : "screen"; value: Presence.busy ? `${Presence.tv || "?"} (switching)` : (Presence.tv || "unknown") }
             KeyValueRow { key: "target"; value: Presence.state === 0 ? "none" : `${Presence.stateWord} at ${Presence.distance} cm` }
 
             // divider, then the controls
             Divider { width: parent.width }
 
             ActionRow {
+                visible: Host.desk   // the office light is the desk's
                 icon: Presence.lightFollow ? "lightbulb" : "lightbulb-off"
                 on: Presence.lightFollow
                 label: "office light"
