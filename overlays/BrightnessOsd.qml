@@ -3,9 +3,11 @@ import Quickshell.Wayland
 import QtQuick
 import ".."  // root module: Theme and friends
 
-// Transient brightness pill, VolumeOsd's twin. Reacts to Backlight (kernel
-// uevents), so hardware keys, chip scrolls and brightnessctl all trigger it
-// identically. Never takes keyboard, never eats clicks.
+// Transient brightness pill, VolumeOsd's twin. Reacts to Backlight's
+// userChanged (kernel uevents that auto brightness did not cause), so
+// hardware keys, chip scrolls and brightnessctl all trigger it identically
+// while auto's own gentle adjustments stay silent. Never takes keyboard,
+// never eats clicks.
 PanelWindow {
     id: root
 
@@ -14,10 +16,13 @@ PanelWindow {
 
     readonly property real b: Backlight.frac
 
-    onBChanged: {
-        if (!armed) return
-        shown = true
-        hideTimer.restart()
+    Connections {
+        target: Backlight
+        function onUserChanged() {
+            if (!root.armed) return
+            root.shown = true
+            hideTimer.restart()
+        }
     }
     Timer { interval: 1000; running: Backlight.present; onTriggered: root.armed = true }
     Timer { id: hideTimer; interval: 1200; onTriggered: root.shown = false }
