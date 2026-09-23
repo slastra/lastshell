@@ -2,27 +2,51 @@ import QtQuick
 
 // The top bar: workspaces + window title left, taskbar center, system
 // chips right. Modules land here phase by phase.
+//
+// Space is claimed by priority, so a narrow screen (the laptop, ~1600 px)
+// degrades instead of overlapping: the system chips keep their width, the
+// taskbar stays centered until it would reach them and then slides left,
+// and the window title elides into whatever is left of the taskbar.
 BarWindow {
+    id: bar
     anchors.top: true
+
+    readonly property int gap: 8
+    // the title always keeps at least this much before the taskbar
+    readonly property int titleMin: 120
 
     ChipRow {
         anchors.top: parent.top
         anchors.left: parent.left
-        anchors.leftMargin: 8
-        spacing: 8
-        Workspaces {}
-        WindowTitle { anchors.top: parent.top }
+        anchors.leftMargin: bar.gap
+        spacing: bar.gap
+        Workspaces { id: workspaces }
+        WindowTitle {
+            anchors.top: parent.top
+            // left margin + workspaces + spacing, then a gap before the taskbar
+            maxWidth: Math.max(bar.titleMin, Math.min(900, tasks.x - bar.gap - (bar.gap + workspaces.width + bar.gap)))
+        }
     }
 
     Taskbar {
+        id: tasks
         anchors.top: parent.top
         // positioned by binding, not anchor, so a width change (a chip
-        // coming or going) glides the whole strip instead of jumping it
-        x: Math.round((parent.width - width) / 2)
+        // coming or going) glides the whole strip instead of jumping it.
+        // Centered, but never under the system chips, and never over the
+        // workspaces plus the title's minimum.
+        x: Math.round(Math.max(bar.gap + workspaces.width + bar.gap + bar.titleMin + bar.gap,
+                               Math.min((parent.width - width) / 2, sys.x - bar.gap - width)))
         Behavior on x { NumberAnimation { duration: Theme.slideDuration; easing.type: Easing.OutCubic } }
+        // Too many windows for the room left: narrow every icon slot (40 ->
+        // 26, the 18 px icon plus 4 each side) before the strip can overlap.
+        // A chip costs slot + 4 border + 4 spacing.
+        readonly property int room: sys.x - bar.gap - (bar.gap + workspaces.width + bar.gap + bar.titleMin + bar.gap)
+        slot: Math.max(26, Math.min(40, Math.floor(room / Math.max(1, count)) - 8))
     }
 
     ChipRow {
+        id: sys
         anchors.top: parent.top
         // positioned by binding, not anchor, so a width change (a chip
         // coming or going) glides the whole strip instead of jumping it

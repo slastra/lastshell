@@ -13,6 +13,10 @@ Chip {
     // border lights up in the accent for the swap and eases back after
     active: swap.running
 
+    // the whole chip's width budget, set by the bar; the label gets it
+    // less the chip's padding and border
+    property int maxWidth: 900
+
     readonly property var focused: Hyprland.activeToplevel
     readonly property string liveTitle: {
         const t = focused?.title ?? ""
@@ -46,7 +50,7 @@ Chip {
             color: root.active ? Theme.rose : Theme.text
             transform: Translate { id: slide }
             elide: Text.ElideRight
-            width: Math.min(implicitWidth, 900)
+            width: Math.max(0, Math.min(implicitWidth, root.maxWidth - 2 * root.contentPadding - 4))
             // chip resizes with the swap rather than snapping to the new title
             Behavior on width { NumberAnimation { duration: Theme.slideDuration; easing.type: Easing.OutCubic } }
         }

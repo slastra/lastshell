@@ -13,6 +13,10 @@ ChipRow {
     id: root
     spacing: 4
 
+    // icon slot width; the bar narrows it when the strip would not fit
+    property int slot: 40
+    readonly property int count: tasks.count
+
     SyncedList { id: tasks }
 
     property var ids: new Map()
@@ -72,7 +76,7 @@ ChipRow {
             onClicked: item?.activate()
             onRightClicked: item?.fullscreen()
 
-            IconChipBody { slot: 40; source: task.iconSource }
+            IconChipBody { slot: root.slot; source: task.iconSource }
 
             ChipTip {
                 owner: task
