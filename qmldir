@@ -52,3 +52,6 @@ ChipRow 1.0 ChipRow.qml
 PresenceChip 1.0 PresenceChip.qml
 singleton Presence 1.0 services/Presence.qml
 PresenceGraph 1.0 PresenceGraph.qml
+singleton Host 1.0 services/Host.qml
+singleton Backlight 1.0 services/Backlight.qml
+BrightnessChip 1.0 BrightnessChip.qml

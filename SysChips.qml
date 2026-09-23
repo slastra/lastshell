@@ -10,7 +10,8 @@ ChipRow {
         edge: "top"
         tone: Net.connected ? Theme.foam : Theme.love
         value: Net.connected ? Net.ip : "Disconnected"
-        icon: Net.connected ? "ethernet-port" : "unplug"
+        icon: Net.wireless ? (Net.connected ? "wifi" : "wifi-off")
+            : Net.connected ? "ethernet-port" : "unplug"
 
         Popout {
             id: netPop

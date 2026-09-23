@@ -37,6 +37,7 @@ Scope {
     // OSD and popups stay resident (they must observe state to react);
     // the eight modals load on demand.
     VolumeOsd {}
+    LazyLoader { active: Backlight.present; BrightnessOsd {} }
     NotificationPopups { id: popups }
     DimOverlay {}
 

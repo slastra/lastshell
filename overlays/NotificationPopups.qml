@@ -35,8 +35,11 @@ Scope {
                 history.remove(50)
                 if (old?.tracked) old.dismiss()
             }
-            const lamp = Quickshell.env("HOME") + "/.config/lastshell/lamp.sh"
-            Quickshell.execDetached(["bash", lamp, n.urgency === 2 ? "alert" : "info"])
+            // the desk's MQTT notification lamp; no lamp anywhere else
+            if (Host.desk) {
+                const lamp = Quickshell.env("HOME") + "/.config/lastshell/lamp.sh"
+                Quickshell.execDetached(["bash", lamp, n.urgency === 2 ? "alert" : "info"])
+            }
         }
     }
 

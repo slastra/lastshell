@@ -31,10 +31,13 @@ BarWindow {
         spacing: 8
         Tray {}
         SysChips {}
-        HdrChip {}
+        // Desk-only chips sit in Loaders so their services never start on
+        // another host (Host.qml); hidden, so the Row adds no spacing for them.
+        Loader { active: Host.desk; visible: active; sourceComponent: Component { HdrChip {} } }
+        BrightnessChip {}
         BatteryChip {}
-        PresenceChip {}
-        DeskwatchChip {}
+        Loader { active: Host.desk; visible: active; sourceComponent: Component { PresenceChip {} } }
+        Loader { active: Host.desk; visible: active; sourceComponent: Component { DeskwatchChip {} } }
         ClockChip {}
     }
 }

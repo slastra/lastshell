@@ -26,7 +26,8 @@ PanelWindow {
         id: shade
         anchors.fill: parent
         color: "black"
-        opacity: Presence.fade
+        // presence is desk-only; the ternary keeps the singleton unbuilt elsewhere
+        opacity: Host.desk ? Presence.fade : 0
         Behavior on opacity {
             // lifting is quick (you are back), dimming eases in
             NumberAnimation { duration: Presence.fade === 0 ? 220 : 320; easing.type: Easing.InOutQuad }

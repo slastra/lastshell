@@ -3,14 +3,15 @@ import Quickshell
 import Quickshell.Io
 import QtQuick
 
-// Wired interface state (waybar network with interface enp*): ip + up/down
-// throughput, 5s cadence, with a ring buffer feeding the popout graph.
+// Default-route interface state (wired on the desk, wifi on the laptop): ip +
+// up/down throughput, 5s cadence, with a ring buffer feeding the popout graph.
 Singleton {
     id: root
 
     property string iface: ""
     property string ip: ""
     property bool connected: false
+    property bool wireless: false
     property real rxBps: 0
     property real txBps: 0
     // last 60 samples of [rx, tx] for the graph
@@ -60,9 +61,14 @@ Singleton {
     Process {
         id: probe
         command: ["sh", "-c",
-            "for i in /sys/class/net/enp*; do [ -d \"$i\" ] || continue; n=$(basename $i); " +
+            // the default route's device, falling back to the first enp* so
+            // an unplugged desk still names its port
+            "n=$(ip -j route show default | jq -r '.[0].dev // empty'); " +
+            "[ -n \"$n\" ] || { i=$(ls -d /sys/class/net/enp* 2>/dev/null | head -n1); n=${i##*/}; }; " +
+            "[ -n \"$n\" ] || exit 0; i=/sys/class/net/$n; " +
             "ip -j -4 addr show $n | jq -r --arg n \"$n\" '.[0].addr_info[0].local // \"\" | $n+\" \"+.' ; " +
-            "cat $i/statistics/rx_bytes $i/statistics/tx_bytes $i/operstate; break; done"]
+            "cat $i/statistics/rx_bytes $i/statistics/tx_bytes $i/operstate; " +
+            "[ -d $i/wireless ] && echo wireless || echo wired"]
         stdout: StdioCollector {
             onStreamFinished: {
                 const lines = text.trim().split("\n")
@@ -72,6 +78,7 @@ Singleton {
                 root.iface = name
                 root.ip = addr ?? ""
                 root.connected = lines[3] === "up" && !!addr
+                root.wireless = lines[4] === "wireless"
                 root.sample(rx, tx)
             }
         }

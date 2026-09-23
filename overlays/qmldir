@@ -6,6 +6,7 @@ ModalFooter 1.0 ModalFooter.qml
 TabSwitcher 1.0 TabSwitcher.qml
 Overlays 1.0 Overlays.qml
 VolumeOsd 1.0 VolumeOsd.qml
+BrightnessOsd 1.0 BrightnessOsd.qml
 Launcher 1.0 Launcher.qml
 singleton Frecency 1.0 Frecency.qml
 NotificationToast 1.0 NotificationToast.qml

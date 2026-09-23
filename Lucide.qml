@@ -31,6 +31,8 @@ QtObject {
         "shield-check":      "\ue1ff",
         "terminal":          "\ue181",
         "sun": "\ue178",
+        "wifi":          "\ue1ae",
+        "wifi-off":      "\ue1af",
         "lightbulb": "\ue1c2",
         "lightbulb-off": "\ue208",
         "moon": "\ue11e",
