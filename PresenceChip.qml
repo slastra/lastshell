@@ -1,8 +1,9 @@
 import QtQuick
 
-// deskpresence chip: is anyone at the desk, as the radar sees it. Foam
-// while you are here, muted while away, love when the sensor has gone
-// quiet (the OLED is unguarded), gold while paused. Hover for the verdict,
+// deskpresence chip: is anyone at the desk, as the radar and the input
+// layer see it. Foam while you are here, muted while away (or an hour
+// without input), love when the sensor has gone quiet (input idle guards
+// the OLED alone), gold while paused. Hover for the verdict,
 // how long it has held, the TV state and the closest target. Click opens
 // the live gate view; right-click toggles the daemon's pause file. The
 // popout has rows to stop the Office Light or audio following presence
@@ -134,6 +135,7 @@ Chip {
                 title: "deskpresence"
                 status: root.stale ? "sensor silent"
                     : Presence.holdUntil > 0 ? "held awake"
+                    : Presence.input === "away" ? "away (no input for 1 h)"
                     : Presence.paused ? "paused"
                     : Presence.present ? "present" : "away"
                 tone: root.tone
@@ -143,7 +145,7 @@ Chip {
                 visible: root.stale
                 width: parent.width
                 wrapMode: Text.WordWrap
-                text: "No frames from the LD2410C. Nothing is blanking the OLED."
+                text: "No frames from the LD2410C. Keyboard and mouse idle decides the screen alone."
                 color: Qt.alpha(Theme.love, 0.9)
                 size: 12
             }
@@ -158,6 +160,7 @@ Chip {
             }
 
             KeyValueRow { key: "for"; value: root.held() }
+            KeyValueRow { key: "input"; value: Presence.input === "unknown" ? "unknown (hypridle not running)" : (Presence.input || "?") }
             KeyValueRow { key: Host.desk ? "tv" : "screen"; value: Presence.busy ? `${Presence.tv || "?"} (switching)` : (Presence.tv || "unknown") }
             KeyValueRow { key: "target"; value: Presence.state === 0 ? "none" : `${Presence.stateWord} at ${Presence.distance} cm` }
 

@@ -16,7 +16,12 @@ Singleton {
     property bool sensorOk: false
     property bool busy: false
     property bool paused: false
-    property string tv: ""          // "on" | "off" | ""
+    property string tv: ""          // "on" | "off" | "on-unverified" | "unknown" | ""
+    // The input layer under the radar (hypridle): "active", "quiet", "idle",
+    // "away" (an hour without input: the TV is off whatever the radar says)
+    // or "unknown" (hypridle not running). want is the daemon's decision.
+    property string input: ""
+    property string want: ""
     property int state: 0           // sensor target: 0 none 1 moving 2 static 3 both
     property int distance: 0        // cm, closest reported target
     property double since: 0        // ms epoch of the last verdict flip
@@ -142,6 +147,8 @@ Singleton {
                 if (!absenceWrite.running) root.absenceSecs = Math.round((j.rule?.absence_ms ?? 0) / 1000)
                 root.audioFollow = j.audio_follow ?? true
                 root.tv = j.tv ?? ""
+                root.input = j.input ?? ""
+                root.want = j.want ?? ""
                 root.state = j.state ?? 0
                 root.distance = j.distance ?? 0
                 root.since = j.since ?? 0
