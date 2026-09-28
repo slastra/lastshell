@@ -52,7 +52,9 @@ Singleton {
     // `deskpresence absence Ns` (debounced, so a drag is one write)
     property int absenceSecs: 0
     readonly property int absenceMin: 10
-    readonly property int absenceMax: 1800
+    // the daemon clamps to 10-60 s: radar noise refreshes presence about
+    // once a minute, so a longer timer never expires in an empty room
+    readonly property int absenceMax: 60
     property int pendingAbsence: 0
     readonly property string deskpresence: Quickshell.env("HOME") + "/go/bin/deskpresence"
 
@@ -82,10 +84,9 @@ Singleton {
     }
 
     function setAbsence(secs) {
-        // 5 s steps under two minutes, 30 s steps above: the track is short
-        // and the far end is "film night", not a precise number
+        // 5 s steps; `deskpresence hold` is the film-night escape hatch now
         const v = Math.max(absenceMin, Math.min(absenceMax, secs))
-        pendingAbsence = v < 120 ? Math.round(v / 5) * 5 : Math.round(v / 30) * 30
+        pendingAbsence = Math.round(v / 5) * 5
         absenceSecs = pendingAbsence   // shown at once; status.json confirms within a tick
         absenceWrite.restart()
     }
