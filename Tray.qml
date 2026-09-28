@@ -7,7 +7,7 @@ import QtQuick
 // MouseAreas never fire, because Chip's MouseArea sits above the content
 // (that's why the first version's clicks went nowhere).
 ChipRow {
-    spacing: 4
+    spacing: 8
     visible: SystemTray.items.values.length > 0
 
     Repeater {

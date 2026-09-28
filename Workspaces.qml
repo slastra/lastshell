@@ -32,7 +32,7 @@ Item {
     ChipRow {
         id: row
         anchors.top: parent.top
-        spacing: 4
+        spacing: 8
 
         Repeater {
             model: chips.model

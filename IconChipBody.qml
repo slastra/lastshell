@@ -6,7 +6,9 @@ Item {
     property alias source: img.source
     property int slot: 34
     implicitWidth: slot
-    height: Theme.barHeight - 4
+    // Chip's content slot sits 1 px low for text ink; images carry no such
+    // bias, so the body is 2 px shorter to centre on the chip fill instead.
+    height: Theme.barHeight - 6
     Image {
         id: img
         anchors.centerIn: parent
