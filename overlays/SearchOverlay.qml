@@ -19,14 +19,27 @@ Overlay {
     contentPadding: 2  // sections run full-bleed inside the card border
     readonly property int rowH: 40
 
+    // Order: tier, then match band (Fuzzy.band), then the caller's weight
+    // (usage/recency), then fuzzy score, then label for a stable list.
+    // An item's optional `tier` lifts it above every lower tier, but only
+    // while a word in its text starts with the query (band 3+): a loose
+    // hit in a long title ("fire" across "linkify-…-firmware", any lone
+    // letter mid-word) is noise and has to compete like everything else.
     readonly property var filtered: {
         const out = []
         for (const it of items) {
             const m = Fuzzy.match(query, it.label + " " + (it.sublabel ?? ""))
-            if (m.score > 0)
-                out.push(Object.assign({ _score: m.score, _idx: m.idx }, it))
+            if (m.score > 0) {
+                const band = Fuzzy.band(query, it.label, it.sublabel)
+                out.push(Object.assign({
+                    _score: m.score, _idx: m.idx, _band: band,
+                    _tier: it.tier && band >= 3 ? it.tier : 0,
+                }, it))
+            }
         }
-        out.sort((a, b) => b._score - a._score || (b.weight ?? 0) - (a.weight ?? 0))
+        out.sort((a, b) => b._tier - a._tier || b._band - a._band
+            || (b.weight ?? 0) - (a.weight ?? 0) || b._score - a._score
+            || a.label.localeCompare(b.label))
         return out   // no truncation — the list scrolls
     }
     property int cursor: 0

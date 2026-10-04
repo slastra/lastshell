@@ -4,8 +4,9 @@ import QtQuick
 import ".."  // root module: Theme and friends
 
 // Launcher + window switcher in one (replaces rofi combi): open windows
-// first, ordered by focus recency, then apps ranked by frecency. Enter on
-// a window focuses it; on an app, launches it.
+// first, ordered by focus recency, then apps ranked by frecency — both
+// within SearchOverlay's match bands, so a clean match still beats a
+// popular loose one. Enter on a window focuses it; on an app, launches it.
 SearchOverlay {
     id: root
 
@@ -29,8 +30,10 @@ SearchOverlay {
     items: {
         const rows = []
         // Windows: most recent first; weight well above any app so they own
-        // the top of an empty query. The window you're in sorts last of the
-        // windows — you rarely switch to where you already are.
+        // the top of an empty query, and tier 1 so they keep it while you
+        // type — "orca" lands on the open OrcaSlicer, not a second launch.
+        // The window you're in sorts last of the windows — you rarely switch
+        // to where you already are.
         root.windows.forEach((c, i) => {
             const entry = DesktopEntries.heuristicLookup(c.class)
             rows.push({
@@ -39,21 +42,32 @@ SearchOverlay {
                 sublabel: c.class,
                 iconSource: entry?.icon ? Quickshell.iconPath(entry.icon, "application-x-executable") : "",
                 weight: c.focusHistoryID === 0 ? 500 : 1000 - i,
+                tier: 1,
                 address: c.address,
             })
         })
+        // Apps: by usage. Entries that would draw identical rows (same name,
+        // same icon — a ~/.local override beside the system file it copies,
+        // under a different id) collapse to the one used most, and that row
+        // carries their combined usage so split history isn't lost.
+        const apps = new Map()
         for (const e of DesktopEntries.applications.values) {
             if (e.noDisplay) continue
-            rows.push({
+            const k = e.name + "\n" + e.icon
+            const w = Frecency.weight(e.id)
+            const prev = apps.get(k)
+            if (prev && prev.own >= w) { prev.weight += w; continue }
+            apps.set(k, {
                 key: e.id,
                 label: e.name,
                 sublabel: [e.genericName, (e.keywords ?? []).join(" ")].filter(x => x).join(" "),
                 iconSource: e.icon ? Quickshell.iconPath(e.icon, "application-x-executable") : "",
-                weight: Frecency.weight(e.id),
+                weight: w + (prev?.weight ?? 0),
+                own: w,
                 entry: e,
             })
         }
-        return rows
+        return rows.concat([...apps.values()])
     }
 
     onActivated: item => {
