@@ -11,10 +11,14 @@ Item {
 
     readonly property int focusedId: Hyprland.focusedWorkspace?.id ?? 1
     // Hyprland keeps visited-but-empty workspaces alive; only count windows.
+    // From toplevels, which Quickshell keeps current from open/close/move
+    // window events. lastIpcObject.windows was a snapshot refreshed only when
+    // a workspace is created (before its first window lands) or fullscreen
+    // toggles, so a populated workspace read 0 and vanished once unfocused.
     readonly property var occupied: {
         const ids = {}
         for (const ws of Hyprland.workspaces.values)
-            if ((ws.lastIpcObject?.windows ?? 0) > 0) ids[ws.id] = true
+            if (ws.toplevels.values.length > 0) ids[ws.id] = true
         return ids
     }
     readonly property var shown: {

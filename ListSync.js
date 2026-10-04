@@ -28,7 +28,17 @@ function sync(model, items, keyField) {
         if (cur < 0) {
             model.insert(pos, { key: key, item: it, gone: false })
         } else {
-            if (cur !== pos) model.move(cur, pos, 1)
+            // A row before pos can only be a gone one the skip above passed
+            // over, now coming back (a workspace refilled mid slide-out).
+            // Taking it out shifts pos down one; moving it to pos itself ran
+            // past the end ("move: out of range"), the revive never landed,
+            // and purge dropped a chip that should be showing.
+            if (cur < pos) {
+                pos--
+                if (cur !== pos) model.move(cur, pos, 1)
+            } else if (cur > pos) {
+                model.move(cur, pos, 1)
+            }
             model.setProperty(pos, "item", it)
             if (model.get(pos).gone) model.setProperty(pos, "gone", false)
         }
