@@ -26,6 +26,7 @@ Singleton {
     property int distance: 0        // cm, closest reported target
     property double since: 0        // ms epoch of the last verdict flip
     property real fade: 0           // 0..1: how far the absence timer has run into its warning window
+    property int fadeMs: 5000       // length of that window (the daemon's -fade), so the shade can run it in one motion
     // last 60 s of the signal the verdict is made from: max moving energy in
     // the near gates per 500 ms bin, oldest first, plus the verdict per bin
     property var history: []
@@ -153,6 +154,7 @@ Singleton {
                 root.state = j.state ?? 0
                 root.distance = j.distance ?? 0
                 root.since = j.since ?? 0
+                root.fadeMs = j.rule?.fade_ms ?? 5000   // before fade: DimOverlay reads it on the change
                 root.fade = j.fade ?? 0
                 root.loaded = true
             } catch (e) { /* mid-write */ }
