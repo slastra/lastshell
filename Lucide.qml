@@ -18,6 +18,8 @@ QtObject {
         "circle-dot":    "",
         "play":          "",
         "pause":         "",
+        "square":        "\ue167",
+        "music":         "\ue122",
         "sparkles":      "",
         "plus":          "\ue13d",
         // greeter
