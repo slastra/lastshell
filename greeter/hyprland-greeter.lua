@@ -14,6 +14,10 @@ hl.monitor({
 })
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = 1 })
 
+-- The greeter user can't read ~/.local/share/icons, so this needs the theme
+-- copied to /usr/share/icons too; without it the login screen draws Adwaita.
+hl.env("XCURSOR_THEME", "BreezeX-RosePine")
+hl.env("HYPRCURSOR_THEME", "BreezeX-RosePine")
 hl.env("XCURSOR_SIZE", "36")
 hl.env("HYPRCURSOR_SIZE", "36")
 hl.env("QT_QPA_PLATFORM", "wayland")
