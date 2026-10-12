@@ -87,6 +87,9 @@ QtObject {
         "bluetooth":     "\ue05c",
         "bluetooth-off": "\ue1b9",
         "battery":       "\ue057",
+        // dictation
+        "mic":           "\ue118",
+        "mic-off":       "\ue119",
     })
 
     function icon(name) { return glyphs[name] ?? "?" }

@@ -28,6 +28,11 @@ Scope {
         function toggleNotifications(): void { root.summon(center) }
         function toggleHotkeys(): void { root.summon(hotkeys) }
         function toggleEco(): void { root.summon(eco) }
+        // tap to start, tap again to stop (the overlay decides which)
+        function toggleDictation(): void {
+            if (!dictation.active) dictation.active = true
+            dictation.item.hotkey()
+        }
         function toggleCapture(): void {
             // Print while recording = stop, no menu — matching the script.
             if (Recorder.recording) Recorder.stop()
@@ -51,4 +56,5 @@ Scope {
     LazyLoader { id: capture; CapturePicker {} }
     LazyLoader { id: hotkeys; HotkeySheet {} }
     LazyLoader { id: eco; EcoDialog {} }
+    LazyLoader { id: dictation; Dictation {} }
 }
