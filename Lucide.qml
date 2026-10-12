@@ -31,6 +31,7 @@ QtObject {
         "log-in":            "\ue10d",
         "arrow-up-down":     "\ue37d",
         "shield-check":      "\ue1ff",
+        "fingerprint":       "\ue2cb",
         "terminal":          "\ue181",
         "sun": "\ue178",
         "wifi":          "\ue1ae",
