@@ -12,6 +12,7 @@ WindowTitle 1.0 WindowTitle.qml
 Taskbar 1.0 Taskbar.qml
 VolumeChip 1.0 VolumeChip.qml
 BatteryChip 1.0 BatteryChip.qml
+BatteryGraph 1.0 BatteryGraph.qml
 Tray 1.0 Tray.qml
 ClockChip 1.0 ClockChip.qml
 SysChips 1.0 SysChips.qml
