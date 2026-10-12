@@ -37,6 +37,11 @@ QtObject {
     readonly property int overlayRadius: 12   // = hyprland rounding = libadwaita window radius
     readonly property int innerRadius: 6      // rows/pills nested inside an overlayRadius frame
 
+    // Left-pad a metric to a fixed digit count, so a chip keeps its width
+    // as the value crosses 9→10 (the font is monospace; a change of width
+    // re-centers the strip and slides every chip beside it).
+    function pad(v, n) { return String(v).padStart(n, " ") }
+
     // Threshold color: value against warn/crit cutoffs, foam family base.
     function level(v, warn, crit, base) {
         return v >= crit ? love : v >= warn ? gold : (base ?? foam)

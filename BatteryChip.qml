@@ -28,7 +28,7 @@ Chip {
                     : ["󰁺","󰁻","󰁼","󰁽","󰁾","󰁿","󰂀","󰂁","󰂂","󰁹"]
                 if (root.pct >= 100 && !root.charging) return "Charged "
                 const i = Math.min(9, Math.floor(root.pct / 10))
-                return `${Math.round(root.pct)}% ${ramp[i]}`
+                return `${Theme.pad(Math.round(root.pct), 3)}% ${ramp[i]}`
             }
         }
     }
