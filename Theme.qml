@@ -34,7 +34,7 @@ QtObject {
     readonly property int blinkDuration: 500   // caret and REC pulse half-period
     readonly property int tipDelay: 400        // ChipTip hover delay
     readonly property int popoutGrace: 250     // Popout hide grace across the gap
-    readonly property int popoutGap: 6         // air between a chip and its popout, tip or menu
+    readonly property int popoutGap: 8         // air between a chip and its popout, tip or menu
     readonly property int overlayRadius: 12   // = hyprland rounding = libadwaita window radius
     readonly property int innerRadius: 6      // rows/pills nested inside an overlayRadius frame
 
