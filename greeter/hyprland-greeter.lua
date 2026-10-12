@@ -9,8 +9,8 @@ if f then host = (f:read("l") or host):match("^%s*(.-)%s*$"); f:close() end
 
 if host == "lap" then
 	hl.monitor({ output = "eDP-1", mode = "2880x1800@120", position = "0x0", scale = 1.5 })
-	hl.env("XCURSOR_SIZE", "24")
-	hl.env("HYPRCURSOR_SIZE", "24")
+	hl.env("XCURSOR_SIZE", "32")
+	hl.env("HYPRCURSOR_SIZE", "32")
 else
 	hl.monitor({
 		output = "HDMI-A-1",
