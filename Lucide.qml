@@ -81,6 +81,12 @@ QtObject {
         "alert-octagon":  "\ue127",
         "eye":            "\ue0ba",
         "info":           "\ue0f9",
+        // eco dialog
+        "leaf":          "\ue2de",
+        "gauge":         "\ue1bf",
+        "bluetooth":     "\ue05c",
+        "bluetooth-off": "\ue1b9",
+        "battery":       "\ue057",
     })
 
     function icon(name) { return glyphs[name] ?? "?" }

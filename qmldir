@@ -56,4 +56,5 @@ PresenceGraph 1.0 PresenceGraph.qml
 singleton Host 1.0 services/Host.qml
 singleton Media 1.0 services/Media.qml
 singleton Backlight 1.0 services/Backlight.qml
+singleton Eco 1.0 services/Eco.qml
 BrightnessChip 1.0 BrightnessChip.qml

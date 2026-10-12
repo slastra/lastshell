@@ -26,10 +26,11 @@ QtObject {
 
     readonly property int barHeight: 34
     readonly property string fontFamily: "ShureTechMono Nerd Font"
-    readonly property int animDuration: 140
-    readonly property int slideDuration: 220   // chip enter/exit slide
-    readonly property int dragDuration: 80     // slider fill following the pointer
-    readonly property int sweepDuration: 320   // gauge/bar sweeps to a new value
+    // motion drops to 0 in eco mode: every animated frame is a bar repaint
+    readonly property int animDuration: Eco.active ? 0 : 140
+    readonly property int slideDuration: Eco.active ? 0 : 220   // chip enter/exit slide
+    readonly property int dragDuration: Eco.active ? 0 : 80     // slider fill following the pointer
+    readonly property int sweepDuration: Eco.active ? 0 : 320   // gauge/bar sweeps to a new value
     readonly property int blinkDuration: 500   // caret and REC pulse half-period
     readonly property int tipDelay: 400        // ChipTip hover delay
     readonly property int popoutGrace: 250     // Popout hide grace across the gap
