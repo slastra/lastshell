@@ -21,7 +21,10 @@ Overlay {
     ]
 
     property var st: ({})
-    readonly property bool eco: st.eco === "on"
+    // eco itself is services/Eco.qml's (eco.sh's state file); the poll
+    // below is only for what eco touches
+    readonly property bool eco: Eco.active
+    property bool scriptFound: true
     property bool busy: false
 
     readonly property var dev: UPower.displayDevice
@@ -50,7 +53,7 @@ Overlay {
     Process {
         id: poll
         command: ["bash", "-c", `
-            echo "eco=$(bash '${root.script}' status 2>/dev/null || echo missing)"
+            [ -x '${root.script}' ] && echo found=1 || echo found=0
             echo "profile=$(powerprofilesctl get 2>/dev/null)"
             rfkill list bluetooth 2>/dev/null | grep -q 'Soft blocked: yes' && echo bt=off || echo bt=on
             echo "kbd=$(cat /sys/class/leds/platform::kbd_backlight/brightness 2>/dev/null || echo 0)"
@@ -65,6 +68,7 @@ Overlay {
                     if (i > 0) s[line.slice(0, i)] = line.slice(i + 1)
                 }
                 root.st = s
+                root.scriptFound = s.found !== "0"
             }
         }
     }
@@ -113,7 +117,7 @@ Overlay {
                     PopText {
                         size: 15; font.bold: true
                         color: root.eco ? Theme.foam : Theme.text
-                        text: root.st.eco === "missing" ? "eco.sh not found" : root.eco ? "On" : "Off"
+                        text: !root.scriptFound ? "eco.sh not found" : root.eco ? "On" : "Off"
                     }
                     PopText {
                         size: 12; dim: 0.5

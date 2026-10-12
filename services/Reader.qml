@@ -1,6 +1,7 @@
 pragma Singleton
 import Quickshell
 import Quickshell.Io
+import ".."  // root module: EngineProcess
 import QtQuick
 
 // The narrator (Super+T): reads the selection, else the clipboard, aloud.
@@ -30,11 +31,7 @@ Singleton {
     readonly property var tidyModes: ["Off", "Auto", "Always"]
     readonly property real speed: config.speed ?? 1
 
-    property var pending: []
-    function send(cmd) {
-        if (proc.running) proc.write(cmd + "\n")
-        else { pending = pending.concat([cmd]); proc.running = true }
-    }
+    function send(cmd) { proc.send(cmd) }
 
     function read() { preparing = true; send("read") }
     function toggle() { if (active) send("toggle") }
@@ -57,29 +54,17 @@ Singleton {
         return h ? `${h}:${String(m).padStart(2, "0")}:${sec}` : `${m}:${sec}`
     }
 
-    Process {
+    EngineProcess {
         id: proc
         command: ["python3", Quickshell.shellDir + "/scripts/reader.py"]
-        stdinEnabled: true
-        onStarted: {
-            for (const c of root.pending) write(c + "\n")
-            root.pending = []
-        }
         onExited: { root.state = { active: false }; root.preparing = false }
-        stdout: SplitParser {
-            onRead: line => {
-                const sp = line.indexOf(" ")
-                if (sp < 0) return
-                const kind = line.slice(0, sp)
-                let v
-                try { v = JSON.parse(line.slice(sp + 1)) } catch (e) { return }
-                if (kind === "state") { root.state = v; if (v.active) root.preparing = false }
-                else if (kind === "config") root.config = v
-                else if (kind === "voices") root.voices = v
-                else if (kind === "notice") {  // comes back in as one of the shell's own toasts
-                    root.preparing = false
-                    Quickshell.execDetached(["notify-send", "-a", "Reader", "Reader", v])
-                }
+        onEvent: (name, v) => {
+            if (name === "state") { root.state = v; if (v.active) root.preparing = false }
+            else if (name === "config") root.config = v
+            else if (name === "voices") root.voices = v
+            else if (name === "notice") {  // comes back in as one of the shell's own toasts
+                root.preparing = false
+                Quickshell.execDetached(["notify-send", "-a", "Reader", "Reader", v])
             }
         }
     }

@@ -76,23 +76,16 @@ Overlay {
         }
     }
 
-    Process {
+    EngineProcess {
         id: proc
-        stdinEnabled: true
-        stdout: SplitParser {
-            onRead: line => {
-                const sp = line.indexOf(" ")
-                const kind = sp < 0 ? line : line.slice(0, sp)
-                const rest = sp < 0 ? "" : line.slice(sp + 1)
-                const str = () => { try { return JSON.parse(rest) } catch (e) { return rest } }
-                if (kind === "level") root.level = Number(rest)
-                else if (kind === "time") root.secs = Number(rest)
-                else if (kind === "state") root.phase = rest
-                else if (kind === "raw") root.raw = str()
-                else if (kind === "clean") { root.cleaned = str(); root.phase = "review" }
-                else if (kind === "note") root.note = str()
-                else if (kind === "error") { root.error = str(); root.phase = "error" }
-            }
+        onEvent: (name, v) => {
+            if (name === "level") root.level = v
+            else if (name === "time") root.secs = v
+            else if (name === "state") root.phase = v
+            else if (name === "raw") root.raw = v
+            else if (name === "clean") { root.cleaned = v; root.phase = "review" }
+            else if (name === "note") root.note = v
+            else if (name === "error") { root.error = v; root.phase = "error" }
         }
         onExited: code => {
             if (code !== 0 && root.open && root.phase !== "error" && root.phase !== "review") {

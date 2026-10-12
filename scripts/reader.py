@@ -49,10 +49,11 @@ import tempfile
 import threading
 import time
 import unicodedata
-import urllib.error
-import urllib.request
 import wave
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import openrouter  # noqa: E402  (scripts/openrouter.py, shared with dictate.py)
 
 APP_ID = 'us.lastra.PiperReader'
 PIPER = '/usr/bin/piper-tts'
@@ -96,8 +97,6 @@ TIDY_BLOCK_WORDS = 700     # raw words per rewrite request
 TIDY_AUTO_THRESHOLD = 0.35  # terminal-likeness above which Auto tidies
 TIDY_AUTO_MAX_WORDS = 4000  # Auto skips very long documents; they are prose
 
-OPENROUTER_URL = os.environ.get('PIPER_READER_TIDY_URL',
-                                'https://openrouter.ai/api/v1/chat/completions')
 # GLM Flash reaches its first content token in about half the time of Haiku
 # (0.52 s vs 1.07 s measured) and costs a fraction as much, which matters here
 # because the whole design is that audio starts within a second. Set
@@ -105,8 +104,9 @@ OPENROUTER_URL = os.environ.get('PIPER_READER_TIDY_URL',
 TIDY_MODEL = os.environ.get('PIPER_READER_TIDY_MODEL', 'z-ai/glm-5.3-flash')
 TIDY_TIMEOUT = 45          # seconds for one block's stream
 
-CONFIG_PATH = (Path(os.environ.get('XDG_CONFIG_HOME', Path.home() / '.config'))
-               / 'piper-reader' / 'config.json')
+_CONFIG_HOME = Path(os.environ.get('XDG_CONFIG_HOME', Path.home() / '.config'))
+CONFIG_PATH = _CONFIG_HOME / 'lastshell' / 'reader.json'
+OLD_CONFIG_PATH = _CONFIG_HOME / 'piper-reader' / 'config.json'   # the GTK app's
 
 TIDY_MODES = ['Off', 'Auto', 'Always']
 
@@ -142,31 +142,6 @@ def _load_venv_packages():
 _load_venv_packages()
 
 
-def _openrouter_key():
-    """The env var wins, else the first OPENROUTER_API_KEY= line of
-    ~/.config/openrouter.env. No key simply disables the tidy stage.
-
-    This replaced an AnthropicBedrock client for one streaming HTTP call the
-    standard library already makes, and unpicked a shared AWS credential.
-    """
-    key = os.environ.get('OPENROUTER_API_KEY', '')
-    if key:
-        return key
-    config = Path(os.environ.get('XDG_CONFIG_HOME', Path.home() / '.config'))
-    try:
-        for line in (config / 'openrouter.env').read_text().splitlines():
-            if line.startswith('OPENROUTER_API_KEY='):
-                return line.split('=', 1)[1].strip().strip('"\'')
-    except OSError:
-        pass
-    # the key lastshell's dictation reads (the laptop has no openrouter.env)
-    try:
-        return (config / 'lastshell' / 'openrouter.key').read_text().strip()
-    except OSError:
-        return ''
-
-
-OPENROUTER_KEY = _openrouter_key()
 
 
 # --------------------------------------------------------------------------
@@ -645,7 +620,7 @@ def build_passages(text):
 # --------------------------------------------------------------------------
 
 def tidy_available():
-    return bool(OPENROUTER_KEY)
+    return bool(openrouter.key())
 
 
 def _text_blocks(text, max_words):
@@ -692,46 +667,13 @@ def _stream_completion(system, user, stop_event):
     before any content and would delay the first spoken sentence, which is the
     one number this whole design optimises for.
     """
-    body = json.dumps({
+    return openrouter.stream_chat({
         'model': TIDY_MODEL,
-        'stream': True,
         'max_tokens': 4096,
         'reasoning': {'effort': 'low', 'exclude': True},
         'messages': [{'role': 'system', 'content': system},
                      {'role': 'user', 'content': user}],
-    }).encode()
-    req = urllib.request.Request(OPENROUTER_URL, data=body, method='POST', headers={
-        'Authorization': 'Bearer ' + OPENROUTER_KEY,
-        'Content-Type': 'application/json',
-        # OpenRouter uses these for attribution on its dashboard; harmless
-        # and it makes the spend legible per application.
-        'HTTP-Referer': 'https://github.com/slastra',
-        'X-Title': 'piper-reader',
-    })
-    with urllib.request.urlopen(req, timeout=TIDY_TIMEOUT) as resp:
-        finish = None
-        for raw in resp:
-            if stop_event.is_set():
-                return
-            line = raw.decode('utf-8', 'replace').strip()
-            if not line.startswith('data:'):
-                continue
-            payload = line[5:].strip()
-            if payload == '[DONE]':
-                break
-            try:
-                chunk = json.loads(payload)
-            except ValueError:
-                continue
-            for choice in chunk.get('choices') or []:
-                # delta.reasoning is present on some models and must never be
-                # spoken; only content is the rewrite.
-                piece = (choice.get('delta') or {}).get('content')
-                if piece:
-                    yield ('text', piece)
-                if choice.get('finish_reason'):
-                    finish = choice['finish_reason']
-        yield ('finish', finish)
+    }, timeout=TIDY_TIMEOUT, title='lastshell reader', stop_event=stop_event)
 
 
 class TidyWorker(threading.Thread):
@@ -769,9 +711,9 @@ class TidyWorker(threading.Thread):
             GLib.idle_add(self.on_passage, self.epoch, piece)
 
     def run(self):
-        if not OPENROUTER_KEY:
+        if not openrouter.key():
             GLib.idle_add(self.on_error, self.epoch,
-                          'no OPENROUTER_API_KEY (env or ~/.config/openrouter.env)')
+                          'no OpenRouter key (%s)' % openrouter.KEY_FILE)
             return
 
         blocks = _text_blocks(self.raw_text, TIDY_BLOCK_WORDS)
@@ -798,10 +740,8 @@ class TidyWorker(threading.Thread):
                     if value == 'length':
                         GLib.idle_add(self.on_status, self.epoch,
                                       'rewrite truncated, some text skipped')
-            except urllib.error.HTTPError as exc:
-                detail = exc.read()[:160].decode('utf-8', 'replace')
-                GLib.idle_add(self.on_error, self.epoch,
-                              'HTTP %s: %s' % (exc.code, detail))
+            except openrouter.OpenRouterError as exc:
+                GLib.idle_add(self.on_error, self.epoch, str(exc)[:200])
                 return
             except Exception as exc:
                 if self.stop_event.is_set():
@@ -961,6 +901,15 @@ def wav_duration(path):
 # --------------------------------------------------------------------------
 
 def load_config():
+    # once: carry the GTK app's settings (voice, speed, tidy, the voice
+    # shortlist) over to lastshell's config home
+    if not CONFIG_PATH.exists() and OLD_CONFIG_PATH.exists():
+        try:
+            CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
+            os.replace(OLD_CONFIG_PATH, CONFIG_PATH)
+            OLD_CONFIG_PATH.parent.rmdir()
+        except OSError:
+            pass
     try:
         data = json.loads(CONFIG_PATH.read_text())
     except Exception:
@@ -1755,18 +1704,25 @@ def main():
     loop = GLib.MainLoop()
     reader = Reader(loop)
 
+    # Raw reads, every complete line per wakeup: sys.stdin.readline() would
+    # pull a burst ("tidy Always\nread\n") into Python's buffer and hand back
+    # one line, leaving the rest where the fd watch can't see it until more
+    # input arrives.
+    pending = bytearray()
+
     def on_stdin(fd, condition):
-        if condition & (GLib.IO_HUP | GLib.IO_ERR):
-            reader.quit()     # the shell went away: stop speaking
+        chunk = os.read(fd, 65536) if condition & GLib.IO_IN else b''
+        if not chunk:
+            reader.quit()     # EOF or hangup: the shell went away, stop speaking
             return False
-        line = sys.stdin.readline()
-        if not line:
-            reader.quit()
-            return False
-        try:
-            reader.command(line)
-        except Exception as exc:  # one bad command must not kill the reader
-            emit('notice', 'reader: %s' % exc)
+        pending.extend(chunk)
+        while b'\n' in pending:
+            line, _, rest = bytes(pending).partition(b'\n')
+            pending[:] = rest
+            try:
+                reader.command(line.decode('utf-8', 'replace'))
+            except Exception as exc:  # one bad command must not kill the reader
+                emit('notice', 'reader: %s' % exc)
         return True
 
     GLib.io_add_watch(sys.stdin.fileno(), GLib.PRIORITY_DEFAULT,
