@@ -58,3 +58,5 @@ singleton Media 1.0 services/Media.qml
 singleton Backlight 1.0 services/Backlight.qml
 singleton Eco 1.0 services/Eco.qml
 BrightnessChip 1.0 BrightnessChip.qml
+singleton Reader 1.0 services/Reader.qml
+ReaderChip 1.0 ReaderChip.qml

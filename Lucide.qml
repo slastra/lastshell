@@ -90,6 +90,11 @@ QtObject {
         // dictation
         "mic":           "\ue118",
         "mic-off":       "\ue119",
+        // reader
+        "skip-back":     "\ue15f",
+        "skip-forward":  "\ue160",
+        "chevron-left":  "\ue06e",
+        "audio-lines":   "\ue55a",
     })
 
     function icon(name) { return glyphs[name] ?? "?" }
