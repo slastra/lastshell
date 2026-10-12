@@ -150,38 +150,16 @@ Overlay {
 
             Rectangle { width: parent.width; height: 1; color: Theme.divider }
 
-            // CPU profile: segmented, independent of eco (eco just picks saver)
+            // CPU profile: independent of eco (eco just picks saver)
             Column {
                 width: parent.width
                 spacing: 8
-                PopText { text: "CPU PROFILE"; size: 11; font.bold: true; font.letterSpacing: 1; color: Theme.iris }
-                Row {
-                    spacing: 6
-                    Repeater {
-                        model: root.profiles
-                        Rectangle {
-                            required property var modelData
-                            required property int index
-                            readonly property bool selected: root.st.profile === modelData[0]
-                            width: (root.cardWidth - 36 - 4 - 12) / 3
-                            height: 30
-                            radius: Theme.innerRadius
-                            color: selected ? Qt.alpha(Theme.rose, 0.18) : Theme.overlay
-                            border.color: selected ? Theme.rose : "transparent"
-                            border.width: 1
-                            PopText {
-                                anchors.centerIn: parent
-                                size: 12
-                                color: parent.selected ? Theme.rose : Theme.textMuted
-                                text: `${parent.index + 1}  ${parent.modelData[1]}`
-                            }
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: root.setProfile(parent.modelData[0])
-                            }
-                        }
-                    }
+                SectionLabel { text: "cpu profile" }
+                Segmented {
+                    width: parent.width
+                    options: root.profiles.map((p, i) => ({ value: p[0], label: `${i + 1}  ${p[1]}` }))
+                    current: root.st.profile
+                    onPicked: v => root.setProfile(v)
                 }
             }
 
@@ -200,7 +178,7 @@ Overlay {
                     property string value
                     property color tone: Theme.text
                     spacing: 10
-                    width: (root.cardWidth - 36 - 4 - 24) / 2
+                    width: (parent.width - 24) / 2
                     LucideIcon { name: parent.icon; font.pixelSize: 14; color: Theme.textMuted; anchors.verticalCenter: parent.verticalCenter }
                     PopText { text: parent.label; dim: 0.5; size: 12; width: 76; anchors.verticalCenter: parent.verticalCenter }
                     PopText { text: parent.value; color: parent.tone; size: 12; anchors.verticalCenter: parent.verticalCenter }
@@ -236,7 +214,7 @@ Overlay {
         }
 
         ModalFooter {
-            hint: "space toggle eco  ·  1–3 / ←→ profile  ·  esc close"
+            hint: "space toggle   1–3 ←→ profile   esc close"
             count: root.busy ? "applying…" : ""
         }
     }

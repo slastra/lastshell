@@ -1384,6 +1384,7 @@ class Reader:
         self.workdir = Path(tempfile.mkdtemp(prefix='piper-reader-'))
         self._lock_fd = claim_workdir(self.workdir)
         self._tick_id = 0
+        self._save_id = 0
         self._last_state = None
         atexit.register(shutil.rmtree, str(self.workdir), True)
         for sig in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
@@ -1441,7 +1442,10 @@ class Reader:
                 return
             if self.mpv:
                 self.mpv.set_property('speed', self.speed)
-            save_config({'speed': round(self.speed, 2)})
+            # a drag sends a step per pixel; write the file once it settles
+            if self._save_id:
+                GLib.source_remove(self._save_id)
+            self._save_id = GLib.timeout_add(800, self._save_speed)
             self._emit_config()
         elif word == 'voice':
             self.set_voice(arg)
@@ -1454,6 +1458,11 @@ class Reader:
             self.quit()
         self._emit_state()
 
+    def _save_speed(self):
+        self._save_id = 0
+        save_config({'speed': round(self.speed, 2)})
+        return GLib.SOURCE_REMOVE
+
     def stop(self):
         self._teardown_playback()
         self.doc_epoch += 1
@@ -1465,6 +1474,9 @@ class Reader:
         self._set_ticking(False)
 
     def quit(self):
+        if self._save_id:
+            GLib.source_remove(self._save_id)
+            self._save_speed()
         self._teardown_playback()
         shutil.rmtree(self.workdir, ignore_errors=True)
         self.loop.quit()

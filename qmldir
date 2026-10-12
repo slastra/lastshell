@@ -60,3 +60,5 @@ singleton Eco 1.0 services/Eco.qml
 BrightnessChip 1.0 BrightnessChip.qml
 singleton Reader 1.0 services/Reader.qml
 ReaderChip 1.0 ReaderChip.qml
+SectionLabel 1.0 SectionLabel.qml
+Segmented 1.0 Segmented.qml

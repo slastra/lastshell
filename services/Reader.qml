@@ -16,10 +16,19 @@ Singleton {
     property var config: ({})        // {voice, speed, tidy, tidy_available}
     property var state: ({ active: false })
 
-    readonly property bool active: state.active === true
-    readonly property bool playing: active && !state.paused && !state.idle && !state.finished
+    // Super+T was pressed and the engine hasn't answered yet: the chip shows
+    // at once instead of after the first passage renders (~1 s, longer on a
+    // cold start). Cleared by the next state, or by a "nothing to read" notice.
+    property bool preparing: false
+    readonly property bool active: state.active === true || preparing
+    readonly property bool finished: state.finished === true
+    // no audio yet: before the first passage renders, or when rendering
+    // falls behind playback (mpv sits idle until the next file lands)
+    readonly property bool starting: preparing || (state.active === true && state.idle === true && !finished)
+    readonly property bool playing: state.active === true && !state.paused && !state.idle && !finished
     readonly property real progress: state.total > 0 ? Math.min(1, state.elapsed / state.total) : 0
     readonly property var tidyModes: ["Off", "Auto", "Always"]
+    readonly property real speed: config.speed ?? 1
 
     property var pending: []
     function send(cmd) {
@@ -27,21 +36,18 @@ Singleton {
         else { pending = pending.concat([cmd]); proc.running = true }
     }
 
-    function read() { send("read") }
+    function read() { preparing = true; send("read") }
     function toggle() { if (active) send("toggle") }
     function next() { send("next") }
     function prev() { send("prev") }
     function stop() { send("stop") }
-    function setSpeed(x) { send(`speed ${Math.round(x * 20) / 20}`) }
-    function cycleVoice(d) {
-        if (!voices.length) return
-        const i = voices.findIndex(v => v.key === config.voice)
-        send(`voice ${voices[(i + d + voices.length) % voices.length].key}`)
+    function setSpeed(x) {
+        const v = Math.max(0.5, Math.min(3, Math.round(x * 20) / 20))   // 0.05 steps
+        if (v !== speed) send(`speed ${v}`)
     }
-    function cycleTidy(d) {
-        const i = Math.max(0, tidyModes.indexOf(config.tidy))
-        send(`tidy ${tidyModes[(i + d + tidyModes.length) % tidyModes.length]}`)
-    }
+    function nudgeSpeed(d) { setSpeed(speed + d * 0.05) }
+    function pickVoice(key) { if (key !== config.voice) send(`voice ${key}`) }
+    function setTidy(mode) { if (mode !== config.tidy) send(`tidy ${mode}`) }
     function voiceLabel() {
         return voices.find(v => v.key === config.voice)?.label ?? (config.voice || "no voices")
     }
@@ -59,7 +65,7 @@ Singleton {
             for (const c of root.pending) write(c + "\n")
             root.pending = []
         }
-        onExited: root.state = { active: false }
+        onExited: { root.state = { active: false }; root.preparing = false }
         stdout: SplitParser {
             onRead: line => {
                 const sp = line.indexOf(" ")
@@ -67,13 +73,22 @@ Singleton {
                 const kind = line.slice(0, sp)
                 let v
                 try { v = JSON.parse(line.slice(sp + 1)) } catch (e) { return }
-                if (kind === "state") root.state = v
+                if (kind === "state") { root.state = v; if (v.active) root.preparing = false }
                 else if (kind === "config") root.config = v
                 else if (kind === "voices") root.voices = v
-                else if (kind === "notice")  // comes back in as one of the shell's own toasts
+                else if (kind === "notice") {  // comes back in as one of the shell's own toasts
+                    root.preparing = false
                     Quickshell.execDetached(["notify-send", "-a", "Reader", "Reader", v])
+                }
             }
         }
+    }
+
+    // A finished read clears itself; Super+T or the popout's play starts over.
+    Timer {
+        interval: 10000
+        running: root.finished
+        onTriggered: root.stop()
     }
 
     IpcHandler {

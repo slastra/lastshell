@@ -1,10 +1,10 @@
 import QtQuick
 
-// The narrator's chip (Super+T reads; services/Reader.qml): here only while
-// a document is loaded. Click play-pauses, the wheel skips passages, and the
-// popout is the whole player. The chip itself changes once per passage; the
-// per-second clock and progress live in the popout, so a long read doesn't
-// repaint the bar every second.
+// The narrator's chip (Super+T reads; services/Reader.qml): here from the
+// moment Super+T is pressed until ten seconds after the read finishes. Click
+// play-pauses, the wheel skips passages, and the popout is the whole player.
+// The chip's text changes once per passage; the per-second clock and the
+// progress bar live in the popout, so a long read doesn't repaint the bar.
 Chip {
     id: root
     edge: "bottom"
@@ -16,37 +16,42 @@ Chip {
     onWheelDown: Reader.next()
 
     readonly property var s: Reader.state
+    readonly property bool starting: Reader.starting
 
     ChipBody {
+        id: body
         LucideIcon {
             anchors.verticalCenter: parent.verticalCenter
-            name: Reader.playing ? "audio-lines" : root.s.finished ? "square" : "pause"
+            name: root.starting || Reader.playing ? "audio-lines" : Reader.finished ? "square" : "pause"
             font.pixelSize: 13
-            color: Qt.alpha(Reader.playing ? Theme.foam : Theme.text, 0.8)
+            color: Qt.alpha(Reader.playing ? Theme.foam : Theme.text, root.starting ? 0.45 : 0.8)
         }
         ValueText {
             font.italic: !Reader.playing
-            color: Reader.playing ? Theme.foam : Theme.text
-            text: root.s.passages ? `${root.s.position}/${root.s.passages}${root.s.complete ? "" : "+"}` : "…"
+            color: Reader.playing ? Theme.foam : root.starting ? Theme.textMuted : Theme.text
+            text: root.starting ? "reading…"
+                : Reader.finished ? "done"
+                : `${root.s.position}/${root.s.passages}${root.s.complete ? "" : "+"}`
         }
     }
-
     Popout {
         id: pop
         owner: root
 
         Column {
-            spacing: 10
+            id: col
+            spacing: 12
             width: 380
 
             PopoutHeader {
                 title: "reader"
                 status: {
                     const s = root.s
+                    if (root.starting) return "preparing"
                     if (s.finished) return "finished"
-                    const parts = [s.passages ? `passage ${s.position} of ${s.passages}${s.complete ? "" : "+"}` : "starting"]
+                    const parts = [`passage ${s.position} of ${s.passages}${s.complete ? "" : "+"}`]
                     if (s.note) parts.push(s.note)
-                    else if (!s.settled && s.passages) parts.push(`rendering ${s.rendered}`)
+                    else if (!s.settled) parts.push(`rendering ${s.rendered}`)
                     return parts.join("  ·  ")
                 }
                 tone: Reader.playing ? Theme.foam : Theme.textMuted
@@ -60,7 +65,8 @@ Chip {
                 maximumLineCount: 8
                 elide: Text.ElideRight
                 size: 14
-                text: root.s.passage || ""
+                color: root.starting ? Theme.textMuted : Theme.text
+                text: root.s.passage || "Preparing…"
             }
 
             Column {
@@ -86,13 +92,13 @@ Chip {
 
             Row { // transport
                 anchors.horizontalCenter: parent.horizontalCenter
-                spacing: 22
+                spacing: 24
                 Repeater {
                     model: [
-                        { icon: "skip-back", act: () => Reader.prev() },
+                        { icon: "skip-back", act: () => Reader.prev(), tip: "previous" },
                         { icon: Reader.playing ? "pause" : "play", act: () => Reader.toggle(), big: true },
-                        { icon: "skip-forward", act: () => Reader.next() },
-                        { icon: "square", act: () => Reader.stop() },
+                        { icon: "skip-forward", act: () => Reader.next(), tip: "next" },
+                        { icon: "square", act: () => Reader.stop(), tip: "stop" },
                     ]
                     LucideIcon {
                         required property var modelData
@@ -112,70 +118,113 @@ Chip {
                 }
             }
 
-            Row { // speed: 0.5x .. 3x, dragging sends steps of 0.05
-                spacing: 10
-                PopText { width: 44; size: 12; dim: 0.5; text: "speed"; anchors.verticalCenter: parent.verticalCenter }
-                SliderTrack {
-                    width: 380 - 44 - 50 - 20
-                    anchors.verticalCenter: parent.verticalCenter
-                    interactive: true
-                    fill: Theme.iris
-                    frac: ((Reader.config.speed ?? 1) - 0.5) / 2.5
-                    onSeek: f => Reader.setSpeed(0.5 + f * 2.5)
-                }
-                PopText {
-                    width: 50; size: 12
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: `${(Reader.config.speed ?? 1).toFixed(2)}×`
-                }
-            }
+            Divider { width: parent.width }
 
-            component Cycler: Row {
-                id: cy
-                property string label
-                property string value
-                property bool enabled: true
-                signal step(int d)
-                spacing: 10
-                PopText { width: 44; size: 12; dim: 0.5; text: cy.label; anchors.verticalCenter: parent.verticalCenter }
-                LucideIcon {
-                    name: "chevron-left"; font.pixelSize: 13
-                    color: cl.containsMouse ? Theme.rose : Theme.textMuted
-                    anchors.verticalCenter: parent.verticalCenter
-                    MouseArea { id: cl; anchors.fill: parent; anchors.margins: -5; hoverEnabled: true; enabled: cy.enabled; onClicked: cy.step(-1) }
-                }
-                PopText {
-                    width: 380 - 44 - 13 * 2 - 30
-                    horizontalAlignment: Text.AlignHCenter
-                    elide: Text.ElideRight
-                    size: 13
-                    dim: cy.enabled ? 1 : 0.4
-                    text: cy.value
-                    anchors.verticalCenter: parent.verticalCenter
-                    MouseArea { // the wheel cycles too
-                        anchors.fill: parent
-                        enabled: cy.enabled
-                        onWheel: w => cy.step(w.angleDelta.y > 0 ? -1 : 1)
+            // speed: 0.5x .. 3x in 0.05 steps; marks at 1, 1.5, 2, 2.5; the
+            // wheel nudges a step
+            Column {
+                width: parent.width
+                spacing: 6
+                Item {
+                    width: parent.width
+                    height: speedLabel.implicitHeight
+                    SectionLabel { id: speedLabel; text: "speed" }
+                    PopText {
+                        anchors.right: parent.right
+                        size: 12
+                        color: Math.abs(Reader.speed - 1) < 0.001 ? Theme.textMuted : Theme.iris
+                        text: `${Reader.speed.toFixed(2)}×`
                     }
                 }
-                LucideIcon {
-                    name: "chevron-right"; font.pixelSize: 13
-                    color: cr.containsMouse ? Theme.rose : Theme.textMuted
-                    anchors.verticalCenter: parent.verticalCenter
-                    MouseArea { id: cr; anchors.fill: parent; anchors.margins: -5; hoverEnabled: true; enabled: cy.enabled; onClicked: cy.step(1) }
+                Item {
+                    width: parent.width
+                    height: 14
+                    SliderTrack {
+                        id: speedTrack
+                        width: parent.width
+                        anchors.verticalCenter: parent.verticalCenter
+                        interactive: true
+                        fill: Theme.iris
+                        frac: (Reader.speed - 0.5) / 2.5
+                        onSeek: f => Reader.setSpeed(0.5 + f * 2.5)
+                    }
+                    Repeater {
+                        model: [1, 1.5, 2, 2.5]
+                        Rectangle {
+                            required property real modelData
+                            x: speedTrack.width * (modelData - 0.5) / 2.5 - 1
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: 2; height: 14; radius: 1
+                            color: Qt.alpha(Theme.text, 0.25)
+                        }
+                    }
+                    MouseArea { // wheel only; presses fall through to the track
+                        anchors.fill: parent
+                        acceptedButtons: Qt.NoButton
+                        onWheel: w => Reader.nudgeSpeed(w.angleDelta.y > 0 ? 1 : -1)
+                    }
                 }
             }
 
-            Cycler {
-                label: "voice"
-                value: Reader.voiceLabel()
-                onStep: d => Reader.cycleVoice(d)
+            Column { // voice: the config's shortlist, else every voice found
+                width: parent.width
+                spacing: 6
+                SectionLabel { text: "voice" }
+                ListView {
+                    id: voiceList
+                    width: parent.width
+                    readonly property int rowH: 28
+                    height: Math.min(count, 5) * (rowH + 2)
+                    clip: true
+                    spacing: 2
+                    boundsBehavior: Flickable.StopAtBounds
+                    model: Reader.voices
+                    currentIndex: Reader.voices.findIndex(v => v.key === Reader.config.voice)
+                    onVisibleChanged: if (visible) positionViewAtIndex(currentIndex, ListView.Center)
+                    delegate: Rectangle {
+                        required property var modelData
+                        readonly property bool current: modelData.key === Reader.config.voice
+                        width: voiceList.width
+                        height: voiceList.rowH
+                        radius: Theme.innerRadius
+                        color: vHover.hovered ? Theme.overlay : "transparent"
+                        border.color: current ? Qt.alpha(Theme.rose, 0.6) : "transparent"
+                        border.width: 1
+                        PopText {
+                            x: 10
+                            width: parent.width - 20
+                            anchors.verticalCenter: parent.verticalCenter
+                            elide: Text.ElideRight
+                            size: 13
+                            color: parent.current ? Theme.rose : Theme.text
+                            text: parent.modelData.label
+                        }
+                        HoverHandler { id: vHover; cursorShape: Qt.PointingHandCursor }
+                        TapHandler { onTapped: Reader.pickVoice(parent.modelData.key) }
+                    }
+                }
             }
-            Cycler {
-                label: "tidy"
-                value: Reader.config.tidy_available ? (Reader.config.tidy ?? "Auto") : "unavailable (no key)"
-                enabled: Reader.config.tidy_available === true
-                onStep: d => Reader.cycleTidy(d)
+
+            Column { // tidy: rewrite terminal-looking text for speech first
+                width: parent.width
+                spacing: 6
+                Item {
+                    width: parent.width
+                    height: tidyLabel.implicitHeight
+                    SectionLabel { id: tidyLabel; text: "tidy" }
+                    PopText {
+                        anchors.right: parent.right
+                        size: 12; dim: 0.45
+                        text: Reader.config.tidy_available ? "rewrite terminal output for speech" : "no OpenRouter key"
+                    }
+                }
+                Segmented {
+                    width: parent.width
+                    enabled: Reader.config.tidy_available === true
+                    options: Reader.tidyModes.map(m => ({ value: m, label: m.toLowerCase() }))
+                    current: Reader.config.tidy
+                    onPicked: v => Reader.setTidy(v)
+                }
             }
         }
     }

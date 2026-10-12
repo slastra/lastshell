@@ -12,7 +12,7 @@ import ".."  // root module
 Overlay {
     id: root
 
-    cardWidth: 640
+    cardWidth: 560
     contentPadding: 2
 
     readonly property string engine: Quickshell.shellDir + "/scripts/dictate.py"
@@ -161,9 +161,9 @@ Overlay {
 
             PopText { // where the text will land
                 anchors.right: parent.right
-                anchors.rightMargin: 18
+                anchors.rightMargin: 14
                 anchors.verticalCenter: parent.verticalCenter
-                width: Math.min(implicitWidth, 360)
+                width: Math.min(implicitWidth, 300)
                 elide: Text.ElideRight
                 size: 12; dim: 0.5
                 text: root.target.cls ? `→ ${root.target.cls}${root.target.title ? "  ·  " + root.target.title : ""}` : ""
@@ -259,11 +259,11 @@ Overlay {
         ModalFooter {
             hint: ({
                 locating: "esc cancel",
-                recording: "enter / space / super+x stop  ·  esc cancel",
+                recording: "↵ stop   esc cancel",
                 transcribing: "esc close",
                 cleaning: "esc close",
-                review: "enter paste  ·  shift+enter copy  ·  tab raw  ·  r again  ·  shift+r rewrite  ·  esc discard",
-                error: "r record again  ·  t retry this clip  ·  esc close",
+                review: "↵ paste   ⇧↵ copy   ⇥ raw   r again   ⇧r rewrite   esc discard",
+                error: "r record again   t retry   esc close",
             })[root.phase] ?? ""
             count: root.phase === "review" ? `${root.shown.split(/\s+/).filter(w => w).length} words` : ""
         }
