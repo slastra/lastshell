@@ -74,4 +74,12 @@ Scope {
         }
     }
     LazyLoader { id: dictation; Dictation {} }
+    // the Voice popout's dictate buttons: the same overlay as Super+X / Shift+Super+X
+    Connections {
+        target: Voice
+        function onDictationRequested(send) {
+            if (!dictation.active) dictation.active = true
+            dictation.item.hotkey(send)
+        }
+    }
 }

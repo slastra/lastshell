@@ -1,0 +1,103 @@
+pragma Singleton
+import Quickshell
+import Quickshell.Io
+import ".."  // root module: Theme, Reader
+import QtQuick
+
+// deskvoice, the desk's one speaker and microphone (~/Projects/Python/deskvoice):
+// who is talking (deskdoc, a Claude cue, the reader), whether the wake word is
+// listening, live dictation, and what was said lately. One socket subscription;
+// deskvoice pushes a status only when something changes, so an idle desk sends
+// nothing. LASTSHELL_DESKVOICE_SOCKET points it elsewhere (the test harness's
+// scripted stand-in).
+Singleton {
+    id: root
+
+    readonly property string socketPath: Quickshell.env("LASTSHELL_DESKVOICE_SOCKET")
+        || `${Quickshell.env("XDG_RUNTIME_DIR")}/deskvoice.sock`
+    readonly property string quietFlag: `${Quickshell.env("HOME")}/.claude/voice/quiet`
+
+    readonly property bool up: sock.connected
+    property var status: ({})
+
+    readonly property var speaking: status.speaking ?? null
+    readonly property var listen: status.listen ?? null
+    readonly property var dictation: status.dictation ?? null
+    readonly property var voices: status.voices ?? ({})
+    readonly property var recent: status.recent ?? []
+    readonly property bool micOn: listen?.mic === true
+    readonly property bool claudeQuiet: status.claude_quiet === true
+    readonly property bool readerHeld: status.reader_held === true
+    readonly property bool ducking: status.duck?.ducked === true
+
+    // The one voice the chip shows, most urgent first: you dictating, the mic
+    // open for a request, deskdoc or Claude speaking, the reader, nobody.
+    readonly property string who: {
+        if (!up) return Reader.active ? "reader" : "down"
+        if (dictation) return "dictating"
+        const ls = listen?.state
+        if (ls === "listening" || ls === "transcribing") return "listening"
+        if (speaking) return speaking.channel === "assistant" ? "deskdoc" : "claude"
+        if (Reader.active) return "reader"
+        return "idle"
+    }
+
+    // One colour per voice, everywhere: deskdoc speaks in the shell's own
+    // rose, Claude in iris, the reader in foam (as it always has); listening
+    // is gold (lastshell's "needs you"), dictating love (the recorder's REC).
+    function tone(w) {
+        return ({ deskdoc: Theme.rose, claude: Theme.iris, reader: Theme.foam,
+                  listening: Theme.gold, dictating: Theme.love })[w] ?? Theme.textMuted
+    }
+    function kindTone(entry) {
+        if (entry.kind === "heard") return Theme.gold
+        if (entry.kind === "dictated") return Theme.love
+        return entry.channel === "assistant" ? Theme.rose : Theme.iris
+    }
+    function kindLabel(entry) {
+        if (entry.kind === "heard") return "you"
+        if (entry.kind === "dictated") return entry.submitted ? "sent" : "typed"
+        return entry.channel === "assistant" ? "doc" : "claude"
+    }
+    function clockOf(ts) { return Qt.formatTime(new Date(ts * 1000), "hh:mm") }
+
+    // Overlays.qml listens: the same overlay as Super+X / Shift+Super+X.
+    signal dictationRequested(bool send)
+
+    function send(msg) {
+        if (!sock.connected) return
+        sock.write(JSON.stringify(msg) + "\n")
+        sock.flush()
+    }
+    function setMic(on) { send({ op: "mic", enabled: on }) }
+    function stopSpeaking() { send({ op: "stop" }) }
+    function setClaudeQuiet(quiet) {
+        Quickshell.execDetached(quiet ? ["sh", "-c", `mkdir -p "$(dirname "$1")" && touch "$1"`, "sh", quietFlag]
+                                      : ["rm", "-f", quietFlag])
+    }
+    function dictate(sendIt) { dictationRequested(sendIt === true) }
+
+    Socket {
+        id: sock
+        path: root.socketPath
+        connected: true
+        onConnectionStateChanged: {
+            if (connected) root.send({ op: "subscribe" })
+            else root.status = ({})
+        }
+        parser: SplitParser {
+            onRead: line => {
+                let m
+                try { m = JSON.parse(line) } catch (e) { return }
+                if (m.event === "status") root.status = m
+            }
+        }
+    }
+    // deskvoice restarts (or starts after the shell): try again every few seconds
+    Timer {
+        interval: 3000
+        repeat: true
+        running: !sock.connected
+        onTriggered: sock.connected = true
+    }
+}
