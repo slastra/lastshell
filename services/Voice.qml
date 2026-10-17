@@ -29,6 +29,9 @@ Singleton {
     readonly property bool claudeQuiet: status.claude_quiet === true
     readonly property bool readerHeld: status.reader_held === true
     readonly property bool ducking: status.duck?.ducked === true
+    // what deskvoice is waiting on: "reply" (deskdoc working out an answer),
+    // "dictation" (a voice dictation being cleaned up and pasted), "transcribing"
+    readonly property string thinking: status.thinking ?? ""
 
     // The one voice the chip shows, most urgent first: you dictating, the mic
     // open for a request, deskdoc or Claude speaking, the reader, nobody.
@@ -38,15 +41,17 @@ Singleton {
         const ls = listen?.state
         if (ls === "listening" || ls === "transcribing") return "listening"
         if (speaking) return speaking.channel === "assistant" ? "deskdoc" : "claude"
+        if (thinking) return "thinking"
         if (Reader.active) return "reader"
         return "idle"
     }
 
-    // One colour per voice, everywhere: deskdoc speaks in the shell's own
-    // rose, Claude in iris, the reader in foam (as it always has); listening
-    // is gold (lastshell's "needs you"), dictating love (the recorder's REC).
+    // One colour per voice, everywhere: deskdoc speaks (and thinks) in the
+    // shell's own rose, Claude in iris, the reader in foam (as it always has);
+    // listening is gold (lastshell's "needs you"), dictating love (the
+    // recorder's REC).
     function tone(w) {
-        return ({ deskdoc: Theme.rose, claude: Theme.iris, reader: Theme.foam,
+        return ({ deskdoc: Theme.rose, thinking: Theme.rose, claude: Theme.iris, reader: Theme.foam,
                   listening: Theme.gold, dictating: Theme.love })[w] ?? Theme.textMuted
     }
     function kindTone(entry) {

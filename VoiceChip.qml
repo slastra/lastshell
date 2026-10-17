@@ -33,12 +33,14 @@ Chip {
 
     readonly property string markMode: who === "dictating" ? "dictating"
         : who === "listening" ? "listening"
+        : who === "thinking" ? "thinking"
         : talking || Reader.playing ? "speaking" : "idle"
 
     readonly property string label: {
         const d = Voice.dictation
         if (who === "dictating") return `${Math.floor((d?.secs ?? 0) / 60)}:${String((d?.secs ?? 0) % 60).padStart(2, "0")}`
         if (who === "listening") return "listening"
+        if (who === "thinking") return Voice.thinking === "dictation" ? "typing" : "thinking"
         if (who === "deskdoc") return "doc"
         if (who === "claude") return "claude"
         if (who === "reader") {
@@ -51,18 +53,23 @@ Chip {
     }
 
     ChipBody {
-        VoiceMark {
-            anchors.verticalCenter: parent.verticalCenter
-            visible: !(root.who === "idle" && !Voice.micOn)
-            mode: root.markMode
-            tone: root.active ? root.tone : Theme.textMuted
-        }
-        LucideIcon { // the wake word is off: no capture
-            anchors.verticalCenter: parent.verticalCenter
-            visible: root.who === "idle" && !Voice.micOn
-            name: "mic-off"
-            font.pixelSize: 13
-            color: Theme.textFaint
+        Item { // one fixed slot for the mark or the struck mic, so the chip
+               // keeps its width when the wake word goes on or off
+            width: 14
+            height: parent.height
+            VoiceMark {
+                anchors.centerIn: parent
+                visible: !(root.who === "idle" && !Voice.micOn)
+                mode: root.markMode
+                tone: root.active ? root.tone : Theme.textMuted
+            }
+            LucideIcon { // the wake word is off: no capture
+                anchors.centerIn: parent
+                visible: root.who === "idle" && !Voice.micOn
+                name: "mic-off"
+                font.pixelSize: 13
+                color: Theme.textFaint
+            }
         }
         ValueText {
             visible: root.label !== ""
@@ -177,7 +184,8 @@ Chip {
                             deskdoc: `deskdoc  ·  ${Voice.voices.assistant ?? ""}`,
                             claude: `claude  ·  ${Voice.voices.cue ?? ""}`,
                             reader: Voice.readerHeld ? "reader  ·  held for the others" : "reader",
-                            listening: Voice.listen?.state === "transcribing" ? "heard you" : "listening",
+                            listening: "listening",
+                            thinking: Voice.thinking === "dictation" ? "dictation  ·  tidying up" : "deskdoc  ·  thinking",
                             dictating: Voice.dictation?.voice ? "dictating  ·  by voice" : "dictating",
                             down: "deskvoice",
                         })[root.who] ?? "quiet"
@@ -192,7 +200,10 @@ Chip {
                         text: {
                             const w = root.who
                             if (w === "dictating") return Voice.dictation?.partial || "Go ahead…"
-                            if (w === "listening") return Voice.listen?.state === "transcribing" ? "Working out what you said…" : "Speak now."
+                            if (w === "listening") return "Speak now."
+                            if (w === "thinking") return ({ dictation: "Cleaning up your words for the window you're in…",
+                                                            transcribing: "Working out what you said…" })[Voice.thinking]
+                                                         ?? (Voice.recent.slice().reverse().find(e => e.kind === "heard")?.text ?? "Working on it…")
                             if (w === "deskdoc" || w === "claude") return Voice.speaking?.text ?? ""
                             if (w === "reader") return Reader.starting ? "Preparing…" : `passage ${Reader.state.position} of ${Reader.state.passages}`
                             if (w === "down") return "Not running. systemctl --user start deskvoice"
@@ -216,6 +227,7 @@ Chip {
                     Item {
                         required property var modelData
                         readonly property bool on: root.who === modelData.id
+                            || (modelData.id === "deskdoc" && root.who === "thinking" && Voice.thinking === "reply")
                         readonly property color laneTone: Voice.tone(modelData.id)
                         width: col.width
                         height: 24
@@ -255,7 +267,7 @@ Chip {
                                     return Reader.playing ? "reading" : "paused"
                                 }
                                 const ch = id === "deskdoc" ? "assistant" : "cue"
-                                if (parent.on) return "speaking"
+                                if (parent.on) return root.who === "thinking" ? "thinking" : "speaking"
                                 const q = Voice.status.queued?.[ch] ?? 0
                                 return q > 0 ? `${q} waiting` : "—"
                             }
