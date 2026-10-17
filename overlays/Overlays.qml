@@ -32,7 +32,12 @@ Scope {
         // tap to start, tap again to stop (the overlay decides which)
         function toggleDictation(): void {
             if (!dictation.active) dictation.active = true
-            dictation.item.hotkey()
+            dictation.item.hotkey(false)
+        }
+        // Shift+Super+X: the same, and the paste is followed by Return
+        function toggleDictationSubmit(): void {
+            if (!dictation.active) dictation.active = true
+            dictation.item.hotkey(true)
         }
         function toggleCapture(): void {
             // Print while recording = stop, no menu — matching the script.
