@@ -20,7 +20,9 @@ each stdout line `<name> <json>` like reader.py (EngineProcess.qml parses both):
     dictate.py finish [--app CLASS] [--title TITLE] [--paste | --dry-run]
         raw text on stdin (deskvoice's voice dictation): clean it up, then paste
         it into the focused window (--paste) or just print it (--dry-run);
-        stdout gains `pasted true` when it pasted
+        stdout gains `pasted true` when it pasted. A dictation that ends with
+        "enter" ("..., enter", "press enter") presses Return after the paste
+        (`submitted true`); the word itself is never typed.
 
 The key is found by scripts/openrouter.py (~/.config/lastshell/openrouter.key)
 and read by the engines only, never the shell. Models and vocabulary are in
@@ -33,6 +35,7 @@ import io
 import json
 import math
 import os
+import re
 import shutil
 import signal
 import socket
@@ -252,6 +255,26 @@ def deskvoice_transcribe(path):
     return None
 
 
+# The spoken "enter" that ends a voice dictation: "press/hit enter" anywhere at
+# the end, or a bare "enter" standing apart (after a pause or comma, which
+# Parakeet punctuates), so "the password you enter" stays text.
+SUBMIT = re.compile(r"(?:[\s,;:-]*\b(?:and\s+)?(?:press|hit)\s+(?:enter|return)"
+                    r"|(?:^|(?<=[.!?,;:]))\s*(?:enter|return))[.!]?\s*$", re.I)
+
+
+def split_submit(raw):
+    """(text without the trailing enter, whether to press Return)."""
+    m = SUBMIT.search(raw)
+    if not m:
+        return raw, False
+    return raw[:m.start()].rstrip(" ,;:-"), True
+
+
+def press_return():
+    subprocess.run(["wtype", "-k", "Return"], check=True, timeout=5,
+                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
 def paste(text, app):
     """Into the focused window, the way the overlay does it: kitty and friends
     take Ctrl+Shift+V as a bracketed paste (so a newline can't press Return),
@@ -396,13 +419,20 @@ def process(path, args, raw=None):
 def finish(args):
     """Voice dictation from deskvoice: raw text on stdin, cleaned for the
     focused window, then pasted there (Shaun chose paste-at-once)."""
-    raw = sys.stdin.read().strip()
-    if not raw:
+    raw, submit = split_submit(sys.stdin.read().strip())
+    if not raw and not submit:
         fail("Nothing to finish")
-    text = process(None, args, raw=raw)
+    text = process(None, args, raw=raw) if raw else ""
+    if submit:
+        emit("submit", True)
     if args.paste and not args.dry_run:
-        if paste(text, args.app):
+        pasted = paste(text, args.app) if text else True
+        if text and pasted:
             emit("pasted", True)
+        if submit and pasted and shutil.which("wtype"):
+            time.sleep(0.12)             # let the paste land before Return
+            press_return()
+            emit("submitted", True)
 
 
 def main():
