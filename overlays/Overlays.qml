@@ -1,5 +1,6 @@
 import Quickshell
 import Quickshell.Io
+import Quickshell.Services.Polkit
 import QtQuick
 import ".."  // root module: Recorder (recording-aware Print behavior), Host, Wifi
 
@@ -82,4 +83,12 @@ Scope {
             dictation.item.hotkey(send)
         }
     }
+
+    // The session's polkit agent (hyprpolkitagent retired): resident, so it
+    // holds the registration; the dialog loads on the first request.
+    PolkitAgent {
+        id: polkit
+        onAuthenticationRequestStarted: auth.active = true
+    }
+    LazyLoader { id: auth; PolkitDialog { agent: polkit } }
 }

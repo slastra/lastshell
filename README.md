@@ -35,6 +35,12 @@ interface. Notifications are the shell's own `NotificationServer`:
 urgency-washed toasts with a countdown ring around the dismiss button,
 and a history the center reads.
 
+The shell is also the session's polkit agent. Its prompt wears the modal
+chrome, names the password it wants when an app's own unlock goes through
+polkit (1Password's), and counts down pam_faillock's remaining attempts,
+since a cancelled prompt is one of them. Stop any other agent
+(hyprpolkitagent, polkit-gnome) first: a session holds one registration.
+
 ## Runs on
 
 - [Quickshell](https://quickshell.org) 0.3.1, Hyprland (workspace and
