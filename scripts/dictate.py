@@ -256,15 +256,21 @@ def paste(text, app):
     """Into the focused window, the way the overlay does it: kitty and friends
     take Ctrl+Shift+V as a bracketed paste (so a newline can't press Return),
     GUI apps take Ctrl+V."""
-    subprocess.run(["wl-copy"], input=text.encode(), check=True, timeout=5)
+    # wl-copy forks a child that stays to serve the clipboard; it must not
+    # inherit our stdout, or whoever reads it (deskvoice) waits for EOF until
+    # the clipboard changes hands.
+    subprocess.run(["wl-copy"], input=text.encode(), check=True, timeout=5,
+                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     if not shutil.which("wtype"):
         subprocess.run(["notify-send", "-a", "Dictation", "Copied to clipboard",
-                        "Install wtype to paste it into the window"], timeout=5)
+                        "Install wtype to paste it into the window"], timeout=5,
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         return False
     time.sleep(0.08)
     keys = ["-M", "ctrl", "-M", "shift", "-k", "v", "-m", "shift", "-m", "ctrl"] if app in TERMINALS \
         else ["-M", "ctrl", "-k", "v", "-m", "ctrl"]
-    subprocess.run(["wtype", *keys], check=True, timeout=5)
+    subprocess.run(["wtype", *keys], check=True, timeout=5,
+                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     return True
 
 
