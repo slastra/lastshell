@@ -15,7 +15,6 @@ Singleton {
 
     readonly property string socketPath: Quickshell.env("LASTSHELL_DESKVOICE_SOCKET")
         || `${Quickshell.env("XDG_RUNTIME_DIR")}/deskvoice.sock`
-    readonly property string quietFlag: `${Quickshell.env("HOME")}/.claude/voice/quiet`
 
     readonly property bool up: sock.connected
     property var status: ({})
@@ -26,7 +25,7 @@ Singleton {
     readonly property var voices: status.voices ?? ({})
     readonly property var recent: status.recent ?? []
     readonly property bool micOn: listen?.mic === true
-    readonly property bool claudeQuiet: status.claude_quiet === true
+    readonly property bool claudeQuiet: status.flags?.claude_quiet === true   // [status.flags] in deskvoice's config
     readonly property bool readerHeld: status.reader_held === true
     readonly property bool ducking: status.duck?.ducked === true
     // what deskvoice is waiting on: "reply" (deskdoc working out an answer),
@@ -76,10 +75,7 @@ Singleton {
     }
     function setMic(on) { send({ op: "mic", enabled: on }) }
     function stopSpeaking() { send({ op: "stop" }) }
-    function setClaudeQuiet(quiet) {
-        Quickshell.execDetached(quiet ? ["sh", "-c", `mkdir -p "$(dirname "$1")" && touch "$1"`, "sh", quietFlag]
-                                      : ["rm", "-f", quietFlag])
-    }
+    function setClaudeQuiet(quiet) { send({ op: "flag", name: "claude_quiet", on: quiet }) }
     function dictate(sendIt) { dictationRequested(sendIt === true) }
 
     Socket {
