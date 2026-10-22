@@ -51,6 +51,7 @@ Scope {
     // OSD and popups stay resident (they must observe state to react);
     // the eight modals load on demand.
     VolumeOsd {}
+    NowPlayingToast {}
     LazyLoader { active: Backlight.present; BrightnessOsd {} }
     NotificationPopups { id: popups }
     DimOverlay {}
@@ -58,8 +59,8 @@ Scope {
     LazyLoader { id: switcher; TabSwitcher {} }
     LazyLoader { id: launcher; Launcher {} }
     LazyLoader { id: audio; AudioPicker {} }
-    LazyLoader { id: effects; EffectPicker {} }
     LazyLoader { id: mixer; AudioMixer {} }
+    LazyLoader { id: effects; EffectPicker {} }
     LazyLoader { id: clipboard; ClipboardPicker {} }
     LazyLoader { id: center; NotificationCenter { history: popups.historyModel } }
     LazyLoader { id: capture; CapturePicker {} }
