@@ -23,6 +23,8 @@ Singleton {
     readonly property var listen: status.listen ?? null
     readonly property var dictation: status.dictation ?? null
     readonly property var voices: status.voices ?? ({})
+    // every voice deskvoice can speak in, [{name, engine, label}], asked for on connect
+    property var voiceList: []
     readonly property var recent: status.recent ?? []
     readonly property bool micOn: listen?.mic === true
     readonly property bool claudeQuiet: status.flags?.claude_quiet === true   // [status.flags] in deskvoice's config
@@ -76,6 +78,14 @@ Singleton {
     function setMic(on) { send({ op: "mic", enabled: on }) }
     function stopSpeaking() { send({ op: "stop" }) }
     function setClaudeQuiet(quiet) { send({ op: "flag", name: "claude_quiet", on: quiet }) }
+    // A channel's voice from now on (deskvoice remembers it), then a line in it
+    // so you hear what you picked; picking again cuts the last preview short.
+    function pickVoice(channel, name) {
+        send({ op: "voice", channel: channel, voice: name })
+        send({ op: "stop", channel: channel })
+        const who = (voiceList.find(v => v.name === name)?.label ?? name).replace(/ \(.*\)$/, "")
+        send({ op: "say", id: `pick-${Date.now()}`, channel: channel, text: `Hi, I'm ${who}. This is how I sound.` })
+    }
     function dictate(sendIt) { dictationRequested(sendIt === true) }
 
     Socket {
@@ -83,7 +93,10 @@ Singleton {
         path: root.socketPath
         connected: true
         onConnectionStateChanged: {
-            if (connected) root.send({ op: "subscribe" })
+            if (connected) {
+                root.send({ op: "subscribe" })
+                root.send({ op: "voices", req: "voices" })
+            }
             else root.status = ({})
         }
         parser: SplitParser {
@@ -91,6 +104,7 @@ Singleton {
                 let m
                 try { m = JSON.parse(line) } catch (e) { return }
                 if (m.event === "status") root.status = m
+                else if (m.req === "voices") root.voiceList = m.voices ?? []
             }
         }
     }

@@ -31,6 +31,26 @@ Chip {
     onWheelUp: if (Reader.active) Reader.prev()
     onWheelDown: if (Reader.active) Reader.next()
 
+    // the voices popout's open picker: "deskdoc", "claude", "reader" or none
+    property string pickingLane: ""
+
+    // deskdoc and Claude pick from deskvoice's English Kokoro voices, the
+    // reader from its own list (its config's shortlist, else every voice)
+    function laneVoices(id) {
+        if (id === "reader") return Reader.voices
+        return Voice.voiceList
+            .filter(v => v.engine === "kokoro" && /^[ab][fm]_/.test(v.name))
+            .map(v => ({ key: v.name, label: v.label }))
+    }
+    function laneCurrent(id) {
+        if (id === "reader") return Reader.config.voice ?? ""
+        return Voice.voices[id === "deskdoc" ? "assistant" : "cue"] ?? ""
+    }
+    function lanePick(id, key) {
+        if (id === "reader") Reader.pickVoice(key)
+        else Voice.pickVoice(id === "deskdoc" ? "assistant" : "cue", key)
+    }
+
     readonly property string markMode: who === "dictating" ? "dictating"
         : who === "listening" ? "listening"
         : who === "thinking" ? "thinking"
@@ -135,6 +155,7 @@ Chip {
     Popout {
         id: pop
         owner: root
+        onVisibleChanged: if (!visible) root.pickingLane = ""
 
         Column {
             id: col
@@ -213,7 +234,7 @@ Chip {
                 }
             }
 
-            // the three voices, each in its colour
+            // the three voices, each in its colour; click one to pick its voice
             Column {
                 width: parent.width
                 spacing: 2
@@ -224,52 +245,76 @@ Chip {
                         { id: "claude", name: "claude", voice: Voice.voices.cue ?? "ff_siwis" },
                         { id: "reader", name: "reader", voice: (Reader.config.voice || "kokoro-bm_george").replace(/^kokoro-/, "") },
                     ]
-                    Item {
+                    Column {
+                        id: lane
                         required property var modelData
                         readonly property bool on: root.who === modelData.id
                             || (modelData.id === "deskdoc" && root.who === "thinking" && Voice.thinking === "reply")
                         readonly property color laneTone: Voice.tone(modelData.id)
+                        readonly property bool picking: root.pickingLane === modelData.id
                         width: col.width
-                        height: 24
-                        Rectangle {
-                            id: dot
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: 8; height: 8; radius: 4
-                            color: parent.on ? parent.laneTone : "transparent"
-                            border.width: 1
-                            border.color: Qt.alpha(parent.laneTone, parent.on ? 1 : 0.55)
-                        }
-                        PopText {
-                            id: laneName
-                            x: 18
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: 70
-                            size: 13
-                            color: parent.on ? parent.laneTone : Theme.text
-                            text: parent.modelData.name
-                        }
-                        PopText {
-                            anchors.left: laneName.right
-                            anchors.verticalCenter: parent.verticalCenter
-                            size: 12; dim: 0.45
-                            text: parent.modelData.voice
-                        }
-                        PopText {
-                            anchors.right: parent.right
-                            anchors.verticalCenter: parent.verticalCenter
-                            size: 12
-                            color: parent.on ? parent.laneTone : Theme.textFaint
-                            text: {
-                                const id = parent.modelData.id
-                                if (id === "reader") {
-                                    if (!Reader.active) return "—"
-                                    if (Voice.readerHeld) return "held"
-                                    return Reader.playing ? "reading" : "paused"
+                        spacing: 4
+                        Item {
+                            width: col.width
+                            height: 24
+                            Rectangle {
+                                id: dot
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: 8; height: 8; radius: 4
+                                color: lane.on ? lane.laneTone : "transparent"
+                                border.width: 1
+                                border.color: Qt.alpha(lane.laneTone, lane.on ? 1 : 0.55)
+                            }
+                            PopText {
+                                id: laneName
+                                x: 18
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: 70
+                                size: 13
+                                color: lane.on ? lane.laneTone : Theme.text
+                                text: lane.modelData.name
+                            }
+                            PopText {
+                                anchors.left: laneName.right
+                                anchors.verticalCenter: parent.verticalCenter
+                                size: 12
+                                dim: laneHover.hovered || lane.picking ? 0.9 : 0.45
+                                color: lane.picking ? lane.laneTone : Theme.text
+                                text: lane.modelData.voice + (laneHover.hovered || lane.picking ? "  ▾" : "")
+                            }
+                            PopText {
+                                anchors.right: parent.right
+                                anchors.verticalCenter: parent.verticalCenter
+                                size: 12
+                                color: lane.on ? lane.laneTone : Theme.textFaint
+                                text: {
+                                    const id = lane.modelData.id
+                                    if (id === "reader") {
+                                        if (!Reader.active) return "—"
+                                        if (Voice.readerHeld) return "held"
+                                        return Reader.playing ? "reading" : "paused"
+                                    }
+                                    const ch = id === "deskdoc" ? "assistant" : "cue"
+                                    if (lane.on) return root.who === "thinking" ? "thinking" : "speaking"
+                                    const q = Voice.status.queued?.[ch] ?? 0
+                                    return q > 0 ? `${q} waiting` : "—"
                                 }
-                                const ch = id === "deskdoc" ? "assistant" : "cue"
-                                if (parent.on) return root.who === "thinking" ? "thinking" : "speaking"
-                                const q = Voice.status.queued?.[ch] ?? 0
-                                return q > 0 ? `${q} waiting` : "—"
+                            }
+                            HoverHandler { id: laneHover; cursorShape: Qt.PointingHandCursor }
+                            TapHandler {
+                                onTapped: root.pickingLane = lane.picking ? "" : lane.modelData.id
+                            }
+                        }
+                        Loader {
+                            active: lane.picking
+                            visible: active
+                            width: col.width
+                            sourceComponent: VoicePicker {
+                                width: col.width
+                                tone: lane.laneTone
+                                voices: root.laneVoices(lane.modelData.id)
+                                current: root.laneCurrent(lane.modelData.id)
+                                onPicked: key => root.lanePick(lane.modelData.id, key)
                             }
                         }
                     }
