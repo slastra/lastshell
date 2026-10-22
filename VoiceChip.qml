@@ -207,7 +207,7 @@ Chip {
                             if (w === "deskdoc" || w === "claude") return Voice.speaking?.text ?? ""
                             if (w === "reader") return Reader.starting ? "Preparing…" : `passage ${Reader.state.position} of ${Reader.state.passages}`
                             if (w === "down") return "Not running. systemctl --user start deskvoice"
-                            return Voice.micOn ? "Say “what's up doc”." : "The wake word is off; the mic is closed."
+                            return Voice.micOn ? "Say “ok computer”." : "The wake word is off; the mic is closed."
                         }
                     }
                 }
@@ -305,7 +305,7 @@ Chip {
                     width: parent.width
                     wrapMode: Text.Wrap
                     size: 11; dim: 0.35
-                    text: "or say “what's up doc, dictate …”; end with “enter” to send"
+                    text: "or say “ok computer, dictate …”; end with “enter” to send"
                 }
             }
 
@@ -356,7 +356,7 @@ Chip {
                 spacing: 6
                 Switch {
                     text: "wake word"
-                    note: Voice.micOn ? "listening for “what's up doc”" : "mic closed"
+                    note: Voice.micOn ? "listening for “ok computer”" : "mic closed"
                     on: Voice.micOn
                     enabled: Voice.up
                     onToggled: v => Voice.setMic(v)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Dictation engine for lastshell's Dictation overlay (Super+X), and for voice
-dictation ("what's up doc, dictate: ...").
+dictation ("ok computer, dictate: ...").
 
 Records and transcribes through deskvoice (~/Projects/Python/deskvoice), the
 desk's shared mic: Parakeet runs locally and transcribes each phrase at its
