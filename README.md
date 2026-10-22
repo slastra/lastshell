@@ -24,6 +24,7 @@ a hint footer, and an animated backdrop mask.
 | Launcher (windows first by focus recency, then apps by frecency) | `qs ipc call overlays toggleLauncher` |
 | Tab switcher (every tab, every browser window, every workspace) | `toggleSwitcher` |
 | Audio sink picker | `toggleAudio` |
+| Per-app volume mixer | `toggleMixer` |
 | Wallpaper effect picker | `toggleEffects` |
 | Clipboard history | `toggleClipboard` |
 | Notification center | `toggleNotifications` |
