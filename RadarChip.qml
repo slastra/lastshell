@@ -16,25 +16,7 @@ Chip {
         : Radar.level === "watch" ? Theme.gold
         : Theme.foam
 
-    function tierTone(s) {
-        return s.tier === "urgent" ? Theme.love : s.tier === "high" ? Theme.gold : Theme.text
-    }
-
-    // 16-point rose, as the daemon words its notifications.
-    function point(deg) {
-        const p = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
-        return p[Math.floor(((deg + 11.25) % 360) / 22.5) % 16]
-    }
-    function miles(km) { const m = km / 1.609; return m < 1 ? "<1 mi" : `${Math.round(m)} mi` }
-    function clock(iso) { const d = Radar.parseLocal(iso); return d ? Qt.formatTime(d, "h:mm AP") : "" }
-
-    function trackLine(s) {
-        if (s.over_home) return "over home now"
-        const pass = s.eta_min >= 0
-            ? `passes ${miles(s.cpa_km)} ${point(s.pass_dir)} of home in ${Math.round(s.eta_min)}m`
-            : "moving away"
-        return `${miles(s.dist_km)} ${point(s.bearing)} · ${Math.round(s.mph)} mph → ${point(s.heading)} · ${pass}`
-    }
+    function tierTone(t) { return t === "urgent" ? Theme.love : t === "high" ? Theme.gold : Theme.foam }
 
     onClicked: Quickshell.execDetached(["qs", "-c", "lastshell", "ipc", "call", "overlays", "toggleRadar"])
 
@@ -65,84 +47,111 @@ Chip {
     }
 
     Popout {
+        id: pop
         owner: root
 
         Column {
-            spacing: 8
-            width: 380
+            spacing: 10
+            width: 400
 
             PopoutHeader {
                 title: "Storms near home"
                 status: Radar.tornadoWarning ? "tornado warning"
                     : Radar.severeWarning ? "severe t-storm warning"
-                    : Radar.watch ? "watch"
+                    : Radar.watch ? "watch in effect"
                     : Radar.threats.length > 0 ? "storm headed this way" : "storms nearby"
                 tone: root.tone
             }
 
-            Repeater {
-                model: Radar.homeAlerts.filter(a => /Warning|Watch/.test(a.event))
+            ThreatRibbon { width: parent.width; compact: true }
+
+            Repeater { // watches at home; the ribbon already carries a warning
+                model: Radar.homeAlerts.filter(a => /Watch/.test(a.event))
                 Row {
                     required property var modelData
-                    spacing: 6
-                    readonly property color atone: /Warning/.test(modelData.event) ? Theme.love : Theme.gold
+                    spacing: 7
                     LucideIcon {
                         anchors.verticalCenter: parent.verticalCenter
-                        name: /Warning/.test(modelData.event) ? "siren" : "eye"
-                        color: parent.atone
+                        name: "eye"
+                        color: /Tornado/.test(modelData.event) ? Theme.love : Theme.gold
                         font.pixelSize: 13
                     }
                     PopText {
                         anchors.verticalCenter: parent.verticalCenter
-                        text: `${modelData.event}${modelData.ends ? "  until " + root.clock(modelData.ends) : ""}`
-                        color: parent.atone
+                        text: `${modelData.event}${modelData.ends ? "  until " + Radar.clock(modelData.ends) : ""}`
                         size: 13
                     }
                 }
             }
 
-            Divider { width: parent.width; visible: Radar.notable.length > 0 && Radar.homeAlerts.length > 0 }
-
-            Repeater {
-                model: Radar.notable.slice(0, 4)
-                Column {
+            Repeater { // other storms worth a row; the ribbon has the nearest
+                model: Radar.notable.filter(s => s.id !== Radar.nearest?.id).slice(0, 3)
+                Item {
                     required property var modelData
                     width: parent.width
-                    spacing: 1
-                    PopText {
-                        text: `Tor ${modelData.probtor}%  ·  wind ${modelData.probwind}%  ·  hail ${modelData.probhail}%`
-                        color: root.tierTone(modelData)
-                        font.bold: modelData.tier !== ""
-                        size: 13
+                    height: rowText.implicitHeight
+                    Column {
+                        id: rowText
+                        width: parent.width - spark.width - 10
+                        spacing: 1
+                        Row {
+                            spacing: 6
+                            Badge {
+                                visible: modelData.tier !== ""
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: Radar.tierLabel(modelData.tier)
+                                tone: root.tierTone(modelData.tier)
+                            }
+                            PopText { text: Radar.probs(modelData); size: 13 }
+                        }
+                        PopText {
+                            width: parent.width
+                            text: Radar.where(modelData)
+                            wrapMode: Text.WordWrap
+                            dim: 0.6
+                            size: 12
+                        }
                     }
-                    PopText {
-                        width: parent.width
-                        text: root.trackLine(modelData)
-                        wrapMode: Text.WordWrap
-                        dim: 0.7
-                        size: 12
+                    TorSpark {
+                        id: spark
+                        anchors.right: parent.right
+                        anchors.top: parent.top
+                        anchors.topMargin: 2
+                        live: pop.visible
+                        values: modelData.tor_hist
+                        tone: root.tierTone(modelData.tier)
                     }
                 }
             }
 
-            Image {
-                visible: status === Image.Ready
+            Rectangle { // map thumbnail, framed like the view's pane
+                visible: thumb.status === Image.Ready
                 width: parent.width
-                height: visible ? width * sourceSize.height / Math.max(1, sourceSize.width) : 0
-                source: Radar.url(Radar.images.map ?? "")
-                cache: false
-                asynchronous: true
-                fillMode: Image.PreserveAspectFit
-                smooth: true
+                height: visible ? width * thumb.sourceSize.height / Math.max(1, thumb.sourceSize.width) : 0
+                radius: Theme.innerRadius
+                color: Theme.base
+                border.color: Theme.border
+                clip: true
+                Image {
+                    id: thumb
+                    anchors.fill: parent
+                    anchors.margins: 1
+                    source: Radar.url(Radar.images.map ?? "")
+                    cache: false
+                    asynchronous: true
+                    fillMode: Image.PreserveAspectFit
+                    smooth: true
+                    mipmap: true
+                }
             }
 
             PopText {
                 width: parent.width
                 elide: Text.ElideRight
                 text: [
-                    Radar.payload.valid ? `ProbSevere ${root.clock(Radar.payload.valid)}` : "",
+                    Radar.payload.valid ? `ProbSevere ${Radar.clock(Radar.payload.valid)}` : "",
                     Radar.images.scan ? `${Radar.payload.radar} ${Radar.images.scan}` : "",
-                    "click for more",
+                    "click to open",
                 ].filter(s => s).join("  ·  ")
                 dim: 0.45
                 size: 12

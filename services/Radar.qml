@@ -49,6 +49,24 @@ Singleton {
 
     function parseLocal(iso) { return iso ? new Date(iso) : null }
 
+    // Wording shared by the chip, the ribbon and the view, so every surface
+    // says a track the same way the phone notification does.
+    function point(deg) {
+        const p = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
+        return p[Math.floor(((deg + 11.25) % 360) / 22.5) % 16]
+    }
+    function miles(km) { const m = km / 1.609; return m < 1 ? "<1 mi" : `${Math.round(m)} mi` }
+    function clock(iso) { const d = parseLocal(iso); return d ? Qt.formatTime(d, "h:mm AP") : "" }
+    function probs(s) { return `tor ${s.probtor}% · wind ${s.probwind}% · hail ${s.probhail}%` }
+    function where(s) {
+        if (s.over_home) return "over home now"
+        const now = `${miles(s.dist_km)} ${point(s.bearing)}, ${Math.round(s.mph)} mph → ${point(s.heading)}`
+        return s.eta_min >= 0
+            ? `${now} · passes ${miles(s.cpa_km)} ${point(s.pass_dir)} ~${clock(s.eta_at)}`
+            : `${now} · moving away`
+    }
+    function tierLabel(t) { return t === "urgent" ? "URGENT" : t === "high" ? "HIGH" : "" }
+
     function tick() {
         const t = parseLocal(updated)
         age = t ? Math.max(0, Math.round((Date.now() - t.getTime()) / 1000)) : 0

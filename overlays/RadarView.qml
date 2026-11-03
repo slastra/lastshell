@@ -2,15 +2,16 @@ import Quickshell
 import QtQuick
 import ".."  // root module
 
-// Full storm view (SUPER+Shift+R, or click the radar chip). One pane at a
-// time, since the card has to fit a 1536x864 logical screen: reflectivity
-// with ProbSevere storms and the tracked vortex, dealiased velocity, MRMS
-// rotation track, and the reflectivity loop. Images come from deskwatch's
-// renderer under names that change per render, so a new render reloads.
+// Full storm view (SUPER+Shift+R, or click the radar chip). An instrument,
+// not a dashboard: the map pane on the left at the renderer's own aspect,
+// and on the right the threat ribbon, what is in force at home, and the
+// storms ProbSevere is scoring, each with its ProbTor trace. One map pane
+// at a time (1-4 / ←→) so the card fits a 1536x864 logical screen. Images
+// change filename per render, so a new render reloads by itself.
 Overlay {
     id: root
 
-    cardWidth: 1120
+    cardWidth: 1140
     contentPadding: 2
 
     property int pane: 0
@@ -21,14 +22,11 @@ Overlay {
         { key: "loop", label: "Loop" },
     ]
     readonly property string src: Radar.url(Radar.images[panes[pane].key] ?? "")
+    // the renderer draws at (lon span · cos lat) / lat span ≈ 0.95
+    readonly property real paneH: 660
+    readonly property real paneW: Math.round(paneH * 0.952)
 
-    function point(deg) {
-        const p = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
-        return p[Math.floor(((deg + 11.25) % 360) / 22.5) % 16]
-    }
-    function miles(km) { const m = km / 1.609; return m < 1 ? "<1 mi" : `${Math.round(m)} mi` }
-    function clock(iso) { const d = Radar.parseLocal(iso); return d ? Qt.formatTime(d, "h:mm AP") : "" }
-    function tierTone(s) { return s.tier === "urgent" ? Theme.love : s.tier === "high" ? Theme.gold : Theme.text }
+    function tierTone(t) { return t === "urgent" ? Theme.love : t === "high" ? Theme.gold : Theme.foam }
 
     Column {
         width: parent.width
@@ -45,9 +43,7 @@ Overlay {
 
         ModalHeader {
             icon: Radar.level === "urgent" ? "tornado" : "cloud-lightning"
-            title: Radar.tornadoWarning ? "Radar · TORNADO WARNING"
-                : Radar.severeWarning ? "Radar · severe thunderstorm warning"
-                : Radar.watch ? "Radar · watch in effect" : "Radar"
+            title: "Radar"
             showQuery: false
             active: root.open
 
@@ -55,8 +51,8 @@ Overlay {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
                 anchors.rightMargin: 18
-                width: 420
-                options: root.panes.map((p, i) => ({ value: i, label: `${i + 1} ${p.label}` }))
+                width: 440
+                options: root.panes.map((p, i) => ({ value: i, label: `${i + 1}  ${p.label}` }))
                 current: root.pane
                 onPicked: v => root.pane = v
             }
@@ -64,25 +60,32 @@ Overlay {
 
         Row {
             x: 18
-            topPadding: 12
-            bottomPadding: 12
-            spacing: 18
+            topPadding: 14
+            bottomPadding: 14
+            spacing: 20
 
-            Item { // image pane, square-ish at the renderer's aspect
-                width: 680
-                height: 636
+            Rectangle { // map pane
+                width: root.paneW
+                height: root.paneH
+                radius: Theme.innerRadius
+                color: Theme.base
+                border.color: Theme.border
+                clip: true
 
                 Image {
                     anchors.fill: parent
+                    anchors.margins: 1
                     visible: root.panes[root.pane].key !== "loop"
                     source: visible ? root.src : ""
                     cache: false
                     asynchronous: true
                     fillMode: Image.PreserveAspectFit
                     smooth: true
+                    mipmap: true
                 }
                 AnimatedImage {
                     anchors.fill: parent
+                    anchors.margins: 1
                     visible: root.panes[root.pane].key === "loop"
                     source: visible ? root.src : ""
                     playing: visible && root.open
@@ -90,100 +93,140 @@ Overlay {
                     fillMode: Image.PreserveAspectFit
                     smooth: true
                 }
-                PopText {
+                Column {
                     anchors.centerIn: parent
                     visible: root.src === ""
-                    text: "no imagery yet: the renderer runs while storms are near"
-                    dim: 0.5
+                    spacing: 8
+                    LucideIcon { anchors.horizontalCenter: parent.horizontalCenter; name: "radar"; color: Theme.textFaint; font.pixelSize: 28 }
+                    PopText { text: "no imagery yet: the renderer runs while storms are near"; dim: 0.5 }
                 }
             }
 
             Column { // what the daemon knows
-                width: 1120 - 36 - 680 - 18
-                spacing: 10
+                width: 1140 - 36 - root.paneW - 20
+                spacing: 14
 
-                Repeater {
-                    model: Radar.homeAlerts.filter(a => /Warning|Watch/.test(a.event))
-                    Column {
-                        required property var modelData
-                        width: parent.width
-                        spacing: 1
-                        PopText {
-                            text: `${modelData.event}${modelData.ends ? "  until " + root.clock(modelData.ends) : ""}`
-                            color: /Warning/.test(modelData.event) ? Theme.love : Theme.gold
-                            font.bold: true
-                            size: 14
-                        }
-                        PopText {
-                            width: parent.width
-                            text: modelData.headline ?? ""
-                            wrapMode: Text.WordWrap
-                            maximumLineCount: 2
-                            elide: Text.ElideRight
-                            dim: 0.55
-                            size: 12
-                        }
-                    }
-                }
+                ThreatRibbon { width: parent.width }
 
-                PopText {
-                    visible: !!Radar.images.vortex
+                Column { // in force at home
                     width: parent.width
-                    wrapMode: Text.WordWrap
-                    color: Theme.love
-                    size: 13
-                    text: Radar.images.vortex
-                        ? `Rotation tracked over ${Radar.images.vortex.scans} scans: ${Math.round(Radar.images.vortex.dv_kt)} kt ΔV, ${Radar.images.vortex.mph} mph → ${root.point(Radar.images.vortex.heading)}`
-                        : ""
-                }
-
-                Divider { width: parent.width }
-
-                Repeater {
-                    model: Radar.notable.slice(0, 6)
-                    Column {
-                        required property var modelData
-                        width: parent.width
-                        spacing: 2
-                        PopText {
-                            text: `#${modelData.id}   Tor ${modelData.probtor}%  wind ${modelData.probwind}%  hail ${modelData.probhail}%`
-                            color: root.tierTone(modelData)
-                            font.bold: modelData.tier !== ""
-                            size: 13
-                        }
-                        PopText {
+                    spacing: 6
+                    visible: homeRep.count > 0
+                    SectionLabel { text: "At home" }
+                    Repeater {
+                        id: homeRep
+                        model: Radar.homeAlerts.filter(a => /Warning|Watch|Statement/.test(a.event))
+                        Row {
+                            required property var modelData
                             width: parent.width
-                            wrapMode: Text.WordWrap
-                            dim: 0.7
-                            size: 12
-                            text: modelData.over_home ? "over home now"
-                                : `${root.miles(modelData.dist_km)} ${root.point(modelData.bearing)} · ${Math.round(modelData.mph)} mph → ${root.point(modelData.heading)}`
-                                  + (modelData.eta_min >= 0 ? ` · passes ${root.miles(modelData.cpa_km)} ${root.point(modelData.pass_dir)} ~${root.clock(modelData.eta_at)}` : " · moving away")
-                        }
-                        PopText {
-                            dim: 0.45
-                            size: 11
-                            text: `SRH ${Math.round(modelData.env.srh01)} · shear ${Math.round(modelData.env.ebshear)} kt · CAPE ${Math.round(modelData.env.mlcape)} · LCL ${Math.round(modelData.env.lcl)} m`
-                                + (modelData.tor_hist.length > 1 ? ` · tor ${modelData.tor_hist.slice(-6).join("→")}` : "")
+                            spacing: 8
+                            LucideIcon {
+                                anchors.verticalCenter: parent.verticalCenter
+                                name: /Warning/.test(modelData.event) ? "siren" : /Watch/.test(modelData.event) ? "eye" : "info"
+                                color: /Tornado/.test(modelData.event) ? Theme.love
+                                    : /Thunderstorm/.test(modelData.event) ? Theme.gold : Theme.foam
+                                font.pixelSize: 13
+                            }
+                            PopText {
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: parent.width - 21
+                                elide: Text.ElideRight
+                                text: `${modelData.event}${modelData.ends ? "  until " + Radar.clock(modelData.ends) : ""}`
+                                size: 13
+                            }
                         }
                     }
                 }
 
-                PopText {
-                    visible: Radar.notable.length === 0
-                    text: "no storm near home is scoring a tornado or wind signal"
-                    dim: 0.5
-                    size: 12
+                Column { // the vortex the renderer tracked across volumes
+                    width: parent.width
+                    spacing: 4
+                    visible: !!Radar.images.vortex
+                    SectionLabel { text: "Rotation" }
+                    PopText {
+                        width: parent.width
+                        wrapMode: Text.WordWrap
+                        size: 13
+                        text: Radar.images.vortex
+                            ? `${Math.round(Radar.images.vortex.dv_kt)} kt ΔV, tracked over ${Radar.images.vortex.scans} scans, ${Radar.images.vortex.mph} mph → ${Radar.point(Radar.images.vortex.heading)}`
+                            : ""
+                    }
+                }
+
+                Column { // the storms
+                    width: parent.width
+                    spacing: 10
+                    SectionLabel { text: "Storms"; visible: Radar.notable.length > 0 }
+                    Repeater {
+                        model: Radar.notable.slice(0, 5)
+                        Item {
+                            required property var modelData
+                            width: parent.width
+                            height: rowText.implicitHeight
+                            Column {
+                                id: rowText
+                                width: parent.width - spark.width - 12
+                                spacing: 2
+                                Row {
+                                    spacing: 7
+                                    Badge {
+                                        visible: modelData.tier !== ""
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: Radar.tierLabel(modelData.tier)
+                                        tone: root.tierTone(modelData.tier)
+                                    }
+                                    PopText {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: `#${modelData.id}  ${Radar.probs(modelData)}`
+                                        size: 13
+                                    }
+                                }
+                                PopText {
+                                    width: parent.width
+                                    wrapMode: Text.WordWrap
+                                    dim: 0.65
+                                    size: 12
+                                    text: Radar.where(modelData)
+                                }
+                                PopText {
+                                    width: parent.width
+                                    elide: Text.ElideRight
+                                    dim: 0.42
+                                    size: 11
+                                    text: `SRH ${Math.round(modelData.env.srh01)} · shear ${Math.round(modelData.env.ebshear)} kt · CAPE ${Math.round(modelData.env.mlcape)} · LCL ${Math.round(modelData.env.lcl)} m`
+                                }
+                            }
+                            TorSpark {
+                                id: spark
+                                anchors.right: parent.right
+                                anchors.top: parent.top
+                                anchors.topMargin: 2
+                                width: 84
+                                height: 22
+                                live: root.open
+                                values: modelData.tor_hist
+                                tone: root.tierTone(modelData.tier)
+                            }
+                        }
+                    }
+                    PopText {
+                        visible: Radar.notable.length === 0
+                        width: parent.width
+                        wrapMode: Text.WordWrap
+                        text: "No storm near home is scoring a tornado or wind signal."
+                        dim: 0.5
+                        size: 12
+                    }
                 }
             }
         }
 
         ModalFooter {
-            hint: "1-4 or ←→ switch pane   esc close"
+            hint: "1-4 or ←→ pane   esc close"
             count: [
-                Radar.payload.valid ? `ProbSevere ${root.clock(Radar.payload.valid)}` : "",
+                Radar.payload.valid ? `ProbSevere ${Radar.clock(Radar.payload.valid)}` : "",
                 Radar.images.scan ? `${Radar.payload.radar ?? ""} ${Radar.images.scan}` : "",
-                Radar.images.rendered_at ? `rendered ${root.clock(Radar.images.rendered_at)}` : "",
+                Radar.images.rendered_at ? `rendered ${Radar.clock(Radar.images.rendered_at)}` : "",
             ].filter(s => s).join("  ·  ")
         }
     }
