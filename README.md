@@ -46,7 +46,8 @@ without them:
 
 - [tabstrip](https://github.com/slastra/tabstrip) feeds the browser tab
   strip and the tab switcher
-- a Claude Code session daemon feeds the session chips and usage ring
+- [`scripts/claude-status.py`](scripts/claude-status.py) `--daemon` (run it from
+  your compositor's autostart) feeds the Claude Code session chips and usage ring
 - the capture and hotkey modals shell out to engine scripts (see
   [dots](https://github.com/slastra/dots) for working copies)
 
