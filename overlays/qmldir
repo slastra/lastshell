@@ -28,3 +28,4 @@ DimOverlay 1.0 DimOverlay.qml
 WifiPicker 1.0 WifiPicker.qml
 WifiPassword 1.0 WifiPassword.qml
 PolkitDialog 1.0 PolkitDialog.qml
+RadarView 1.0 RadarView.qml

@@ -85,6 +85,7 @@ nested Hyprland, in demo mode, where the password `pass` succeeds.
 | Clipboard history | `toggleClipboard` |
 | Notification center | `toggleNotifications` |
 | Hotkey sheet | `toggleHotkeys` |
+| Storm radar (desk layout; needs deskwatch's `news.storms`) | `toggleRadar` |
 | Capture menu | `toggleCapture` |
 | Eco mode (laptop) | `toggleEco` |
 | Wi-Fi picker (laptop layout only) | `toggleWifi` |

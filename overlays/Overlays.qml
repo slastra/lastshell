@@ -29,6 +29,7 @@ Scope {
         function toggleClipboard(): void { root.summon(clipboard) }
         function toggleNotifications(): void { root.summon(center) }
         function toggleHotkeys(): void { root.summon(hotkeys) }
+        function toggleRadar(): void { if (Host.desk) root.summon(radar) }
         function toggleEco(): void { root.summon(eco) }
         function toggleWifi(): void { if (Host.laptop) root.summon(wifi) }
         // tap to start, tap again to stop (the overlay decides which)
@@ -65,6 +66,7 @@ Scope {
     LazyLoader { id: center; NotificationCenter { history: popups.historyModel } }
     LazyLoader { id: capture; CapturePicker {} }
     LazyLoader { id: hotkeys; HotkeySheet {} }
+    LazyLoader { id: radar; RadarView {} }
     LazyLoader { id: eco; EcoDialog {} }
     LazyLoader { id: wifi; WifiPicker {} }
     LazyLoader { id: wifiPass; WifiPassword {} }
