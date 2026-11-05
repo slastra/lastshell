@@ -2,8 +2,8 @@ import Quickshell
 import QtQuick
 import ".."  // root module
 
-// Screen capture menu (Print key; replaces rofi capture.sh's menu — the
-// script itself stays as the capture engine, invoked by subcommand).
+// Screen capture menu (Print key). scripts/capture.sh is the engine,
+// invoked by subcommand; its old rofi menu remains as a no-argument fallback.
 //
 // Fullscreen and window captures, image AND video, must not photograph this
 // modal's own exit: the mask and card are still fading when grim or the
@@ -18,7 +18,7 @@ SearchOverlay {
     visibleRows: 8
 
     readonly property string script:
-        Quickshell.env("HOME") + "/.config/rofi/scripts/capture.sh"
+        Quickshell.shellDir + "/scripts/capture.sh"
 
     // weights pin the menu order — SearchOverlay's sort is not stable
     // across equal weights and shuffled the list

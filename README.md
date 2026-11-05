@@ -49,8 +49,13 @@ without them:
 - [`scripts/claude-status.py`](scripts/claude-status.py) `--daemon` feeds the
   Claude Code session chips and usage ring; [`systemd/claude-status.service`](systemd/claude-status.service)
   runs it with the graphical session (or start it from your compositor's autostart)
-- the capture and hotkey modals shell out to engine scripts (see
-  [dots](https://github.com/slastra/dots) for working copies)
+- the capture modal runs [`scripts/capture.sh`](scripts/capture.sh): grim,
+  slurp and satty for shots, gpu-screen-recorder for video, and for the
+  recording overlays and sounds python-evdev, numpy, ffmpeg and
+  gtk4-layer-shell (the region border). Needs the `input` group for clicks
+  and keys
+- the hotkey modal shells out to an engine script (see
+  [dots](https://github.com/slastra/dots) for a working copy)
 
 ### The shell
 
