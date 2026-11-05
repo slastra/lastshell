@@ -56,6 +56,7 @@ Scope {
     LazyLoader { active: Backlight.present; BrightnessOsd {} }
     NotificationPopups { id: popups }
     DimOverlay {}
+    InputCast {}  // clicks + keys in recordings; inert unless recording
 
     LazyLoader { id: switcher; TabSwitcher {} }
     LazyLoader { id: launcher; Launcher {} }
