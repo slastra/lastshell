@@ -74,7 +74,10 @@ Singleton {
         const normal = slot("color" + n, fallback)
         return dark ? slot("color" + (n + 8), normal) : normal
     }
-    readonly property color accent: hue(6, "#bebeda")   // focus, the active item, selection
+    // the accent and the secondary may be pinned to one of the scheme's hues
+    // (`tint look`, the Look dialog); the shape file then carries the color
+    function pinned(v) { return typeof v === "string" && /^#[0-9a-fA-F]{6}$/.test(v) ? v : "" }
+    readonly property color accent: pinned(shape.accent) || hue(6, "#bebeda")   // focus, the active item, selection
     // `quiet` is the one-accent look: color marks what is active or on
     // (accent) and what needs attention (warn, crit), and nothing else.
     // Readings in their normal range are plain text and the supporting
@@ -116,6 +119,7 @@ Singleton {
         return Math.min(d, 1 - d) > 0.06
     }
     readonly property color secondary: {
+        if (pinned(shape.secondary)) return readable(Qt.color(shape.secondary))
         const blue = Qt.color(hue(4, "#8ba9c1")), magenta = Qt.color(hue(5, "#c9b1ca"))
         return readable(ownHue(blue) ? blue : ownHue(magenta) ? magenta : mix(accent, text, 0.5))
     }
