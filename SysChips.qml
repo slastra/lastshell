@@ -18,22 +18,18 @@ ChipRow {
         Popout {
             id: netPop
             owner: net
-            Column {
-                spacing: 6
-                PopText {
-                    text: `${Net.iface}: ${Net.ip}`
-                    size: 14
-                }
-                PopText {
-                    function fmt(b) {
-                        return b > 1e6 ? `${(b / 1e6).toFixed(1)} MB/s`
-                             : b > 1e3 ? `${(b / 1e3).toFixed(0)} kB/s` : `${b.toFixed(0)} B/s`
-                    }
-                    text: `↓ ${fmt(Net.rxBps)}   ↑ ${fmt(Net.txBps)}`
-                    color: Theme.calm; size: 14
-                }
-                NetGraph { width: 240; height: 60; live: netPop.visible }
+            title: "network"
+            status: Net.connected ? Net.ip : "disconnected"
+            tone: Net.connected ? Theme.calm : Theme.crit
+
+            function rate(b) {
+                return b > 1e6 ? `${(b / 1e6).toFixed(1)} MB/s`
+                     : b > 1e3 ? `${(b / 1e3).toFixed(0)} kB/s` : `${b.toFixed(0)} B/s`
             }
+            KeyValueRow { key: "interface"; value: Net.iface || "—" }
+            KeyValueRow { key: "down"; value: netPop.rate(Net.rxBps) }
+            KeyValueRow { key: "up"; value: netPop.rate(Net.txBps) }
+            NetGraph { width: parent.width; height: 56; live: netPop.visible }
         }
     }
 
@@ -43,9 +39,13 @@ ChipRow {
         tone: Theme.level(SysStat.cpuPct, 25, 50)
         value: `${Theme.pad(SysStat.cpuPct, 3)}%`
         icon: "cpu"
-        ChipTip {
+        Popout {
             owner: cpu
-            text: `CPU ${SysStat.cpuPct}%\nload ${SysStat.loadAvg}`
+            title: "cpu"
+            status: `${SysStat.cpuPct}%`
+            tone: Theme.level(SysStat.cpuPct, 25, 50)
+            PopMeter { frac: SysStat.cpuPct / 100; fill: Theme.level(SysStat.cpuPct, 25, 50, Theme.accent) }
+            KeyValueRow { key: "load"; value: SysStat.loadAvg }
         }
     }
 
@@ -103,30 +103,17 @@ ChipRow {
         Popout {
             id: tempPop
             owner: temp
-            Column {
-                spacing: 6
-                Row {
-                    spacing: 8
-                    PopText {
-                        text: "package temperature"
-                        size: 14
-                    }
-                    PopText {
-                        text: `${SysStat.tempC}°C`
-                        color: Theme.level(SysStat.tempC, 70, 80)
-                        size: 14
-                    }
-                }
-                PopText {
-                    readonly property var h: SysStat.tempHistory
-                    text: h.length > 1
-                        ? `5 min: low ${Math.min(...h)}°  ·  high ${Math.max(...h)}°`
-                        : "collecting…"
-                    dim: 0.6
-                    size: 12
-                }
-                TempGraph { width: 240; height: 60; live: tempPop.visible }
+            title: "temperature"
+            status: `${SysStat.tempC}°C`
+            tone: Theme.level(SysStat.tempC, 70, 80)
+
+            KeyValueRow {
+                readonly property var h: SysStat.tempHistory
+                key: "last 5 min"
+                value: h.length > 1 ? `${Math.min(...h)}° to ${Math.max(...h)}°` : "collecting…"
             }
+            TempGraph { width: parent.width; height: 56; live: tempPop.visible }
+            PopNote { text: "cpu package" }
         }
     }
 
@@ -136,9 +123,13 @@ ChipRow {
         tone: Theme.level(SysStat.diskPct, 70, 90)
         value: `${Theme.pad(SysStat.diskPct, 2)}%`
         icon: "hard-drive"
-        ChipTip {
+        Popout {
             owner: disk
-            text: `/ — ${SysStat.diskUsed} of ${SysStat.diskTotal} used`
+            title: "disk"
+            status: `${SysStat.diskPct}%`
+            tone: Theme.level(SysStat.diskPct, 70, 90)
+            PopMeter { frac: SysStat.diskPct / 100; fill: Theme.level(SysStat.diskPct, 70, 90, Theme.accent) }
+            KeyValueRow { key: "used on /"; value: `${SysStat.diskUsed} of ${SysStat.diskTotal}` }
         }
     }
 
@@ -148,9 +139,13 @@ ChipRow {
         tone: Theme.level(SysStat.memPct, 50, 75)
         value: `${Theme.pad(SysStat.memPct, 2)}%`
         icon: "memory-stick"
-        ChipTip {
+        Popout {
             owner: mem
-            text: `${SysStat.memUsedGiB.toFixed(1)} / ${SysStat.memTotalGiB.toFixed(1)} GiB`
+            title: "memory"
+            status: `${SysStat.memPct}%`
+            tone: Theme.level(SysStat.memPct, 50, 75)
+            PopMeter { frac: SysStat.memPct / 100; fill: Theme.level(SysStat.memPct, 50, 75, Theme.accent) }
+            KeyValueRow { key: "used"; value: `${SysStat.memUsedGiB.toFixed(1)} of ${SysStat.memTotalGiB.toFixed(1)} GiB` }
         }
     }
 
@@ -189,46 +184,20 @@ ChipRow {
 
         Popout {
             owner: weather
+            title: (Weather.now.condition ?? "weather").toLowerCase()
+            status: `${Weather.now.temp ?? "?"}°F`
+            tone: Theme.calm
 
-            Column {
-                spacing: 8
-
-                Row {
-                    spacing: 8
-                    PopText {
-                        text: `${Weather.now.condition ?? "—"}`
-                        size: 14; font.bold: true
-                    }
-                    PopText {
-                        text: `${Weather.now.temp ?? "?"}°`
-                        color: Theme.calm
-                        size: 14
-                    }
-                }
-                PopText {
-                    text: `feels ${Weather.now.feels ?? "?"}°  ·  ${Weather.now.wind ?? ""}  ·  ${Weather.now.humidity ?? ""}`
-                    dim: 0.6
-                    size: 12
-                }
-                Divider { width: 200 }
-                Repeater {
-                    model: Weather.days
-                    Item {
-                        required property var modelData
-                        width: 200; height: 20
-                        PopText {
-                            anchors.left: parent.left
-                            text: modelData.name
-                            dim: 0.8
-                            size: 13
-                        }
-                        PopText {
-                            anchors.right: parent.right
-                            text: `${modelData.hi}° / ${modelData.lo}°`
-                            color: Theme.calm
-                            size: 13
-                        }
-                    }
+            KeyValueRow { key: "feels like"; value: `${Weather.now.feels ?? "?"}°` }
+            KeyValueRow { key: "wind"; value: Weather.now.wind ?? "—" }
+            KeyValueRow { key: "humidity"; value: Weather.now.humidity ?? "—" }
+            Divider { width: parent.width; visible: Weather.days.length > 0 }
+            Repeater {
+                model: Weather.days
+                KeyValueRow {
+                    required property var modelData
+                    key: modelData.name.toLowerCase()
+                    value: `${modelData.hi}° / ${modelData.lo}°`
                 }
             }
         }

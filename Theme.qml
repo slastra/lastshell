@@ -91,6 +91,11 @@ Singleton {
     readonly property int tipDelay: 400        // ChipTip hover delay
     readonly property int popoutGrace: 250     // Popout hide grace
     readonly property int popoutGap: 0         // popouts and tips hang flush off their plate
+    // popouts come in three widths and one padding (see Popout.qml)
+    readonly property int popS: 240
+    readonly property int popM: 320
+    readonly property int popL: 400
+    readonly property int popPad: 12
 
     // Left-pad a metric to a fixed digit count, so an item keeps its width
     // as the value crosses 9→10 (the font is monospace; a change of width

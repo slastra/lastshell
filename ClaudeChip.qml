@@ -35,40 +35,20 @@ Chip {
 
     Popout {
         owner: root
+        title: root.session.cwd
+        status: root.session.state === "waiting" ? "waiting on you" : root.session.state
+        tone: root.session.state === "waiting" ? Theme.warn
+            : root.session.state === "busy" ? Theme.ok : Theme.textMuted
 
-        Column {
-            spacing: 6
-
-            PopText {
-                text: root.session.cwd
-                size: 14; font.bold: true
-            }
-            Row {
-                spacing: 8
-                StateDot { anchors.verticalCenter: parent.verticalCenter; state: root.session.state }
-                PopText {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: root.session.state === "waiting" ? "waiting on you" : root.session.state
-                    color: root.session.state === "waiting" ? Theme.warn : Qt.alpha(Theme.text, 0.8)
-                    size: 13
-                }
-            }
-            Repeater {
-                model: root.session.jobs ?? []
-                PopText {
-                    required property var modelData
-                    text: `󰒓 ${modelData.name} — ${modelData.status}`
-                    dim: 0.7
-                    size: 13
-                }
-            }
-            Divider { width: 220 }
-            PopText {
-                text: `${root.session.session ?? "—"}\nup ${root.session.uptime}`
-                dim: 0.55
-                size: 12
-                lineHeight: 1.3
+        Repeater {
+            model: root.session.jobs ?? []
+            KeyValueRow {
+                required property var modelData
+                key: modelData.name
+                value: modelData.status
             }
         }
+        KeyValueRow { key: "session"; value: root.session.session ?? "—" }
+        KeyValueRow { key: "up"; value: root.session.uptime }
     }
 }
