@@ -136,7 +136,9 @@ Chip {
                     id: thumb
                     anchors.fill: parent
                     anchors.margins: 1
-                    source: Radar.url(Radar.images.map ?? "")
+                    // not while quiet: the chip is away, and the paths in
+                    // an old payload may no longer exist
+                    source: Radar.active ? Radar.url(Radar.images.map ?? "") : ""
                     cache: false
                     asynchronous: true
                     fillMode: Image.PreserveAspectFit
