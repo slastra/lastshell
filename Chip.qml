@@ -92,7 +92,9 @@ Rectangle {
     }
 
     Rectangle { // the separator
-        visible: chip.separator
+        // not on the plate's first item: the plate's own frame is there,
+        // and a straight line would cut across its rounded corner
+        visible: chip.separator && !chip.capStart
         width: Theme.hairline
         height: parent.height
         color: Theme.border
