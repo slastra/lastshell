@@ -36,8 +36,15 @@ Item {
     // so a hover or selection fill does not poke past them. Items can sit
     // several levels down (a nested row, a Repeater), so this walks the
     // tree and asks each where it landed.
+    // Items call this as they move or resize (the row's own transitions
+    // slide them after its width has settled); a row nested in a plate
+    // passes it up.
     function cap() {
-        if (!plate) return
+        if (!plate) {
+            for (let p = parent; p; p = p.parent)
+                if (p.plate === true && typeof p.cap === "function") { Qt.callLater(p.cap); break }
+            return
+        }
         const walk = it => {
             for (const c of it.children) {
                 if (c.capStart !== undefined && c.filled !== undefined) {
@@ -51,6 +58,7 @@ Item {
         walk(row)
     }
     onWidthChanged: Qt.callLater(cap)
+    onXChanged: if (!plate) Qt.callLater(cap)
     Component.onCompleted: Qt.callLater(cap)
 
     Row {

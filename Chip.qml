@@ -21,6 +21,13 @@ Rectangle {
     // end, so its fill rounds with the plate's corner there
     property bool capStart: false
     property bool capEnd: false
+    function recap() {
+        for (let p = parent; p; p = p.parent)
+            if (typeof p.cap === "function") { Qt.callLater(p.cap); return }
+    }
+    onXChanged: recap()
+    onWidthChanged: recap()
+    onVisibleChanged: recap()
     readonly property bool filled: active && !rule
     // the color for text and glyphs on this chip
     readonly property color ink: filled ? Theme.base : Theme.text
