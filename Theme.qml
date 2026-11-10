@@ -148,10 +148,10 @@ Singleton {
     readonly property int bandRadius: Math.max(0, overlayRadius - 2)
 
     readonly property int barHeight: 34
-    readonly property string fontFamily: "Iosevka Nerd Font"
+    readonly property string fontFamily: "RecMonoLinear Nerd Font"
     // Geist Mono is wider and taller in the x-height than ShureTechMono,
     // which the sizes around the shell were chosen for
-    readonly property real fontScale: 1.0
+    readonly property real fontScale: 0.88
     function fs(n) { return Math.round(n * fontScale) }
     // What ShellText places text by. The height of a capital or digit as a
     // share of the font size, measured at a large size: at text size the
