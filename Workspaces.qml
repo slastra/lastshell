@@ -57,7 +57,7 @@ Item {
                         text: wsChip.wsId
                         // empty workspaces read dim but legible — overlay-on-surface
                         // was too faint to count at a glance
-                        color: wsChip.active ? Theme.accent
+                        color: wsChip.active ? wsChip.ink
                              : root.occupied[wsChip.wsId] ? Theme.text
                              : Theme.textMuted
                     }

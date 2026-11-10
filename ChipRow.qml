@@ -27,6 +27,27 @@ Item {
         bottomRightRadius: bottomLeftRadius
     }
 
+    // Tell the items at either end of the plate to round with its corners,
+    // so a hover or selection fill does not poke past them. Items can sit
+    // several levels down (a nested row, a Repeater), so this walks the
+    // tree and asks each where it landed.
+    function cap() {
+        if (!plate) return
+        const walk = it => {
+            for (const c of it.children) {
+                if (c.capStart !== undefined && c.filled !== undefined) {
+                    if (!c.visible) continue
+                    const x = c.mapToItem(zone, 0, 0).x
+                    c.capStart = x < 1
+                    c.capEnd = x + c.width > zone.width - 1
+                } else walk(c)
+            }
+        }
+        walk(row)
+    }
+    onWidthChanged: Qt.callLater(cap)
+    Component.onCompleted: Qt.callLater(cap)
+
     Row {
         id: row
         move: Transition { NumberAnimation { properties: "x"; duration: Theme.slideDuration; easing.type: Easing.OutCubic } }

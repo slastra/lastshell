@@ -13,6 +13,7 @@ Chip {
     edge: "bottom"
     clip: true
     active: swap.running
+    rule: true
 
     readonly property var player: Media.player
     readonly property bool paused: player?.playbackState === MprisPlaybackState.Paused

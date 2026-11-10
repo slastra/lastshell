@@ -81,7 +81,7 @@ Chip {
                 anchors.centerIn: parent
                 visible: !(root.who === "idle" && !Voice.micOn)
                 mode: root.markMode
-                tone: root.active ? root.tone : Theme.textMuted
+                tone: root.active ? root.ink : Theme.textMuted
             }
             LucideIcon { // the wake word is off: no capture
                 anchors.centerIn: parent
@@ -94,7 +94,7 @@ Chip {
         ValueText {
             visible: root.label !== ""
             text: root.label
-            color: root.tone
+            color: root.active ? root.ink : root.tone
             font.italic: root.who === "reader" && !Reader.playing
         }
     }

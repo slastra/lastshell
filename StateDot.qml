@@ -10,7 +10,10 @@ Item {
     implicitWidth: 12
     implicitHeight: 12
 
+    // on an accent fill: one flat color, the state still told by shape and motion
+    property bool inverse: false
     readonly property color tone:
+        inverse ? Theme.base :
         state === "waiting" ? Theme.warn :
         state === "busy" ? Theme.ok : Qt.alpha(Theme.text, 0.45)
 
@@ -42,7 +45,7 @@ Item {
             const ctx = getContext("2d")
             ctx.reset()
             if (root.state !== "waiting") return
-            ctx.strokeStyle = Qt.alpha(Theme.warn, 0.9 * (1 - p))
+            ctx.strokeStyle = Qt.alpha(root.tone, 0.9 * (1 - p))
             ctx.lineWidth = 1.5
             ctx.beginPath()
             ctx.arc(width / 2, height / 2, 4 + 7.5 * p, 0, 2 * Math.PI)
