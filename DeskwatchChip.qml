@@ -16,7 +16,7 @@ Chip {
         switch (lvl) {
         case "crit": case "high": return Theme.crit
         case "watch": return Theme.warn
-        case "low": return Theme.ok
+        case "low": return Theme.calm
         default: return Theme.text
         }
     }
@@ -48,7 +48,7 @@ Chip {
     readonly property color tone:
         Deskwatch.stale || !Deskwatch.tailUp ? Qt.alpha(Theme.text, 0.45)
         : bad ? levelTone(Deskwatch.level)
-        : Theme.ok
+        : Theme.calm
 
     onClicked: Apps.launch(
         ["kitty", "--hold", "-e", Quickshell.env("HOME") + "/go/bin/deskwatch", "status"], "deskwatch-status")

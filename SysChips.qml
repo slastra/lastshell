@@ -8,7 +8,7 @@ ChipRow {
     StatChip {
         id: net
         edge: "top"
-        tone: Net.connected ? Theme.ok : Theme.crit
+        tone: Net.connected ? Theme.calm : Theme.crit
         value: Net.connected ? Net.ip : "Disconnected"
         icon: Net.wireless ? (Net.connected ? "wifi" : "wifi-off")
             : Net.connected ? "ethernet-port" : "unplug"
@@ -30,7 +30,7 @@ ChipRow {
                              : b > 1e3 ? `${(b / 1e3).toFixed(0)} kB/s` : `${b.toFixed(0)} B/s`
                     }
                     text: `↓ ${fmt(Net.rxBps)}   ↑ ${fmt(Net.txBps)}`
-                    color: Theme.ok; size: 14
+                    color: Theme.calm; size: 14
                 }
                 NetGraph { width: 240; height: 60; live: netPop.visible }
             }
@@ -182,7 +182,7 @@ ChipRow {
     StatChip {
         id: weather
         edge: "top"
-        tone: Theme.ok
+        tone: Theme.calm
         value: `${Theme.pad(Weather.now.temp ?? "?", 2)}°F`
         icon: Weather.icon
         present: Weather.text !== ""
@@ -201,7 +201,7 @@ ChipRow {
                     }
                     PopText {
                         text: `${Weather.now.temp ?? "?"}°`
-                        color: Theme.ok
+                        color: Theme.calm
                         size: 14
                     }
                 }
@@ -225,7 +225,7 @@ ChipRow {
                         PopText {
                             anchors.right: parent.right
                             text: `${modelData.hi}° / ${modelData.lo}°`
-                            color: Theme.ok
+                            color: Theme.calm
                             size: 13
                         }
                     }

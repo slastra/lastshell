@@ -7,7 +7,7 @@ import QtQuick
 Sparkline {
     id: canvas
     property var values: []
-    property color tone: Theme.ok
+    property color tone: Theme.calm
     lo: 0
     hi: Math.max(35, ...(values.length ? values : [0]))
     implicitWidth: 72

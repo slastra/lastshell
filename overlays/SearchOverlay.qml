@@ -133,7 +133,7 @@ Overlay {
                             anchors.verticalCenter: parent.verticalCenter
                             font.family: Theme.fontFamily
                             font.pixelSize: 15
-                            color: row.modelData.current ? Theme.agent
+                            color: row.modelData.current ? Theme.accent
                                  : row.index === root.cursor ? Theme.text : Qt.alpha(Theme.text, 0.75)
                             textFormat: Text.StyledText
                             text: Fuzzy.highlight(row.modelData.label, row.modelData._idx, Theme.warn.toString())
@@ -169,7 +169,7 @@ Overlay {
                         anchors.verticalCenter: parent.verticalCenter
                         name: row.modelData.current ? "check" : row.modelData.trailIcon ?? ""
                         font.pixelSize: 14
-                        color: row.modelData.current ? Theme.agent : Theme.textFaint
+                        color: row.modelData.current ? Theme.accent : Theme.textFaint
                     }
 
                     MouseArea {

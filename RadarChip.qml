@@ -14,9 +14,9 @@ Chip {
     readonly property color tone:
         Radar.level === "urgent" ? Theme.crit
         : Radar.level === "watch" ? Theme.warn
-        : Theme.ok
+        : Theme.calm
 
-    function tierTone(t) { return t === "urgent" ? Theme.crit : t === "high" ? Theme.warn : Theme.ok }
+    function tierTone(t) { return t === "urgent" ? Theme.crit : t === "high" ? Theme.warn : Theme.calm }
 
     onClicked: Quickshell.execDetached(["qs", "-c", "lastshell", "ipc", "call", "overlays", "toggleRadar"])
 

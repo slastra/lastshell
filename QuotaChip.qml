@@ -12,7 +12,7 @@ Chip {
     onClicked: frame = (frame + 1) % Math.max(1, Claude.quota.frames.length)
 
     readonly property var shown: Claude.quota.frames[frame % Math.max(1, Claude.quota.frames.length)] ?? { id: "", pct: 0 }
-    readonly property color accent: Theme.level(Claude.quota.worstPct, 70, 90, Theme.ok)
+    readonly property color accent: Theme.level(Claude.quota.worstPct, 70, 90)
 
     // The animated value the arc actually draws — sweeps on frame change
     // and on live quota movement alike.
@@ -112,7 +112,7 @@ Chip {
                     required property var modelData
                     width: 264
                     height: 34
-                    readonly property color tone: Theme.level(modelData.pct, 70, 90, Theme.ok)
+                    readonly property color tone: Theme.level(modelData.pct, 70, 90)
                     readonly property var names: ({ "5h": "5-hour window", "wk": "weekly",
                                                     "opus": "weekly · opus", "sonnet": "weekly · sonnet" })
 

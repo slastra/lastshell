@@ -52,11 +52,18 @@ Singleton {
         return dark ? slot("color" + (n + 8), normal) : normal
     }
     readonly property color accent: hue(6, "#bebeda")   // focus, the active item, selection
-    readonly property color ok:     hue(2, "#99b782")   // healthy, live, normal readings
+    // `quiet` is the one-accent look: color marks what is active or on
+    // (accent) and what needs attention (warn, crit), and nothing else.
+    // Readings in their normal range are plain text and the supporting
+    // hues fold into the accent or a neutral. Set it false for a hue per role.
+    readonly property bool quiet: true
+    readonly property color neutral: mix(base, text, 0.6)
+    readonly property color ok:     quiet ? accent : hue(2, "#99b782")    // on, live, healthy
     readonly property color warn:   hue(3, "#f5cb96")   // waiting on you, warning
     readonly property color crit:   hue(1, "#e08398")   // critical, destructive, recording
-    readonly property color info:   hue(4, "#8ba9c1")   // network, links, neutral fills
-    readonly property color agent:  hue(5, "#c9b1ca")   // Claude and the voice assistants
+    readonly property color info:   quiet ? accent : hue(4, "#8ba9c1")    // network, links, slider fills
+    readonly property color agent:  quiet ? neutral : hue(5, "#c9b1ca")   // Claude, the voice assistants, labels
+    readonly property color calm:   quiet ? text : ok   // a reading in its normal range
 
     // text at the alphas the popouts settled on; `track` is the neutral
     // slider/ring track, `divider` the rule between popout sections,
@@ -90,8 +97,8 @@ Singleton {
     // re-centers the zone and slides everything beside it).
     function pad(v, n) { return String(v).padStart(n, " ") }
 
-    // Threshold color: value against warn/crit cutoffs, `ok` by default.
+    // Threshold color: value against warn/crit cutoffs, `calm` by default.
     function level(v, warnAt, critAt, base) {
-        return v >= critAt ? crit : v >= warnAt ? warn : (base ?? ok)
+        return v >= critAt ? crit : v >= warnAt ? warn : (base ?? calm)
     }
 }

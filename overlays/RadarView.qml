@@ -26,7 +26,7 @@ Overlay {
     readonly property real paneH: 660
     readonly property real paneW: Math.round(paneH * 0.952)
 
-    function tierTone(t) { return t === "urgent" ? Theme.crit : t === "high" ? Theme.warn : Theme.ok }
+    function tierTone(t) { return t === "urgent" ? Theme.crit : t === "high" ? Theme.warn : Theme.calm }
 
     Column {
         width: parent.width
@@ -124,7 +124,7 @@ Overlay {
                                 anchors.verticalCenter: parent.verticalCenter
                                 name: /Warning/.test(modelData.event) ? "siren" : /Watch/.test(modelData.event) ? "eye" : "info"
                                 color: /Tornado/.test(modelData.event) ? Theme.crit
-                                    : /Thunderstorm/.test(modelData.event) ? Theme.warn : Theme.ok
+                                    : /Thunderstorm/.test(modelData.event) ? Theme.warn : Theme.calm
                                 font.pixelSize: 13
                             }
                             PopText {
