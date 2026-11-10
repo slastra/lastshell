@@ -83,7 +83,7 @@ Chip {
                     anchors.verticalCenter: parent.verticalCenter
                     diameter: rowText.implicitHeight   // as tall as the two lines beside it
                     name: root.stateIcon(row.modelData)
-                    color: row.modelData.isPlaying ? Theme.ok : Theme.textMuted
+                    color: row.modelData.isPlaying ? Theme.accent : Theme.textMuted
                 }
                 Column {
                     id: rowText
@@ -125,7 +125,8 @@ Chip {
         RingIcon {
             anchors.verticalCenter: parent.verticalCenter
             name: root.player ? root.stateIcon(root.player) : "play"
-            color: Qt.alpha(root.active ? Theme.accent : Theme.text, 0.7)
+            // the accent while something plays; paused or stopped it recedes
+            color: root.player?.isPlaying ? Theme.accent : Qt.alpha(Theme.text, 0.7)
         }
         ValueText {
             font.italic: root.paused
