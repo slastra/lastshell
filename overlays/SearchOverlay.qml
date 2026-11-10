@@ -137,8 +137,28 @@ Overlay {
                                  : row.index === root.cursor ? Theme.text : Qt.alpha(Theme.text, 0.75)
                             textFormat: Text.StyledText
                             text: Fuzzy.highlight(row.modelData.label, row.modelData._idx, Theme.warn.toString())
-                            width: 450
+                            width: (row.modelData.swatches ?? []).length > 0 ? 330 : 450
                             elide: Text.ElideRight
+                        }
+                    }
+
+                    Row { // a scheme's own colors, drawn in them (not the theme's)
+                        visible: (row.modelData.swatches ?? []).length > 0
+                        anchors.right: parent.right
+                        anchors.rightMargin: 40
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: 3
+                        Repeater {
+                            model: row.modelData.swatches ?? []
+                            Rectangle {
+                                required property var modelData
+                                required property int index
+                                width: index === 0 ? 22 : 12; height: 12
+                                color: modelData
+                                // the background swatch may be the card's own color: outline it
+                                border.width: index === 0 ? 1 : 0
+                                border.color: Theme.border
+                            }
                         }
                     }
 
