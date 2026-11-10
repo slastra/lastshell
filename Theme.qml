@@ -152,6 +152,16 @@ Singleton {
     // Geist Mono is wider and taller in the x-height than ShureTechMono,
     // which the sizes around the shell were chosen for
     readonly property real fontScale: 0.88
+    function fs(n) { return Math.round(n * fontScale) }
+    // What ShellText places text by. The height of a capital or digit as a
+    // share of the font size, measured at a large size: at text size the
+    // answer is rounded to whole pixels and changes with the display scale
+    // (10 at 1.0, 12 at 1.25 for the same 14 px Geist Mono).
+    readonly property real capRatio: capProbe.tightBoundingRect("0").height / 400
+    FontMetrics { id: capProbe; font.family: root.fontFamily; font.pixelSize: 400 }
+    // The icons' ink rides this far above the middle of their box (measured
+    // at 1.0 and 1.25 scale); text gives up the same to agree with them.
+    readonly property real iconLift: 0.6
     // motion drops to 0 in eco mode: every animated frame is a bar repaint
     readonly property int animDuration: Eco.active ? 0 : 140
     readonly property int slideDuration: Eco.active ? 0 : 220   // item enter/exit
