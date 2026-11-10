@@ -109,13 +109,13 @@ Overlay {
                                             height: 21; radius: Theme.innerRadius
                                             anchors.verticalCenter: parent.verticalCenter
                                             color: Theme.overlay
-                                            border.color: Qt.alpha(Theme.rose, 0.35)
+                                            border.color: Qt.alpha(Theme.accent, 0.35)
                                             border.width: 1
                                             Text {
                                                 id: capText
                                                 anchors.centerIn: parent
                                                 text: parent.parent.modelData
-                                                color: Theme.rose
+                                                color: Theme.accent
                                                 font.family: Theme.fontFamily; font.pixelSize: 11
                                             }
                                         }

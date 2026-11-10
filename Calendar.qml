@@ -17,7 +17,7 @@ Column {
         spacing: 8
         anchors.horizontalCenter: parent.horizontalCenter
         PopText {
-            text: "󰅁"; color: Theme.iris; size: 16
+            text: "󰅁"; color: Theme.agent; size: 16
             MouseArea { anchors.fill: parent; onClicked: root.shown = new Date(root.shown.getFullYear(), root.shown.getMonth() - 1, 1) }
         }
         PopText {
@@ -25,7 +25,7 @@ Column {
             size: 16; font.bold: true
         }
         PopText {
-            text: "󰅂"; color: Theme.iris; size: 16
+            text: "󰅂"; color: Theme.agent; size: 16
             MouseArea { anchors.fill: parent; onClicked: root.shown = new Date(root.shown.getFullYear(), root.shown.getMonth() + 1, 1) }
         }
     }
@@ -39,7 +39,7 @@ Column {
             PopText {
                 required property string modelData
                 text: modelData; width: 30; horizontalAlignment: Text.AlignHCenter
-                color: Theme.iris; size: 13
+                color: Theme.agent; size: 13
             }
         }
         Repeater {
@@ -54,12 +54,12 @@ Column {
                 Rectangle {
                     visible: parent.isToday
                     anchors.fill: parent; radius: Theme.innerRadius; color: Theme.overlay
-                    border.color: Theme.rose; border.width: 1
+                    border.color: Theme.accent; border.width: 1
                 }
                 PopText {
                     anchors.centerIn: parent
                     text: parent.day > 0 ? parent.day : ""
-                    color: parent.isToday ? Theme.rose : Theme.text
+                    color: parent.isToday ? Theme.accent : Theme.text
                     size: 14
                 }
             }

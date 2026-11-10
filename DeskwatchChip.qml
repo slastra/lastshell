@@ -14,9 +14,9 @@ Chip {
 
     function levelTone(lvl) {
         switch (lvl) {
-        case "crit": case "high": return Theme.love
-        case "watch": return Theme.gold
-        case "low": return Theme.foam
+        case "crit": case "high": return Theme.crit
+        case "watch": return Theme.warn
+        case "low": return Theme.ok
         default: return Theme.text
         }
     }
@@ -48,7 +48,7 @@ Chip {
     readonly property color tone:
         Deskwatch.stale || !Deskwatch.tailUp ? Qt.alpha(Theme.text, 0.45)
         : bad ? levelTone(Deskwatch.level)
-        : Theme.foam
+        : Theme.ok
 
     onClicked: Apps.launch(
         ["kitty", "--hold", "-e", Quickshell.env("HOME") + "/go/bin/deskwatch", "status"], "deskwatch-status")
@@ -58,7 +58,7 @@ Chip {
         Badge { // attention count, only when crit/high is live
             visible: Deskwatch.attention > 0
             anchors.verticalCenter: parent.verticalCenter
-            tone: Theme.love
+            tone: Theme.crit
             text: String(Deskwatch.attention)
         }
 
@@ -118,7 +118,7 @@ Chip {
                         width: parent.width
                         text: `$ ${modelData.fix}`
                         wrapMode: Text.WrapAnywhere
-                        color: Qt.alpha(Theme.foam, 0.8)
+                        color: Qt.alpha(Theme.ok, 0.8)
                         size: 12
                     }
                 }
@@ -139,7 +139,7 @@ Chip {
                         spacing: 6
                         readonly property color vtone:
                             modelData.verdict === "benign" ? Theme.text
-                          : modelData.verdict === "watch" ? Theme.gold : Theme.love
+                          : modelData.verdict === "watch" ? Theme.warn : Theme.crit
                         LucideIcon {
                             anchors.verticalCenter: parent.verticalCenter
                             name: modelData.verdict === "benign" ? "check"

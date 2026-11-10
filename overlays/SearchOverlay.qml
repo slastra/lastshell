@@ -95,8 +95,8 @@ Overlay {
                 highlight: Rectangle {
                     radius: Theme.innerRadius
                     color: Theme.overlay
-                    border.width: 2
-                    border.color: Qt.alpha(Theme.rose, 0.8)
+                    border.width: Theme.hairline
+                    border.color: Qt.alpha(Theme.accent, 0.8)
                 }
                 highlightMoveDuration: 110
                 highlightResizeDuration: 0
@@ -127,16 +127,16 @@ Overlay {
                             anchors.verticalCenter: parent.verticalCenter
                             name: row.modelData.lucideIcon ?? ""
                             font.pixelSize: 15
-                            color: Qt.alpha(Theme.iris, 0.8)
+                            color: Qt.alpha(Theme.agent, 0.8)
                         }
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
                             font.family: Theme.fontFamily
                             font.pixelSize: 15
-                            color: row.modelData.current ? Theme.iris
+                            color: row.modelData.current ? Theme.agent
                                  : row.index === root.cursor ? Theme.text : Qt.alpha(Theme.text, 0.75)
                             textFormat: Text.StyledText
-                            text: Fuzzy.highlight(row.modelData.label, row.modelData._idx, Theme.gold.toString())
+                            text: Fuzzy.highlight(row.modelData.label, row.modelData._idx, Theme.warn.toString())
                             width: 450
                             elide: Text.ElideRight
                         }
@@ -149,7 +149,7 @@ Overlay {
                         anchors.verticalCenter: parent.verticalCenter
                         name: row.modelData.current ? "check" : row.modelData.trailIcon ?? ""
                         font.pixelSize: 14
-                        color: row.modelData.current ? Theme.iris : Theme.textFaint
+                        color: row.modelData.current ? Theme.agent : Theme.textFaint
                     }
 
                     MouseArea {
@@ -182,7 +182,7 @@ Overlay {
                 visible: root.filtered.length === 0
                 anchors.centerIn: parent
                 text: "no matches"
-                color: Qt.alpha(Theme.love, 0.7)
+                color: Qt.alpha(Theme.crit, 0.7)
                 font.family: Theme.fontFamily; font.pixelSize: 14
                 font.italic: true
             }

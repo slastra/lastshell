@@ -29,7 +29,7 @@ Column {
     }
 
     readonly property color tone:
-        urgency === 2 ? Theme.love : urgency === 0 ? Theme.foam : Theme.rose
+        urgency === 2 ? Theme.crit : urgency === 0 ? Theme.ok : Theme.accent
 
     spacing: 2
 

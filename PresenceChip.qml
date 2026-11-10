@@ -34,7 +34,7 @@ Chip {
             LucideIcon {
                 anchors.verticalCenter: parent.verticalCenter
                 name: row.icon
-                color: row.on ? Theme.gold : Qt.alpha(Theme.text, 0.45)
+                color: row.on ? Theme.warn : Qt.alpha(Theme.text, 0.45)
             }
             PopText {
                 anchors.verticalCenter: parent.verticalCenter
@@ -50,24 +50,24 @@ Chip {
             PopText {
                 anchors.verticalCenter: parent.verticalCenter
                 text: row.word
-                color: row.on ? Qt.alpha(Theme.gold, 0.9) : Qt.alpha(Theme.text, 0.45)
+                color: row.on ? Qt.alpha(Theme.warn, 0.9) : Qt.alpha(Theme.text, 0.45)
                 size: 12
                 Behavior on color { ColorAnimation { duration: Theme.animDuration } }
             }
             // switch: track + knob, gold when on
             Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
-                width: 30; height: 16; radius: 8
-                color: row.on ? Qt.alpha(Theme.gold, 0.35) : Qt.alpha(Theme.text, 0.12)
+                width: 30; height: 16
+                color: row.on ? Qt.alpha(Theme.warn, 0.35) : Qt.alpha(Theme.text, 0.12)
                 border.width: 1
-                border.color: row.on ? Theme.gold : Qt.alpha(Theme.text, 0.25)
+                border.color: row.on ? Theme.warn : Qt.alpha(Theme.text, 0.25)
                 Behavior on color { ColorAnimation { duration: Theme.animDuration } }
                 Behavior on border.color { ColorAnimation { duration: Theme.animDuration } }
                 Rectangle {
-                    width: 10; height: 10; radius: 5
+                    width: 10; height: 10
                     y: 3
                     x: row.on ? parent.width - width - 3 : 3
-                    color: row.on ? Theme.gold : Qt.alpha(Theme.text, 0.5)
+                    color: row.on ? Theme.warn : Qt.alpha(Theme.text, 0.5)
                     Behavior on x { NumberAnimation { duration: Theme.animDuration; easing.type: Easing.OutCubic } }
                     Behavior on color { ColorAnimation { duration: Theme.animDuration } }
                 }
@@ -84,9 +84,9 @@ Chip {
 
     readonly property bool stale: !Presence.sensorOk || !Presence.known
     readonly property color tone:
-        root.stale ? Theme.love
-        : Presence.paused ? Theme.gold
-        : Presence.present ? Theme.foam
+        root.stale ? Theme.crit
+        : Presence.paused ? Theme.warn
+        : Presence.present ? Theme.ok
         : Qt.alpha(Theme.text, 0.45)
 
     // ticks once a second while the popout is up so "for 4m 12s" stays honest
@@ -146,7 +146,7 @@ Chip {
                 width: parent.width
                 wrapMode: Text.WordWrap
                 text: "No frames from the LD2410C. Keyboard and mouse idle decides the screen alone."
-                color: Qt.alpha(Theme.love, 0.9)
+                color: Qt.alpha(Theme.crit, 0.9)
                 size: 12
             }
 
@@ -207,7 +207,7 @@ Chip {
                     PopText {
                         anchors.verticalCenter: parent.verticalCenter
                         size: 12
-                        color: Qt.alpha(Theme.gold, 0.9)
+                        color: Qt.alpha(Theme.warn, 0.9)
                         text: Presence.absenceSecs >= 60
                             ? `${Math.floor(Presence.absenceSecs / 60)}m${Presence.absenceSecs % 60 ? " " + Presence.absenceSecs % 60 + "s" : ""}`
                             : `${Presence.absenceSecs}s`
@@ -216,7 +216,7 @@ Chip {
                         anchors.verticalCenter: parent.verticalCenter
                         width: 110
                         frac: (Presence.absenceSecs - Presence.absenceMin) / (Presence.absenceMax - Presence.absenceMin)
-                        fill: Theme.gold
+                        fill: Theme.warn
                         interactive: true
                         onSeek: f => Presence.setAbsence(Presence.absenceMin + f * (Presence.absenceMax - Presence.absenceMin))
                     }

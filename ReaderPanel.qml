@@ -30,7 +30,7 @@ Column {
             width: parent.width
             height: 6
             frac: root.live ? Reader.progress : 0
-            fill: Theme.foam
+            fill: Theme.ok
         }
         Item {
             width: parent.width
@@ -58,7 +58,7 @@ Column {
                 required property var modelData
                 name: modelData.icon
                 font.pixelSize: modelData.big ? 22 : 16
-                color: tap.containsMouse ? Theme.rose : modelData.big ? Theme.text : Theme.textMuted
+                color: tap.containsMouse ? Theme.accent : modelData.big ? Theme.text : Theme.textMuted
                 anchors.verticalCenter: parent.verticalCenter
                 MouseArea {
                     id: tap
@@ -86,7 +86,7 @@ Column {
             PopText {
                 anchors.right: parent.right
                 size: 12
-                color: Math.abs(Reader.speed - 1) < 0.001 ? Theme.textMuted : Theme.iris
+                color: Math.abs(Reader.speed - 1) < 0.001 ? Theme.textMuted : Theme.agent
                 text: `${Reader.speed.toFixed(2)}×`
             }
         }
@@ -98,7 +98,7 @@ Column {
                 width: parent.width
                 anchors.verticalCenter: parent.verticalCenter
                 interactive: true
-                fill: Theme.iris
+                fill: Theme.agent
                 frac: (Reader.speed - 0.5) / 2.5
                 onSeek: f => Reader.setSpeed(0.5 + f * 2.5)
             }
@@ -108,7 +108,7 @@ Column {
                     required property real modelData
                     x: speedTrack.width * (modelData - 0.5) / 2.5 - 1
                     anchors.verticalCenter: parent.verticalCenter
-                    width: 2; height: 14; radius: 1
+                    width: 2; height: 14
                     color: Qt.alpha(Theme.text, 0.25)
                 }
             }
@@ -142,7 +142,7 @@ Column {
                 height: voiceList.rowH
                 radius: Theme.innerRadius
                 color: vHover.hovered ? Theme.overlay : "transparent"
-                border.color: current ? Qt.alpha(Theme.rose, 0.6) : "transparent"
+                border.color: current ? Qt.alpha(Theme.accent, 0.6) : "transparent"
                 border.width: 1
                 PopText {
                     x: 10
@@ -150,7 +150,7 @@ Column {
                     anchors.verticalCenter: parent.verticalCenter
                     elide: Text.ElideRight
                     size: 13
-                    color: parent.current ? Theme.rose : Theme.text
+                    color: parent.current ? Theme.accent : Theme.text
                     text: parent.modelData.label
                 }
                 HoverHandler { id: vHover; cursorShape: Qt.PointingHandCursor }

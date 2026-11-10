@@ -48,9 +48,7 @@ PanelWindow {
         implicitHeight: inner.childrenRect.height + root.contentPadding * 2
 
         opacity: root.open ? 1 : 0
-        scale: root.open ? 1 : 0.97
         Behavior on opacity { NumberAnimation { duration: Theme.animDuration; easing.type: Easing.OutCubic } }
-        Behavior on scale { NumberAnimation { duration: Theme.animDuration; easing.type: Easing.OutCubic } }
         Behavior on anchors.verticalCenterOffset { NumberAnimation { duration: Theme.animDuration; easing.type: Easing.OutCubic } }
 
         property real jolt: 0

@@ -6,5 +6,5 @@ Rectangle {
     radius: Theme.overlayRadius
     color: Theme.surface
     border.color: Theme.border
-    border.width: 2
+    border.width: Theme.hairline
 }

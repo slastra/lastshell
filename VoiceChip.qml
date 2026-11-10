@@ -171,7 +171,7 @@ Chip {
                     else if (Voice.ducking) parts.push("ducking")
                     return parts.join("  ·  ")
                 }
-                tone: !Voice.up ? Theme.love : root.active ? root.tone : Theme.textMuted
+                tone: !Voice.up ? Theme.crit : root.active ? root.tone : Theme.textMuted
             }
 
             Divider { width: parent.width }

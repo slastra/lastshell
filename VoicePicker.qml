@@ -7,7 +7,7 @@ ListView {
     id: root
     property var voices: []          // [{key, label}]
     property string current: ""
-    property color tone: Theme.rose
+    property color tone: Theme.accent
     signal picked(string key)
 
     readonly property int rowH: 26

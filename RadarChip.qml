@@ -12,11 +12,11 @@ Chip {
     present: Radar.active
 
     readonly property color tone:
-        Radar.level === "urgent" ? Theme.love
-        : Radar.level === "watch" ? Theme.gold
-        : Theme.foam
+        Radar.level === "urgent" ? Theme.crit
+        : Radar.level === "watch" ? Theme.warn
+        : Theme.ok
 
-    function tierTone(t) { return t === "urgent" ? Theme.love : t === "high" ? Theme.gold : Theme.foam }
+    function tierTone(t) { return t === "urgent" ? Theme.crit : t === "high" ? Theme.warn : Theme.ok }
 
     onClicked: Quickshell.execDetached(["qs", "-c", "lastshell", "ipc", "call", "overlays", "toggleRadar"])
 
@@ -73,7 +73,7 @@ Chip {
                     LucideIcon {
                         anchors.verticalCenter: parent.verticalCenter
                         name: "eye"
-                        color: /Tornado/.test(modelData.event) ? Theme.love : Theme.gold
+                        color: /Tornado/.test(modelData.event) ? Theme.crit : Theme.warn
                         font.pixelSize: 13
                     }
                     PopText {

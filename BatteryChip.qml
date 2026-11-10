@@ -108,7 +108,7 @@ Chip {
                 }
                 PopText {
                     text: root.charging ? "charging" : root.dev?.state === UPowerDeviceState.FullyCharged ? "full" : "discharging"
-                    color: root.charging ? Theme.foam : Theme.textMuted
+                    color: root.charging ? Theme.ok : Theme.textMuted
                     size: 14
                 }
             }
@@ -134,7 +134,7 @@ Chip {
                         readonly property bool selected: root.span === modelData[0] * 3600
                         text: modelData[1]
                         size: 12
-                        color: selected ? Theme.rose : Theme.textMuted
+                        color: selected ? Theme.accent : Theme.textMuted
                         MouseArea {
                             anchors.fill: parent
                             anchors.margins: -3

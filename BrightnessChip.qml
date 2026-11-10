@@ -11,7 +11,7 @@ StatChip {
     readonly property real b: Backlight.level
     value: `${Theme.pad(Math.round(b * 100), 3)}%`
     icon: "sun"
-    tone: Backlight.autoActive ? Theme.foam : Theme.text
+    tone: Backlight.autoActive ? Theme.ok : Theme.text
 
     onClicked: Backlight.toggleAuto()
 
@@ -39,7 +39,7 @@ StatChip {
             SliderTrack {
                 width: 220
                 frac: root.b
-                fill: Theme.gold
+                fill: Theme.warn
                 interactive: true
                 onSeek: f => Backlight.setLevel(f)
             }

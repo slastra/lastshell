@@ -28,7 +28,7 @@ Chip {
             SliderTrack {
                 width: 220
                 frac: root.vol
-                fill: root.muted ? Theme.love : Theme.pine
+                fill: root.muted ? Theme.crit : Theme.info
                 interactive: true
                 onSeek: f => Audio.setVolume(f)
             }
@@ -81,12 +81,12 @@ Chip {
                     // mute slash in love
                     ctx.lineWidth = 2
                     ctx.lineCap = "round"
-                    ctx.strokeStyle = Theme.love
+                    ctx.strokeStyle = Theme.crit
                     ctx.beginPath(); ctx.moveTo(1.5, cy - 6.5); ctx.lineTo(12.5, cy + 6.5); ctx.stroke()
                 }
                 // bluetooth tick: small iris dot above the cone
                 if (root.bluetooth && !root.muted) {
-                    ctx.fillStyle = Theme.iris
+                    ctx.fillStyle = Theme.agent
                     ctx.beginPath(); ctx.arc(15, cy - 6, 1.8, 0, 2 * Math.PI); ctx.fill()
                 }
             }

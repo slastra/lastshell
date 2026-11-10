@@ -24,7 +24,7 @@ Item {
             anchors.leftMargin: 18
             anchors.verticalCenter: parent.verticalCenter
             size: 12
-            color: Qt.alpha(Theme.iris, 0.55)
+            color: Qt.alpha(Theme.agent, 0.55)
             text: parent.parent.hint
         }
         PopText {

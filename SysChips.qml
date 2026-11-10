@@ -4,12 +4,11 @@ import QtQuick
 // The foam-family stat cluster: network, cpu, temp, disk, memory, recording,
 // weather — thin views over the polled singletons, waybar thresholds kept.
 ChipRow {
-    spacing: 8
 
     StatChip {
         id: net
         edge: "top"
-        tone: Net.connected ? Theme.foam : Theme.love
+        tone: Net.connected ? Theme.ok : Theme.crit
         value: Net.connected ? Net.ip : "Disconnected"
         icon: Net.wireless ? (Net.connected ? "wifi" : "wifi-off")
             : Net.connected ? "ethernet-port" : "unplug"
@@ -31,7 +30,7 @@ ChipRow {
                              : b > 1e3 ? `${(b / 1e3).toFixed(0)} kB/s` : `${b.toFixed(0)} B/s`
                     }
                     text: `↓ ${fmt(Net.rxBps)}   ↑ ${fmt(Net.txBps)}`
-                    color: Theme.foam; size: 14
+                    color: Theme.ok; size: 14
                 }
                 NetGraph { width: 240; height: 60; live: netPop.visible }
             }
@@ -163,10 +162,10 @@ ChipRow {
             LucideIcon {
                 anchors.verticalCenter: parent.verticalCenter
                 name: "circle-dot"
-                color: Theme.love
+                color: Theme.crit
             }
             ValueText {
-                color: Theme.love
+                color: Theme.crit
                 text: "REC"
             }
             SequentialAnimation on opacity {
@@ -181,7 +180,7 @@ ChipRow {
     StatChip {
         id: weather
         edge: "top"
-        tone: Theme.foam
+        tone: Theme.ok
         value: `${Theme.pad(Weather.now.temp ?? "?", 2)}°F`
         icon: Weather.icon
         present: Weather.text !== ""
@@ -200,7 +199,7 @@ ChipRow {
                     }
                     PopText {
                         text: `${Weather.now.temp ?? "?"}°`
-                        color: Theme.foam
+                        color: Theme.ok
                         size: 14
                     }
                 }
@@ -224,7 +223,7 @@ ChipRow {
                         PopText {
                             anchors.right: parent.right
                             text: `${modelData.hi}° / ${modelData.lo}°`
-                            color: Theme.foam
+                            color: Theme.ok
                             size: 13
                         }
                     }

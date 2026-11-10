@@ -64,7 +64,7 @@ Chip {
             PopoutHeader {
                 title: "media"
                 status: Media.players.length === 1 ? "1 player" : `${Media.players.length} players`
-                tone: Media.playing.length > 0 ? Theme.foam : Theme.textMuted
+                tone: Media.playing.length > 0 ? Theme.ok : Theme.textMuted
             }
 
             Divider { width: parent.width }
@@ -80,7 +80,7 @@ Chip {
                     height: rowText.implicitHeight + 12
                     radius: Theme.innerRadius
                     color: rowMouse.containsMouse ? Theme.overlay : "transparent"
-                    border.color: current ? Qt.alpha(Theme.rose, 0.6) : "transparent"
+                    border.color: current ? Qt.alpha(Theme.accent, 0.6) : "transparent"
                     border.width: 1
                     Behavior on color { ColorAnimation { duration: Theme.animDuration } }
 
@@ -90,7 +90,7 @@ Chip {
                         anchors.verticalCenter: parent.verticalCenter
                         name: root.stateIcon(row.modelData)
                         font.pixelSize: 13
-                        color: row.modelData.isPlaying ? Theme.foam : Theme.textMuted
+                        color: row.modelData.isPlaying ? Theme.ok : Theme.textMuted
                     }
                     Column {
                         id: rowText
@@ -103,7 +103,7 @@ Chip {
                             width: parent.width
                             elide: Text.ElideRight
                             text: row.modelData.trackTitle || row.modelData.identity || "unknown"
-                            color: row.current ? Theme.rose : Theme.text
+                            color: row.current ? Theme.accent : Theme.text
                             font.italic: !row.modelData.isPlaying
                         }
                         PopText {
@@ -134,11 +134,11 @@ Chip {
             anchors.verticalCenter: parent.verticalCenter
             name: root.player ? root.stateIcon(root.player) : "play"
             font.pixelSize: 13
-            color: Qt.alpha(root.active ? Theme.rose : Theme.text, 0.7)
+            color: Qt.alpha(root.active ? Theme.accent : Theme.text, 0.7)
         }
         ValueText {
             font.italic: root.paused
-            color: root.active ? Theme.rose : Theme.text
+            color: root.active ? Theme.accent : Theme.text
             text: root.text
             Behavior on width { NumberAnimation { duration: Theme.slideDuration; easing.type: Easing.OutCubic } }
         }

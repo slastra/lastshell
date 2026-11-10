@@ -21,14 +21,14 @@ Chip {
         }
 
         ValueText {
-            color: root.session.state === "waiting" ? Theme.gold : Theme.text
+            color: root.session.state === "waiting" ? Theme.warn : Theme.text
             text: root.session.label
         }
 
         Badge { // agent count, only when >1
             visible: root.session.agents > 1
             anchors.verticalCenter: parent.verticalCenter
-            tone: Theme.iris
+            tone: Theme.agent
             text: `×${root.session.agents}`
         }
     }
@@ -49,7 +49,7 @@ Chip {
                 PopText {
                     anchors.verticalCenter: parent.verticalCenter
                     text: root.session.state === "waiting" ? "waiting on you" : root.session.state
-                    color: root.session.state === "waiting" ? Theme.gold : Qt.alpha(Theme.text, 0.8)
+                    color: root.session.state === "waiting" ? Theme.warn : Qt.alpha(Theme.text, 0.8)
                     size: 13
                 }
             }

@@ -46,9 +46,7 @@ PopupWindow {
         implicitHeight: inner.childrenRect.height + 24
 
         opacity: open ? 1 : 0
-        scale: open ? 1 : 0.96
         Behavior on opacity { NumberAnimation { duration: Theme.animDuration; easing.type: Easing.OutCubic } }
-        Behavior on scale { NumberAnimation { duration: Theme.animDuration; easing.type: Easing.OutCubic } }
         onOpacityChanged: if (opacity === 0 && !open) root.visible = false
 
         Item {
