@@ -148,7 +148,7 @@ Singleton {
     readonly property int bandRadius: Math.max(0, overlayRadius - 2)
 
     readonly property int barHeight: 34
-    readonly property string fontFamily: "ShureTechMono Nerd Font"
+    readonly property string fontFamily: "GeistMono Nerd Font"
     // motion drops to 0 in eco mode: every animated frame is a bar repaint
     readonly property int animDuration: Eco.active ? 0 : 140
     readonly property int slideDuration: Eco.active ? 0 : 220   // item enter/exit
