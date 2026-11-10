@@ -76,12 +76,11 @@ Chip {
                 color: rowMouse.containsMouse ? Theme.overlay : "transparent"
                 Behavior on color { ColorAnimation { duration: Theme.animDuration } }
 
-                LucideIcon {
+                RingIcon {
                     id: glyph
                     x: 6
                     anchors.verticalCenter: parent.verticalCenter
                     name: root.stateIcon(row.modelData)
-                    font.pixelSize: 13
                     color: row.modelData.isPlaying ? Theme.ok : Theme.textMuted
                 }
                 Column {
@@ -121,10 +120,9 @@ Chip {
         id: content
         transform: Translate { id: slide }
 
-        LucideIcon {
+        RingIcon {
             anchors.verticalCenter: parent.verticalCenter
             name: root.player ? root.stateIcon(root.player) : "play"
-            font.pixelSize: 13
             color: Qt.alpha(root.active ? Theme.accent : Theme.text, 0.7)
         }
         ValueText {

@@ -46,6 +46,7 @@ ChipTip 1.0 ChipTip.qml
 StateDot 1.0 StateDot.qml
 singleton Lucide 1.0 Lucide.qml
 LucideIcon 1.0 LucideIcon.qml
+RingIcon 1.0 RingIcon.qml
 TrayMenu 1.0 TrayMenu.qml
 ValueText 1.0 ValueText.qml
 HdrChip 1.0 HdrChip.qml

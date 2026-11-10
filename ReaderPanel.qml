@@ -54,19 +54,34 @@ Column {
                 { icon: "skip-forward", act: () => Reader.next(), tip: "next" },
                 { icon: "square", act: () => Reader.stop(), tip: "stop" },
             ]
-            LucideIcon {
+            Item { // play/pause sits in a ring; the rest are bare glyphs
+                id: btn
                 required property var modelData
-                name: modelData.icon
-                font.pixelSize: modelData.big ? 22 : 16
-                color: tap.containsMouse ? Theme.accent : modelData.big ? Theme.text : Theme.textMuted
-                anchors.verticalCenter: parent.verticalCenter
+                readonly property color tone: tap.containsMouse ? Theme.accent
+                    : modelData.big ? Theme.text : Theme.textMuted
+                width: modelData.big ? 34 : 16
+                height: 34
+                RingIcon {
+                    visible: btn.modelData.big ?? false
+                    anchors.centerIn: parent
+                    diameter: 34
+                    name: btn.modelData.icon
+                    color: btn.tone
+                }
+                LucideIcon {
+                    visible: !(btn.modelData.big ?? false)
+                    anchors.centerIn: parent
+                    name: btn.modelData.icon
+                    font.pixelSize: 16
+                    color: btn.tone
+                }
                 MouseArea {
                     id: tap
                     anchors.fill: parent
                     anchors.margins: -6
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: parent.modelData.act()
+                    onClicked: btn.modelData.act()
                 }
             }
         }
