@@ -88,6 +88,38 @@ Singleton {
     readonly property color agent:  quiet ? neutral : hue(5, "#c9b1ca")   // Claude, the voice assistants, labels
     readonly property color calm:   quiet ? text : ok   // a reading in its normal range
 
+    // ---- the secondary: the color of the small print (a popout's note, a
+    // dialog's footer: key hints, counts, where the data is from). That text
+    // is small and usually worth reading, and a faint gray made it hard to.
+    // A terminal scheme names no such color, so it is
+    // read out of one: the scheme's blue, or its magenta when the blue is
+    // gray or too near the accent's hue, or failing both the accent pulled
+    // halfway to the text. Whatever is chosen is then stepped toward the
+    // text until it reads at 4.5:1 on a card.
+    function luminance(c) {
+        const lin = v => v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)
+        return 0.2126 * lin(c.r) + 0.7152 * lin(c.g) + 0.0722 * lin(c.b)
+    }
+    function contrast(a, b) {
+        const la = luminance(a), lb = luminance(b)
+        return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05)
+    }
+    function readable(c) {
+        let out = c
+        for (let i = 0; i < 12 && contrast(out, surface) < 4.5; i++) out = mix(out, text, 0.15)
+        return out
+    }
+    function ownHue(c) {   // colored, and not the accent over again
+        if (c.hslSaturation < 0.12) return false
+        if (accent.hslSaturation < 0.12) return true
+        const d = Math.abs(c.hslHue - accent.hslHue)
+        return Math.min(d, 1 - d) > 0.06
+    }
+    readonly property color secondary: {
+        const blue = Qt.color(hue(4, "#8ba9c1")), magenta = Qt.color(hue(5, "#c9b1ca"))
+        return readable(ownHue(blue) ? blue : ownHue(magenta) ? magenta : mix(accent, text, 0.5))
+    }
+
     // text at the alphas the popouts settled on; `track` is the neutral
     // slider/ring track, `divider` the rule between popout sections,
     // `seam` the hairline under modal headers and over footers
