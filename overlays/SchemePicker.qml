@@ -14,7 +14,15 @@ SearchOverlay {
     typeIcon: "palette"
     visibleRows: 12
     backdrop: 0.3
-    hint: "↑↓ preview   ↵ apply everywhere   esc keep " + (original || "current")
+    hint: "tab dark / light   ↑↓ preview   ↵ apply   esc keep " + (original || "current")
+
+    // every scheme, or only the dark or the light ones (by background)
+    readonly property var kinds: [null, true, false]
+    scopes: [
+        { label: "all", count: schemes.length },
+        { label: "dark", count: schemes.filter(s => s.dark).length },
+        { label: "light", count: schemes.filter(s => !s.dark).length },
+    ]
 
     // LASTSHELL_TINT points the harness at a wrapper that renders into a
     // scratch root, so a test never recolors the real desktop
@@ -44,7 +52,7 @@ SearchOverlay {
     }
 
     // the applied scheme leads the list, then your own, then the rest
-    items: schemes.map(s => ({
+    items: schemes.filter(s => kinds[scope] === null || s.dark === kinds[scope]).map(s => ({
         key: s.name, label: s.name, swatches: s.swatches,
         current: s.name === root.original,
         weight: s.name === root.original ? 2 : s.yours ? 1 : 0,
