@@ -16,6 +16,10 @@ Rectangle {
     property alias hovered: mouse.containsMouse
     // horizontal room around the content; 0 for content that carries its own
     property int contentPadding: 12
+    // a hairline on the item's leading edge, dividing it from its neighbor
+    // (the first item's falls on the plate's own border). Off for the icon
+    // strips (tabs, tasks, tray), which carry no padding and read as one group.
+    property bool separator: contentPadding > 0
     default property alias content: contentSlot.data
 
     signal clicked()
@@ -53,6 +57,13 @@ Rectangle {
         id: exitAnim
         NumberAnimation { target: chip; property: "opacity"; to: 0; duration: Theme.slideDuration; easing.type: Easing.InCubic }
         NumberAnimation { target: chip; property: "widthFactor"; to: 0; duration: Theme.slideDuration; easing.type: Easing.InCubic }
+    }
+
+    Rectangle { // the separator
+        visible: chip.separator
+        width: Theme.hairline
+        height: parent.height
+        color: Theme.border
     }
 
     Rectangle { // the active rule
