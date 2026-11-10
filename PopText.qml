@@ -6,6 +6,6 @@ Text {
     property int size: 13
     property real dim: 1     // 1 = full Theme.text; < 1 = Qt.alpha(Theme.text, dim)
     font.family: Theme.fontFamily
-    font.pixelSize: size
+    font.pixelSize: Math.round(size * Theme.fontScale)
     color: dim < 1 ? Qt.alpha(Theme.text, dim) : Theme.text
 }

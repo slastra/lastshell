@@ -16,7 +16,7 @@ Text {
     anchors.baseline: parent.verticalCenter
     anchors.baselineOffset: 0.75 + metrics.ascent - Math.ceil(metrics.height) / 2
     font.family: Theme.fontFamily
-    font.pixelSize: 16
+    font.pixelSize: Math.round(16 * Theme.fontScale)
     color: Theme.text
     Behavior on color { ColorAnimation { duration: Theme.animDuration } }
 
