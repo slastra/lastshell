@@ -80,6 +80,7 @@ Chip {
                     id: glyph
                     x: 6
                     anchors.verticalCenter: parent.verticalCenter
+                    diameter: rowText.implicitHeight   // as tall as the two lines beside it
                     name: root.stateIcon(row.modelData)
                     color: row.modelData.isPlaying ? Theme.ok : Theme.textMuted
                 }
