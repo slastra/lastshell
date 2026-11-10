@@ -9,8 +9,27 @@ Column {
     property var notif
     property string time
     property bool compact: false
+    // Cached while the notification is alive: its row slides out after the
+    // sender has closed it, and Quickshell has freed the object by then.
+    property int urgency: 1
+    property string appName: ""
+    property string summary: ""
+    property string body: ""
+    readonly property int liveUrgency: notif?.urgency ?? 1
+    readonly property string liveAppName: notif?.appName ?? ""
+    readonly property string liveSummary: notif?.summary ?? ""
+    readonly property string liveBody: notif?.body ?? ""
+    onLiveUrgencyChanged: if (notif) urgency = liveUrgency
+    onLiveAppNameChanged: if (notif) appName = liveAppName
+    onLiveSummaryChanged: if (notif) summary = liveSummary
+    onLiveBodyChanged: if (notif) body = liveBody
+    Component.onCompleted: {
+        urgency = liveUrgency; appName = liveAppName
+        summary = liveSummary; body = liveBody
+    }
+
     readonly property color tone:
-        notif.urgency === 2 ? Theme.love : notif.urgency === 0 ? Theme.foam : Theme.rose
+        urgency === 2 ? Theme.love : urgency === 0 ? Theme.foam : Theme.rose
 
     spacing: 2
 
@@ -18,7 +37,7 @@ Column {
         spacing: 8
         PopText {
             id: app
-            text: notif.appName ?? ""
+            text: appName
             color: Qt.alpha(tone, 0.9)
             size: compact ? 11 : 12
             visible: text !== ""
@@ -31,13 +50,13 @@ Column {
         }
     }
     PopText {
-        text: notif.summary ?? ""
+        text: summary
         size: compact ? 14 : 15
         font.bold: true
         width: parent.width; elide: Text.ElideRight
     }
     PopText {
-        text: notif.body ?? ""
+        text: body
         dim: compact ? 0.65 : 0.75
         size: compact ? 12 : 13
         width: parent.width; wrapMode: Text.Wrap

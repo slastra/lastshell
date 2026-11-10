@@ -35,6 +35,9 @@ Rectangle {
     // the stable Popups scope: they are async and this delegate is gone
     // once the toast leaves the stack.
     signal activated()
+    // An action button. Same reason: invoking it can make the sender close
+    // the notification, which destroys this delegate mid-handler.
+    signal actionChosen(var action)
 
     Timer {
         id: expiry
@@ -160,7 +163,7 @@ Rectangle {
                         text: parent.modelData.text
                         color: Theme.iris; font.family: Theme.fontFamily; font.pixelSize: 12
                     }
-                    TapHandler { onTapped: { if (root.notif.tracked) parent.modelData.invoke(); root.wantsOut(true) } }
+                    TapHandler { onTapped: root.actionChosen(parent.modelData) }
                 }
             }
         }

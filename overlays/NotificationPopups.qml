@@ -48,6 +48,14 @@ Scope {
             if (toasts.get(i).notif === n) { toasts.remove(i); break }
         if (dismissToo) n.dismiss()
     }
+    // An action button on a toast: send it, then off the stack. Here rather
+    // than in the toast, whose delegate the sender's close destroys.
+    // Invoking closes a notification that is not resident, so only one
+    // that is still tracked afterwards is dismissed by hand.
+    function act(n, action) {
+        if (n.tracked) action.invoke()
+        drop(n, n.tracked)
+    }
     // A closed notification leaves both models. QML nulls a var that held a
     // destroyed object, so rows whose notif is gone or untracked go too.
     function forget(n) {
@@ -192,12 +200,18 @@ Scope {
     }
     Timer { id: clientsRetry; interval: 100; onTriggered: clientsProc.running = true }
 
-    // Test hook: `qs -c lastshell ipc call notifs activateLatest` is a click
-    // on the newest toast.
+    // Test hooks: `qs -c lastshell ipc call notifs activateLatest` is a click
+    // on the newest toast, `actLatest` a click on its first action button.
     IpcHandler {
         target: "notifs"
         function activateLatest(): void {
             if (toasts.count > 0) root.activate(toasts.get(toasts.count - 1).notif)
+        }
+        function actLatest(): void {
+            if (toasts.count === 0) return
+            const n = toasts.get(toasts.count - 1).notif
+            const a = (n.actions ?? []).find(a => (a.text ?? "").trim() !== "")
+            if (a) root.act(n, a)
         }
     }
 
@@ -234,6 +248,7 @@ Scope {
                 // role fills it — redeclaring here shadows and breaks it
                 onWantsOut: dismissToo => root.drop(notif, dismissToo)
                 onActivated: root.activate(notif)
+                onActionChosen: action => root.act(notif, action)
             }
 
             add: Transition {
