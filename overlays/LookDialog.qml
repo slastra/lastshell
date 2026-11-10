@@ -2,10 +2,12 @@ import Quickshell
 import QtQuick
 import ".."  // root module
 
-// The look: the four choices that sit on top of whatever color scheme is
+// The look: the choices that sit on top of whatever color scheme is
 // applied. Corner radius and border thickness for everything that draws a
-// box, and which of the scheme's six hues is the primary (the accent) and
-// which the secondary (small print). `tint look` is the engine and holds
+// box, which of the scheme's six hues is the primary (the accent) and
+// which the secondary (small print), and the font pair: a monospace for the
+// terminal and the shell with its matching sans for apps, from tint's
+// fonts.toml. `tint look` is the engine and holds
 // the state; every change is applied to the whole desktop as it is made.
 Overlay {
     id: root
@@ -15,7 +17,7 @@ Overlay {
     backdrop: 0.3     // the desktop is what is being changed: keep it in view
 
     readonly property string tint: Quickshell.env("LASTSHELL_TINT") || (Quickshell.env("HOME") + "/.local/bin/tint")
-    readonly property var rows: ["radius", "border", "accent", "secondary"]
+    readonly property var rows: ["radius", "border", "accent", "secondary"].concat(fonts.length ? ["font"] : [])
     property int cursor: 0
 
     // what tint reports, and the values on screen (ahead of it while a
@@ -25,6 +27,9 @@ Overlay {
     property int border: 1
     property string accent: "auto"
     property string secondary: "auto"
+    property string font: ""
+    readonly property var fonts: info.fonts ?? []
+    readonly property var fontNow: fonts.find(f => f.name === font) ?? null
     readonly property var slots: info.slots ?? []
     readonly property var choices: ["auto"].concat(slots.map(s => s.name))
 
@@ -38,7 +43,7 @@ Overlay {
         if (!j || j.radius === undefined) return
         info = j
         if (!send.running && !settle.running) {
-            radius = j.radius; border = j.border; accent = j.accent; secondary = j.secondary
+            radius = j.radius; border = j.border; accent = j.accent; secondary = j.secondary; font = j.font ?? ""
         }
     }
     JsonProcess { id: load; command: [root.tint, "look", "--json"]; fallback: ({}); onResult: j => root.take(j) }
@@ -51,7 +56,7 @@ Overlay {
         if (send.running || !dirty) return
         dirty = false
         send.command = [tint, "look", "--json", "--radius", String(radius), "--border", String(border),
-                        "--accent", accent, "--secondary", secondary]
+                        "--accent", accent, "--secondary", secondary].concat(font ? ["--font", font] : [])
         send.running = true
     }
     Timer { id: settle; interval: 220; onTriggered: root.flush() }
@@ -77,7 +82,10 @@ Overlay {
     function step(d) {
         const key = rows[cursor]
         if (key === "radius" || key === "border") setNumber(key, root[key] + d)
-        else {
+        else if (key === "font") {
+            const i = Math.max(0, fonts.findIndex(f => f.name === font))
+            setChoice("font", fonts[(i + d + fonts.length) % fonts.length].name)
+        } else {
             const i = Math.max(0, choices.indexOf(root[key]))
             setChoice(key, choices[(i + d + choices.length) % choices.length])
         }
@@ -214,6 +222,41 @@ Overlay {
             Setting {
                 index: 3; label: "secondary"; value: root.secondary
                 Swatches { role: "secondary" }
+            }
+            Setting { // the pair by name, then a sample of each face: the mono, its sans
+                visible: root.fonts.length > 0
+                index: 4; label: "font"; value: root.font
+                Row {
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 10
+                    LucideIcon {
+                        anchors.verticalCenter: parent.verticalCenter
+                        name: "chevron-left"; font.pixelSize: 14; color: Theme.textFaint
+                        MouseArea { anchors.fill: parent; anchors.margins: -6; cursorShape: Qt.PointingHandCursor
+                                    onClicked: { root.cursor = 4; root.step(-1) } }
+                    }
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        font.family: root.fontNow?.mono ?? Theme.fontFamily
+                        font.pixelSize: 13
+                        color: Theme.text
+                        text: "mono 0O1l"
+                    }
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        font.family: root.fontNow?.sans ?? Theme.fontFamily
+                        font.pixelSize: 13
+                        color: Theme.secondary
+                        text: "Sans Aa"
+                    }
+                    LucideIcon {
+                        anchors.verticalCenter: parent.verticalCenter
+                        name: "chevron-right"; font.pixelSize: 14; color: Theme.textFaint
+                        MouseArea { anchors.fill: parent; anchors.margins: -6; cursorShape: Qt.PointingHandCursor
+                                    onClicked: { root.cursor = 4; root.step(1) } }
+                    }
+                }
             }
         }
 

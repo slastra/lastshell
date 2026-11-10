@@ -148,10 +148,12 @@ Singleton {
     readonly property int bandRadius: Math.max(0, overlayRadius - 2)
 
     readonly property int barHeight: 34
-    readonly property string fontFamily: "MartianMono Nerd Font"
-    // Geist Mono is wider and taller in the x-height than ShureTechMono,
-    // which the sizes around the shell were chosen for
-    readonly property real fontScale: 0.8
+    // The font and its scale come from the shape file too (`tint look
+    // --font`, a pair from tint's fonts.toml). Sizes around the shell were
+    // chosen for the narrow ShureTechMono, the font without a shape file;
+    // a wider face brings a scale under 1 with it.
+    readonly property string fontFamily: shape.font || "ShureTechMono Nerd Font"
+    readonly property real fontScale: Number(shape.fontScale) > 0 ? Number(shape.fontScale) : 1
     function fs(n) { return Math.round(n * fontScale) }
     // What ShellText places text by. The height of a capital or digit as a
     // share of the font size, measured at a large size: at text size the
