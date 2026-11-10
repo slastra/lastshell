@@ -148,7 +148,7 @@ Singleton {
     readonly property int bandRadius: Math.max(0, overlayRadius - 2)
 
     readonly property int barHeight: 34
-    readonly property string fontFamily: "AtkynsonMono Nerd Font"
+    readonly property string fontFamily: "BlexMono Nerd Font"
     // Geist Mono is wider and taller in the x-height than ShureTechMono,
     // which the sizes around the shell were chosen for
     readonly property real fontScale: 0.88
