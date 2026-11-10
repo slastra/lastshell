@@ -147,7 +147,7 @@ Rectangle {
                 Rectangle {
                     required property var modelData
                     width: actionText.implicitWidth + 22; height: 26; radius: Theme.innerRadius
-                    color: actionHover.hovered ? Theme.overlay : "transparent"
+                    color: actionHover.hovered ? Theme.overlay : Theme.clear(Theme.overlay)
                     border.color: Qt.alpha(Theme.agent, 0.5)
                     border.width: 1
                     Behavior on color { ColorAnimation { duration: Theme.animDuration } }

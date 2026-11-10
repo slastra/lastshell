@@ -227,7 +227,7 @@ Chip {
                             id: dot
                             anchors.verticalCenter: parent.verticalCenter
                             width: 8; height: 8; radius: 4
-                            color: lane.on ? lane.laneTone : "transparent"
+                            color: lane.on ? lane.laneTone : Theme.clear(lane.laneTone)
                             border.width: 1
                             border.color: Qt.alpha(lane.laneTone, lane.on ? 1 : 0.55)
                         }

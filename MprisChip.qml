@@ -73,7 +73,7 @@ Chip {
                 x: -6
                 width: parent.width + 12
                 height: rowText.implicitHeight + 10
-                color: rowMouse.containsMouse ? Theme.overlay : "transparent"
+                color: rowMouse.containsMouse ? Theme.overlay : Theme.clear(Theme.overlay)
                 Behavior on color { ColorAnimation { duration: Theme.animDuration } }
 
                 RingIcon {

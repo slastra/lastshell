@@ -84,7 +84,7 @@ PopupWindow {
                 }
                 Rectangle {
                     anchors.fill: parent; radius: Theme.innerRadius; z: -1
-                    color: backHover.hovered ? Theme.overlay : "transparent"
+                    color: backHover.hovered ? Theme.overlay : Theme.clear(Theme.overlay)
                 }
                 HoverHandler { id: backHover }
                 TapHandler { onTapped: root.stack = root.stack.slice(0, -1) }

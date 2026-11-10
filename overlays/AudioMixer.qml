@@ -96,9 +96,9 @@ Overlay {
         Rectangle {
             anchors.fill: parent
             radius: Theme.innerRadius
-            color: row.selected ? Theme.overlay : "transparent"
+            color: row.selected ? Theme.overlay : Theme.clear(Theme.overlay)
             border.width: Theme.hairline
-            border.color: row.selected ? Qt.alpha(Theme.accent, 0.8) : "transparent"
+            border.color: row.selected ? Qt.alpha(Theme.accent, 0.8) : Theme.clear(Qt.alpha(Theme.accent, 0.8))
             Behavior on border.color { ColorAnimation { duration: Theme.animDuration } }
         }
         MouseArea { // under the slider and mute: selects, wheel steps 2%

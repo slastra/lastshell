@@ -23,7 +23,7 @@ Row {
             height: root.segmentHeight
             radius: Theme.innerRadius
             color: selected ? Qt.alpha(Theme.accent, 0.18) : hover.hovered ? Theme.border : Theme.overlay
-            border.color: selected ? Theme.accent : "transparent"
+            border.color: selected ? Theme.accent : Theme.clear(Theme.accent)
             border.width: 1
             Behavior on color { ColorAnimation { duration: Theme.animDuration } }
             PopText {

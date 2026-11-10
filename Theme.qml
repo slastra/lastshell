@@ -32,6 +32,10 @@ Singleton {
     }
     // the fallbacks are Vague on black, for a host with no scheme file (the greeter)
     function slot(name, fallback) { return scheme[name] ?? fallback }
+    // The see-through end of a fade. Never "transparent" for this: that is
+    // transparent BLACK, so a fade to or from it passes through a dark,
+    // half-opaque middle and the surface flashes before it lights.
+    function clear(c) { return Qt.alpha(c, 0) }
     function mix(a, b, t) {
         return Qt.rgba(a.r + (b.r - a.r) * t, a.g + (b.g - a.g) * t, a.b + (b.b - a.b) * t, 1)
     }

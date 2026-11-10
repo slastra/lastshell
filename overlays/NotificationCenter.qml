@@ -29,7 +29,7 @@ Overlay {
                 width: clearRow.implicitWidth + 20
                 height: 28
                 radius: Theme.innerRadius
-                color: clearHover.hovered ? Qt.alpha(Theme.crit, 0.15) : "transparent"
+                color: clearHover.hovered ? Qt.alpha(Theme.crit, 0.15) : Theme.clear(Qt.alpha(Theme.crit, 0.15))
                 border.color: Qt.alpha(Theme.crit, 0.5)
                 border.width: 1
                 Behavior on color { ColorAnimation { duration: Theme.animDuration } }

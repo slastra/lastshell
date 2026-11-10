@@ -14,7 +14,7 @@ Rectangle {
     x: -6
     width: parent.width + 12
     height: 28
-    color: area.containsMouse ? Theme.overlay : "transparent"
+    color: area.containsMouse ? Theme.overlay : Theme.clear(Theme.overlay)
     Behavior on color { ColorAnimation { duration: Theme.animDuration } }
     Row {
         anchors.verticalCenter: parent.verticalCenter

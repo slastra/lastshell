@@ -156,8 +156,8 @@ Column {
                 width: voiceList.width
                 height: voiceList.rowH
                 radius: Theme.innerRadius
-                color: vHover.hovered ? Theme.overlay : "transparent"
-                border.color: current ? Qt.alpha(Theme.accent, 0.6) : "transparent"
+                color: vHover.hovered ? Theme.overlay : Theme.clear(Theme.overlay)
+                border.color: current ? Qt.alpha(Theme.accent, 0.6) : Theme.clear(Qt.alpha(Theme.accent, 0.6))
                 border.width: 1
                 PopText {
                     x: 10

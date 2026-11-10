@@ -54,7 +54,7 @@ Item {
         id: dot
         anchors.centerIn: parent
         width: 9; height: 9; radius: 4.5
-        color: root.state === "idle" ? "transparent" : root.tone
+        color: root.state === "idle" ? Theme.clear(root.tone) : root.tone
         border.color: root.tone
         border.width: 1.5
         Behavior on color { ColorAnimation { duration: Theme.animDuration } }

@@ -25,8 +25,8 @@ ListView {
         width: root.width
         height: root.rowH
         radius: Theme.innerRadius
-        color: hover.hovered ? Theme.overlay : "transparent"
-        border.color: isCurrent ? Qt.alpha(root.tone, 0.6) : "transparent"
+        color: hover.hovered ? Theme.overlay : Theme.clear(Theme.overlay)
+        border.color: isCurrent ? Qt.alpha(root.tone, 0.6) : Theme.clear(Qt.alpha(root.tone, 0.6))
         border.width: 1
         PopText {
             x: 18
