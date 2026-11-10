@@ -61,6 +61,8 @@ ChipRow {
 
             Canvas { // thermometer: mercury tracks the reading (tip on chip below)
                 id: thermo
+                // drawn, not bound: repaint when the color scheme changes
+                Connections { target: Theme; function onSchemeChanged() { thermo.requestPaint() } }
                 anchors.verticalCenter: parent.verticalCenter
                 width: 10; height: 18
                 Connections {

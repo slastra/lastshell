@@ -24,6 +24,8 @@ Chip {
 
         Canvas { // the face
             id: face
+            // drawn, not bound: repaint when the color scheme changes
+            Connections { target: Theme; function onSchemeChanged() { face.requestPaint() } }
             anchors.verticalCenter: parent.verticalCenter
             width: 18; height: 18
 

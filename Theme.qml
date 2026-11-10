@@ -60,12 +60,12 @@ Singleton {
 
     // text at the alphas the popouts settled on; `track` is the neutral
     // slider/ring track, `divider` the rule between popout sections,
-    // `seam` the hard line under modal headers and over footers
+    // `seam` the hairline under modal headers and over footers
     readonly property color textMuted: Qt.alpha(text, 0.45)
     readonly property color textFaint: Qt.alpha(text, 0.35)
     readonly property color track:     Qt.alpha(text, 0.22)
     readonly property color divider:   overlay
-    readonly property color seam:      Qt.alpha("#000000", 0.35)
+    readonly property color seam:      border
 
     // ---- shape: lines and plates. Nothing is rounded but the instruments
     // (clock, rings, dots), which draw their own circles.

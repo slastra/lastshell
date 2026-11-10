@@ -44,6 +44,8 @@ Chip {
 
         Canvas { // drawn speaker: wave arcs grow with volume, slash when muted
             id: spk
+            // drawn, not bound: repaint when the color scheme changes
+            Connections { target: Theme; function onSchemeChanged() { spk.requestPaint() } }
             anchors.verticalCenter: parent.verticalCenter
             width: 18; height: 18
 
