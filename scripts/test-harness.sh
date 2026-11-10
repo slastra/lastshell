@@ -93,7 +93,14 @@ env WAYLAND_DISPLAY="$NWL" HYPRLAND_INSTANCE_SIGNATURE="$HIS" \
     qs "${QS_ARGS[@]}" >"$OUT/qs.log" 2>&1 &
 QS_PID=$!
 
-cleanup() { kill $QS_PID $BG_PID $HYPR_PID 2>/dev/null; }
+# A killed Hyprland leaves its instance directory and sockets behind, and
+# anything that looks for "the newest instance" (keyglow did) then follows
+# the dead one. Take it away with the session.
+cleanup() {
+    kill $QS_PID $BG_PID $HYPR_PID 2>/dev/null
+    wait $HYPR_PID 2>/dev/null
+    rm -rf "$XDG_RUNTIME_DIR/hypr/$HIS"
+}
 trap cleanup EXIT INT TERM
 
 # The host rule for class aquamarine (hyprland.lua "nested-aquamarine")
