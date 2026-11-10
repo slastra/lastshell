@@ -18,12 +18,17 @@ Item {
 
     Rectangle { // the plate
         visible: zone.plate && row.width > 0
+        // inside the hairline drawn over it, so no fill fringes the frame
         anchors.fill: parent
+        anchors.leftMargin: Theme.hairline
+        anchors.rightMargin: Theme.hairline
+        anchors.topMargin: zone.edge === "top" ? 0 : Theme.hairline
+        anchors.bottomMargin: zone.edge === "top" ? Theme.hairline : 0
         color: Theme.surface
         // only the corners away from the screen edge round
-        topLeftRadius: zone.edge === "top" ? 0 : Theme.overlayRadius
+        topLeftRadius: zone.edge === "top" ? 0 : Theme.insetRadius
         topRightRadius: topLeftRadius
-        bottomLeftRadius: zone.edge === "top" ? Theme.overlayRadius : 0
+        bottomLeftRadius: zone.edge === "top" ? Theme.insetRadius : 0
         bottomRightRadius: bottomLeftRadius
     }
 

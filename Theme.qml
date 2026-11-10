@@ -141,6 +141,11 @@ Singleton {
     readonly property int hairline: px(shape.border, 1, 8)
     readonly property int overlayRadius: px(shape.radius, 0, 32)
     readonly property int innerRadius: Math.round(overlayRadius / 2)
+    // a fill that sits flush inside a framed corner: concentric with the
+    // frame's inner edge, so it neither pokes past the hairline nor gaps
+    readonly property int insetRadius: Math.max(0, overlayRadius - hairline)
+    // the header and footer bands of a modal, which sit 2 px inside its card
+    readonly property int bandRadius: Math.max(0, overlayRadius - 2)
 
     readonly property int barHeight: 34
     readonly property string fontFamily: "ShureTechMono Nerd Font"

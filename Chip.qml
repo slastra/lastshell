@@ -21,10 +21,6 @@ Rectangle {
     // end, so its fill rounds with the plate's corner there
     property bool capStart: false
     property bool capEnd: false
-    topLeftRadius: capStart && edge !== "top" ? Theme.overlayRadius : 0
-    topRightRadius: capEnd && edge !== "top" ? Theme.overlayRadius : 0
-    bottomLeftRadius: capStart && edge === "top" ? Theme.overlayRadius : 0
-    bottomRightRadius: capEnd && edge === "top" ? Theme.overlayRadius : 0
     readonly property bool filled: active && !rule
     // the color for text and glyphs on this chip
     readonly property color ink: filled ? Theme.base : Theme.text
@@ -46,8 +42,22 @@ Rectangle {
     // Uniform by construction: every item is exactly this tall.
     height: Theme.barHeight - 2
 
-    color: filled ? accent : mouse.containsMouse ? Theme.overlay : Theme.clear(Theme.overlay)
-    Behavior on color { ColorAnimation { duration: Theme.animDuration } }
+    color: "transparent"
+    Rectangle { // the hover and selection fill, kept inside the plate's
+                // hairline where the item touches it so a rounded corner
+                // shows no fringe of fill outside the frame
+        anchors.fill: parent
+        anchors.leftMargin: chip.capStart ? Theme.hairline : 0
+        anchors.rightMargin: chip.capEnd ? Theme.hairline : 0
+        anchors.topMargin: chip.edge === "top" ? 0 : Theme.hairline
+        anchors.bottomMargin: chip.edge === "top" ? Theme.hairline : 0
+        topLeftRadius: chip.capStart && chip.edge !== "top" ? Theme.insetRadius : 0
+        topRightRadius: chip.capEnd && chip.edge !== "top" ? Theme.insetRadius : 0
+        bottomLeftRadius: chip.capStart && chip.edge === "top" ? Theme.insetRadius : 0
+        bottomRightRadius: chip.capEnd && chip.edge === "top" ? Theme.insetRadius : 0
+        color: chip.filled ? chip.accent : mouse.containsMouse ? Theme.overlay : Theme.clear(Theme.overlay)
+        Behavior on color { ColorAnimation { duration: Theme.animDuration } }
+    }
 
     property real widthFactor: 0
     width: Math.round(implicitWidth * widthFactor)

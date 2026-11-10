@@ -15,8 +15,8 @@ Item {
         y: 1
         width: parent.width
         height: 32
-        bottomLeftRadius: Theme.innerRadius
-        bottomRightRadius: Theme.innerRadius
+        bottomLeftRadius: Theme.bandRadius
+        bottomRightRadius: Theme.bandRadius
         color: Qt.alpha(Theme.overlay, 0.55)
 
         PopText {
