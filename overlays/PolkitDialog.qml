@@ -178,7 +178,7 @@ Overlay {
             }
         }
 
-        Rectangle { width: parent.width; height: 1; color: Theme.seam }
+        Rectangle { width: parent.width; height: Theme.hairline; color: Theme.seam }
 
         // the secret: the greeter's field treatment
         Rectangle {

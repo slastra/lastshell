@@ -10,7 +10,7 @@ Item {
     width: parent.width
     height: 33
 
-    Rectangle { width: parent.width; height: 1; color: Theme.seam }
+    Rectangle { width: parent.width; height: Theme.hairline; color: Theme.seam }
     Rectangle {
         y: 1
         width: parent.width

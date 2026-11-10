@@ -30,6 +30,25 @@ Singleton {
         onFileChanged: reload()
         onLoaded: root.scheme = root.parse(text())
     }
+    // ---- the shape: corner radius and border thickness, in pixels. Set for
+    // the whole desktop with `tint shape --radius N --border N`, which writes
+    // this file (and Hyprland's and GTK's numbers beside it).
+    readonly property string shapePath: Quickshell.env("LASTSHELL_SHAPE")
+        || (Quickshell.env("HOME") + "/.config/tint/out/shape.json")
+    property var shape: ({})
+    FileView {
+        path: root.shapePath
+        blockLoading: true
+        watchChanges: true
+        printErrors: false
+        onFileChanged: reload()
+        onLoaded: { try { root.shape = JSON.parse(text()) } catch (e) { root.shape = {} } }
+    }
+    function px(v, fallback, max) {
+        const n = Math.round(Number(v))
+        return isFinite(n) ? Math.max(0, Math.min(max, n)) : fallback
+    }
+
     // the fallbacks are Vague on black, for a host with no scheme file (the greeter)
     function slot(name, fallback) { return scheme[name] ?? fallback }
     // The see-through end of a fade. Never "transparent" for this: that is
@@ -80,9 +99,12 @@ Singleton {
 
     // ---- shape: lines and plates. Nothing is rounded but the instruments
     // (clock, rings, dots), which draw their own circles.
-    readonly property int hairline: 1
-    readonly property int overlayRadius: 0
-    readonly property int innerRadius: 0
+    // Both come from the shape file; square with a 1 px line without one.
+    // `hairline` is every frame, divider and separator; `overlayRadius` the
+    // corners of plates and floating cards, `innerRadius` of what sits inside.
+    readonly property int hairline: px(shape.border, 1, 8)
+    readonly property int overlayRadius: px(shape.radius, 0, 32)
+    readonly property int innerRadius: Math.round(overlayRadius / 2)
 
     readonly property int barHeight: 34
     readonly property string fontFamily: "ShureTechMono Nerd Font"

@@ -152,7 +152,7 @@ Overlay {
                 }
             }
 
-            Rectangle { width: parent.width; height: 1; color: Theme.divider }
+            Rectangle { width: parent.width; height: Theme.hairline; color: Theme.divider }
 
             // CPU profile: independent of eco (eco just picks saver)
             Column {
@@ -167,7 +167,7 @@ Overlay {
                 }
             }
 
-            Rectangle { width: parent.width; height: 1; color: Theme.divider }
+            Rectangle { width: parent.width; height: Theme.hairline; color: Theme.divider }
 
             // what eco touches, as it stands right now
             Grid {

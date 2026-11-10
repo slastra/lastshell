@@ -59,6 +59,7 @@ PopupWindow {
     Card {
         id: card
         property bool open: false
+        attach: root.edge
         // the window spans chip edge to card; the gap is its transparent end
         anchors.horizontalCenter: parent.horizontalCenter
         y: root.edge === "top" ? Theme.popoutGap : 0

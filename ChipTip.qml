@@ -34,6 +34,7 @@ PopupWindow {
 
     Card {
         id: card
+        attach: root.edge
         y: root.edge === "top" ? Theme.popoutGap : 0
         width: tip.implicitWidth + 2 * Theme.popPad
         height: tip.implicitHeight + 16

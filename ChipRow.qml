@@ -20,6 +20,11 @@ Item {
         visible: zone.plate && row.width > 0
         anchors.fill: parent
         color: Theme.surface
+        // only the corners away from the screen edge round
+        topLeftRadius: zone.edge === "top" ? 0 : Theme.overlayRadius
+        topRightRadius: topLeftRadius
+        bottomLeftRadius: zone.edge === "top" ? Theme.overlayRadius : 0
+        bottomRightRadius: bottomLeftRadius
     }
 
     Row {
@@ -37,5 +42,9 @@ Item {
         color: "transparent"
         border.color: Theme.border
         border.width: Theme.hairline
+        topLeftRadius: zone.edge === "top" ? 0 : Theme.overlayRadius
+        topRightRadius: topLeftRadius
+        bottomLeftRadius: zone.edge === "top" ? Theme.overlayRadius : 0
+        bottomRightRadius: bottomLeftRadius
     }
 }
