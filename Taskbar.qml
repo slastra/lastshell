@@ -57,8 +57,9 @@ ChipRow {
             readonly property string liveTitle: item?.title ?? ""
             readonly property string liveAppId: item?.appId ?? ""
             onLiveTitleChanged: if (item) title = liveTitle
-            onLiveAppIdChanged: if (item) iconSource = lookupIcon(liveAppId)
-            Component.onCompleted: { title = liveTitle; iconSource = lookupIcon(liveAppId) }
+            property string appId: ""
+            onLiveAppIdChanged: if (item) { appId = liveAppId; iconSource = lookupIcon(liveAppId) }
+            Component.onCompleted: { title = liveTitle; appId = liveAppId; iconSource = lookupIcon(liveAppId) }
 
             function lookupIcon(appId) {
                 // referencing .applications.values makes this re-evaluate
@@ -66,7 +67,9 @@ ChipRow {
                 // startup, BEFORE the scan finishes)
                 void DesktopEntries.applications.values
                 const e = DesktopEntries.heuristicLookup(appId)
-                return e?.icon ? Quickshell.iconPath(e.icon, "image-missing") : ""
+                // "" when the entry is missing or names an icon the theme
+                // does not have: the slot then draws a monogram instead
+                return e?.icon ? Quickshell.iconPath(e.icon, true) : ""
             }
             Connections {
                 target: DesktopEntries.applications
@@ -76,7 +79,12 @@ ChipRow {
             onClicked: item?.activate()
             onRightClicked: item?.fullscreen()
 
-            IconChipBody { slot: root.slot; source: task.iconSource }
+            IconChipBody {
+                slot: root.slot
+                source: task.iconSource
+                placeholder: true
+                fallback: task.appId || task.title
+            }
 
             ChipTip {
                 owner: task
