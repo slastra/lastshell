@@ -10,10 +10,7 @@ Item {
     implicitWidth: 12
     implicitHeight: 12
 
-    // on an accent fill: one flat color, the state still told by shape and motion
-    property bool inverse: false
     readonly property color tone:
-        inverse ? Theme.base :
         state === "waiting" ? Theme.warn :
         state === "busy" ? Theme.ok : Qt.alpha(Theme.text, 0.45)
 

@@ -1,12 +1,9 @@
 import QtQuick
 
 // One item in a bar zone: content on the zone's plate, no box of its own.
-// Hover fills its full height. `active` (the focused workspace, window, tab
-// or session) fills it in the accent, and content that follows `ink` turns
-// the background color to stay readable on it. A chip that only flashes
-// `active` for a beat (a title swap) sets `rule` and gets the lighter mark:
-// a 2 px accent line along the screen edge. `edge` names that edge: "top"
-// in the top bar, "bottom" in the bottom bar.
+// Hover fills its full height; `active` (the focused workspace, window, tab
+// or session) draws a 2 px rule in the accent along the screen edge.
+// `edge` names that edge: "top" in the top bar, "bottom" in the bottom bar.
 Rectangle {
     id: chip
 
@@ -16,7 +13,6 @@ Rectangle {
     // before it actually hides, and the zone closes over it in the same beat.
     property bool present: true
     property color accent: Theme.accent
-    property bool rule: false
     // set by the zone: this item sits at the plate's leading or trailing
     // end, so its fill rounds with the plate's corner there
     property bool capStart: false
@@ -28,9 +24,6 @@ Rectangle {
     onXChanged: recap()
     onWidthChanged: recap()
     onVisibleChanged: recap()
-    readonly property bool filled: active && !rule
-    // the color for text and glyphs on this chip
-    readonly property color ink: filled ? Theme.base : Theme.text
     property alias hovered: mouse.containsMouse
     // horizontal room around the content; 0 for content that carries its own
     property int contentPadding: 12
@@ -50,7 +43,7 @@ Rectangle {
     height: Theme.barHeight - 2
 
     color: "transparent"
-    Rectangle { // the hover and selection fill, kept inside the plate's
+    Rectangle { // the hover fill, kept inside the plate's
                 // hairline where the item touches it so a rounded corner
                 // shows no fringe of fill outside the frame
         anchors.fill: parent
@@ -62,7 +55,7 @@ Rectangle {
         topRightRadius: chip.capEnd && chip.edge !== "top" ? Theme.insetRadius : 0
         bottomLeftRadius: chip.capStart && chip.edge === "top" ? Theme.insetRadius : 0
         bottomRightRadius: chip.capEnd && chip.edge === "top" ? Theme.insetRadius : 0
-        color: chip.filled ? chip.accent : mouse.containsMouse ? Theme.overlay : Theme.clear(Theme.overlay)
+        color: mouse.containsMouse ? Theme.overlay : Theme.clear(Theme.overlay)
         Behavior on color { ColorAnimation { duration: Theme.animDuration } }
     }
 
@@ -105,7 +98,7 @@ Rectangle {
         height: 2
         y: chip.edge === "top" ? 0 : parent.height - height
         color: chip.accent
-        opacity: chip.active && chip.rule ? 1 : 0
+        opacity: chip.active ? 1 : 0
         Behavior on opacity { NumberAnimation { duration: Theme.animDuration } }
     }
 

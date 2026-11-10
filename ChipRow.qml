@@ -33,7 +33,7 @@ Item {
     }
 
     // Tell the items at either end of the plate to round with its corners,
-    // so a hover or selection fill does not poke past them. Items can sit
+    // so a hover fill does not poke past them. Items can sit
     // several levels down (a nested row, a Repeater), so this walks the
     // tree and asks each where it landed.
     // Items call this as they move or resize (the row's own transitions
@@ -47,7 +47,7 @@ Item {
         }
         const walk = it => {
             for (const c of it.children) {
-                if (c.capStart !== undefined && c.filled !== undefined) {
+                if (c.capStart !== undefined && c.capEnd !== undefined) {
                     if (!c.visible) continue
                     const x = c.mapToItem(zone, 0, 0).x
                     c.capStart = x < 1

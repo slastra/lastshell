@@ -2,7 +2,7 @@ import Quickshell.Hyprland
 import QtQuick
 
 // One Claude session: drawn state dot, label, agent-count badge, and a
-// rich hover card. The accent fill shows window focus (the shared active language).
+// rich hover card. The accent rule shows window focus (the shared active language).
 Chip {
     id: root
     required property var session
@@ -18,12 +18,10 @@ Chip {
         StateDot {
             anchors.verticalCenter: parent.verticalCenter
             state: root.session.state
-            inverse: root.filled
         }
 
         ValueText {
-            color: root.filled ? root.ink
-                 : root.session.state === "waiting" ? Theme.warn : Theme.text
+            color: root.session.state === "waiting" ? Theme.warn : Theme.text
             text: root.session.label
         }
 

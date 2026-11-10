@@ -12,7 +12,6 @@ Chip {
     clip: true
     // border lights up in the accent for the swap and eases back after
     active: swap.running
-    rule: true
 
     // the whole chip's width budget, set by the bar; the label gets it
     // less the chip's padding and border
