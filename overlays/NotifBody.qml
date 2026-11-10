@@ -38,6 +38,7 @@ Column {
         PopText {
             id: app
             text: appName
+            textFormat: Text.PlainText
             color: Qt.alpha(tone, 0.9)
             size: compact ? 11 : 12
             visible: text !== ""
@@ -51,12 +52,14 @@ Column {
     }
     PopText {
         text: summary
+        textFormat: Text.PlainText   // only the body may carry markup
         size: compact ? 14 : 15
         font.bold: true
         width: parent.width; elide: Text.ElideRight
     }
     PopText {
-        text: body
+        // StyledText folds a newline into a space; senders mean a line break
+        text: body.replace(/\n/g, "<br/>")
         dim: compact ? 0.65 : 0.75
         size: compact ? 12 : 13
         width: parent.width; wrapMode: Text.Wrap

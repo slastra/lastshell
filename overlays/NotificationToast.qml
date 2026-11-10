@@ -2,13 +2,18 @@ import Quickshell
 import QtQuick
 import ".."  // root module
 
-// One notification card. Urgency lives in the left accent bar and app-name
-// tone, not a full border — critical is loud, normal is present, low is
-// quiet. A countdown line drains along the bottom and pauses on hover;
-// cards slide in from the right.
+// One notification card. Urgency lives in the app name's tone and a faint
+// wash of it over the card: critical is loud, normal is present, low is
+// quiet. A countdown ring drains around the close button and waits while
+// the pointer is on the stack; cards slide in from the right.
 Rectangle {
     id: root
     required property var notif
+    required property string time
+    // bumped when the sender replaces the notification: the countdown restarts
+    required property int rev
+    // the pointer is on the stack: every countdown waits
+    property bool held: false
 
     readonly property int urgency: notif.urgency ?? 1
     readonly property color urgencyColor: body.tone
@@ -39,15 +44,31 @@ Rectangle {
     // the notification, which destroys this delegate mid-handler.
     signal actionChosen(var action)
 
+    // One clock for the card: the ring is drawn from `remaining` and the
+    // card leaves when it runs out, so the two cannot disagree. Stepped by
+    // a Timer, not animated: an animation would repaint the stack at display
+    // refresh for the whole life of every toast. Eco takes coarser steps.
+    property real remaining: 1
+    onRevChanged: remaining = 1
     Timer {
-        id: expiry
-        interval: root.timeout
-        running: !root.sticky && !hover.hovered
-        onTriggered: root.wantsOut(false)
+        // measured, not counted: a late tick still takes off the time it took
+        property double last: 0
+        interval: Eco.active ? 500 : 50
+        repeat: true
+        running: !root.sticky && !root.held && root.remaining > 0
+        onRunningChanged: last = Date.now()
+        onTriggered: {
+            const now = Date.now()
+            root.remaining = Math.max(0, root.remaining - (now - last) / root.timeout)
+            last = now
+            if (root.remaining === 0) root.wantsOut(false)
+        }
     }
-    HoverHandler { id: hover }
 
-    TapHandler { onTapped: root.activated() }
+    // The buttons inside take the press for themselves (WithinBounds is an
+    // exclusive grab, and one TapHandler does not take over from another),
+    // so a tap on one is not also a tap on the card.
+    TapHandler { gesturePolicy: TapHandler.WithinBounds; onTapped: root.activated() }
 
     Item { // close, with the countdown as a ring draining around it
         anchors.top: parent.top
@@ -56,21 +77,6 @@ Rectangle {
         anchors.rightMargin: 10
         z: 1
         width: 24; height: 24
-
-        property real remaining: 1
-        NumberAnimation on remaining {
-            id: drain
-            running: !root.sticky
-            from: 1; to: 0
-            duration: root.timeout
-        }
-        Connections {
-            target: hover
-            function onHoveredChanged() {
-                if (root.sticky) return
-                hover.hovered ? drain.pause() : drain.resume()
-            }
-        }
 
         Canvas {
             id: ring
@@ -84,16 +90,20 @@ Rectangle {
                 ctx.lineCap = "round"
                 ctx.strokeStyle = Qt.alpha(Theme.text, 0.15)
                 ctx.beginPath(); ctx.arc(c, c, r, 0, 2 * Math.PI); ctx.stroke()
-                if (parent.remaining > 0) {
+                if (root.remaining > 0) {
                     ctx.strokeStyle = Qt.alpha(root.urgencyColor, 0.8)
                     ctx.beginPath()
                     ctx.arc(c, c, r, -Math.PI / 2,
-                            -Math.PI / 2 + 2 * Math.PI * parent.remaining)
+                            -Math.PI / 2 + 2 * Math.PI * root.remaining)
                     ctx.stroke()
                 }
             }
         }
-        onRemainingChanged: ring.requestPaint()
+        Connections {
+            target: root
+            function onRemainingChanged() { ring.requestPaint() }
+            function onUrgencyColorChanged() { ring.requestPaint() }
+        }
 
         Text {
             anchors.centerIn: parent
@@ -103,7 +113,7 @@ Rectangle {
             text: "✕"; color: Qt.alpha(Theme.text, 0.55)
             font.pixelSize: 12
         }
-        TapHandler { onTapped: root.wantsOut(true) }
+        TapHandler { gesturePolicy: TapHandler.WithinBounds; onTapped: root.wantsOut(true) }
     }
 
     Column {
@@ -134,7 +144,7 @@ Rectangle {
                 id: body
                 width: headRow.width - (appImage.visible ? appImage.width + headRow.spacing : 0) - 28
                 notif: root.notif
-                time: Qt.formatTime(new Date(), "hh:mm AP")
+                time: root.time
             }
         }
 
@@ -163,7 +173,7 @@ Rectangle {
                         text: parent.modelData.text
                         color: Theme.iris; font.family: Theme.fontFamily; font.pixelSize: 12
                     }
-                    TapHandler { onTapped: root.actionChosen(parent.modelData) }
+                    TapHandler { gesturePolicy: TapHandler.WithinBounds; onTapped: root.actionChosen(parent.modelData) }
                 }
             }
         }
