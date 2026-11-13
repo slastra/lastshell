@@ -73,7 +73,7 @@ Chip {
             visible: root.stale
             width: parent.width
             wrapMode: Text.WordWrap
-            text: "No frames from the LD2410C. Keyboard and mouse idle decides the screen alone."
+            text: `No frames from the ${Host.desk ? "LD2410C" : "presence sensor"}. Keyboard and mouse idle decides the screen alone.`
             color: Qt.alpha(Theme.crit, 0.9)
             size: 12
         }
