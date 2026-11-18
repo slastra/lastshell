@@ -11,13 +11,18 @@ SearchOverlay {
     id: root
 
     typeIcon: "app-window"
+    hint: "↑↓ navigate   ↵ open   del close tab   esc close"
     property var raw: []
+    // LASTSHELL_TABSTRIP points the modal at a stand-in for harness runs,
+    // where Delete must not reach real browser tabs.
+    readonly property string tabstrip: Quickshell.env("LASTSHELL_TABSTRIP")
+        || Quickshell.env("HOME") + "/.local/bin/tabstrip"
 
     onOpenChanged: if (open) lister.running = true
 
     JsonProcess {
         id: lister
-        command: [Quickshell.env("HOME") + "/.local/bin/tabstrip", "list"]
+        command: [root.tabstrip, "list"]
         onResult: tabs => root.raw = tabs
     }
 
@@ -51,7 +56,17 @@ SearchOverlay {
         if (item.cmd)
             Apps.launch(item.cmd)
         else
-            Quickshell.execDetached(
-                [Quickshell.env("HOME") + "/.local/bin/tabstrip", "activate", item.key])
+            Quickshell.execDetached([root.tabstrip, "activate", item.key])
+    }
+
+    // Delete closes the tab under the cursor. The row goes at once and the
+    // list is not fetched again while the modal is up: closing the tab you
+    // were on makes the browser pick another, a fresh list would re-sort
+    // around it, and a second Delete could then land on a row that moved
+    // under the cursor. The next summon lists from scratch.
+    onRemoveRequested: item => {
+        if (item.cmd) return   // "+ New window" rows are not tabs
+        raw = raw.filter(t => t.id !== item.key)
+        Quickshell.execDetached([root.tabstrip, "close", item.key])
     }
 }

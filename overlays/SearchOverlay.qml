@@ -21,6 +21,10 @@ Overlay {
     property int scope: 0
     onScopeChanged: cursor = 0
     signal activated(var item)
+    // Delete on the row under the cursor. The overlay stays open, so a
+    // caller that drops the row from `items` lets several go in a row;
+    // one that ignores the signal makes the key a no-op.
+    signal removeRequested(var item)
 
     cardWidth: 560
     contentPadding: 2  // sections run full-bleed inside the card border
@@ -51,6 +55,8 @@ Overlay {
     }
     property int cursor: 0
     onQueryChanged: cursor = 0
+    // a row removed from under the cursor: stay on the last one left
+    onFilteredChanged: if (cursor >= filtered.length) cursor = Math.max(0, filtered.length - 1)
     onOpenChanged: if (open) { query = ""; cursor = 0 }
 
     function activate() {
@@ -76,6 +82,13 @@ Overlay {
                 root.cursor = Math.max(0, root.cursor - 1)
             else if (event.key === Qt.Key_Backspace)
                 root.query = root.query.slice(0, -1)
+            else if (event.key === Qt.Key_Delete) { // its text is 0x7f: keep it out of the query
+                if (root.filtered[root.cursor]) {
+                    list.keepY = list.contentY
+                    root.removeRequested(root.filtered[root.cursor])
+                    Qt.callLater(list.forgetY)   // a caller that kept the row: nothing to restore
+                }
+            }
             else if (event.text && event.text >= " ")
                 root.query += event.text
             else
@@ -139,13 +152,31 @@ Overlay {
                 keyNavigationEnabled: false
                 boundsBehavior: Flickable.StopAtBounds
 
+                // A JS-array model changes by full reset, which sends the
+                // view back to its first row and the top of the list. After
+                // one, put the cursor row back (the currentIndex binding does
+                // not re-fire for a cursor that did not move). After a Delete
+                // put the scroll offset back too, and skip the glide so the
+                // outline does not fly down from row one.
+                property real keepY: -1
+                property bool settling: false
+                function forgetY() { keepY = -1 }
+                function resync() {
+                    settling = true
+                    if (keepY >= 0)
+                        contentY = Math.max(0, Math.min(keepY, contentHeight - height))
+                    currentIndex = Qt.binding(() => root.cursor)
+                    settling = false
+                }
+                onModelChanged: Qt.callLater(resync)
+
                 highlight: Rectangle {
                     radius: Theme.innerRadius
                     color: Theme.overlay
                     border.width: Theme.hairline
                     border.color: Qt.alpha(Theme.accent, 0.8)
                 }
-                highlightMoveDuration: 110
+                highlightMoveDuration: settling ? 0 : 110
                 highlightResizeDuration: 0
                 highlightRangeMode: ListView.ApplyRange
                 preferredHighlightBegin: root.rowH
